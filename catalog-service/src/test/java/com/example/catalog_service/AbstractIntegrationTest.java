@@ -1,22 +1,16 @@
 package com.example.catalog_service;
 
-import com.example.catalog_service.dto.PagedResult;
-import com.example.catalog_service.dto.ProductCreationResponse;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.r2dbc.core.DatabaseClient;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.test.StepVerifier;
-
-import java.time.Duration;
-import java.util.Arrays;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -27,9 +21,11 @@ public abstract class AbstractIntegrationTest {
 
     @Autowired
     private DatabaseClient databaseClient;
-    private static final String TEST_DATA = """
+
+    private static final String TEST_DATA =
+            """
             truncate table products;
-            
+
             insert into products(code, name, description, image_url, price) values
                                                                                 ('P100','The Hunger Games','Winning will make you famous. Losing means certain death...','https://images.gr-assets.com/books/1447303603l/2767052.jpg', 34.0),
                                                                                 ('P101','To Kill a Mockingbird','The unforgettable novel of a childhood in a sleepy Southern town and the crisis of conscience that rocked it...','https://images.gr-assets.com/books/1361975680l/2657.jpg', 45.40),
@@ -55,14 +51,12 @@ public abstract class AbstractIntegrationTest {
         Arrays.stream(TEST_DATA.split(";"))
                 .map(String::trim)
                 .filter(sql -> !sql.isEmpty())
-                .forEach(sql ->
-                        databaseClient.sql(sql)
-                                .fetch()
-                                .rowsUpdated()
-                                .as(StepVerifier::create)
-                                .expectNextCount(1)
-                                .verifyComplete()
-                );
+                .forEach(sql -> databaseClient
+                        .sql(sql)
+                        .fetch()
+                        .rowsUpdated()
+                        .as(StepVerifier::create)
+                        .expectNextCount(1)
+                        .verifyComplete());
     }
-
 }

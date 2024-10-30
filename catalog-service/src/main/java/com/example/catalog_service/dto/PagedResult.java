@@ -1,8 +1,7 @@
 package com.example.catalog_service.dto;
 
-import lombok.Builder;
-
 import java.util.List;
+import lombok.Builder;
 
 @Builder
 public record PagedResult<T>(
@@ -13,7 +12,4 @@ public record PagedResult<T>(
         boolean isFirst,
         boolean isLast,
         boolean hasNext,
-        boolean hasPrevious
-) {
-
-}
+        boolean hasPrevious) {}

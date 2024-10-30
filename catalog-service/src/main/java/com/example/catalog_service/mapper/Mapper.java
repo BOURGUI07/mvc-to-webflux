@@ -1,11 +1,9 @@
 package com.example.catalog_service.mapper;
 
-
 import com.example.catalog_service.domain.Product;
 import com.example.catalog_service.dto.PagedResult;
 import com.example.catalog_service.dto.ProductCreationRequest;
 import com.example.catalog_service.dto.ProductCreationResponse;
-
 import java.util.List;
 
 public class Mapper {
@@ -30,10 +28,11 @@ public class Mapper {
                 .build();
     }
 
-    public static PagedResult<ProductCreationResponse> toPagedResult(List<ProductCreationResponse> data, long count, int page, int size){
-        int totalPages = (int)Math.ceil((double)count / size);
-        var isFirst = page==0;
-        var isLast = page==totalPages-1;
+    public static PagedResult<ProductCreationResponse> toPagedResult(
+            List<ProductCreationResponse> data, long count, int page, int size) {
+        int totalPages = (int) Math.ceil((double) count / size);
+        var isFirst = page == 0;
+        var isLast = page == totalPages - 1;
         return PagedResult.<ProductCreationResponse>builder()
                 .data(data)
                 .totalPages(totalPages)
@@ -42,7 +41,7 @@ public class Mapper {
                 .hasPrevious(!isFirst)
                 .isFirst(isFirst)
                 .isLast(isLast)
-                .pageNumber(page+1)
+                .pageNumber(page + 1)
                 .build();
     }
 }
