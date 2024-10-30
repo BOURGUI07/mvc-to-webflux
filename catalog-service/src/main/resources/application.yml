@@ -8,14 +8,17 @@ catalog:
     logging:
       level:
         root: INFO
-        spring: WARN
+        spring: INFO
         flyway: INFO
         r2dbc: INFO
         netty: INFO
         reactor: INFO
         reactive: INFO
         webflux: INFO
-        service: WARN
+        service: INFO
+    default:
+      page:
+        size: 10
 
 db:
   url:
@@ -28,24 +31,24 @@ db:
 
 spring:
   application:
-    name: ${catalog.service.name}
+    name: ${catalog.service.name:catalog-service}
   r2dbc:
-    url: ${db.url.r2dbc}
-    username: ${db.username}
-    password: ${db.password}
+    url: ${db.url.r2dbc:r2dbc:postgresql://localhost:5432/catalog_db}
+    username: ${db.username:user}
+    password: ${db.password:password}
     pool:
       max-size: 10
       initial-size: 5
       max-create-connection-time: 2s
   flyway:
-    url: ${db.url.flyway}
-    user: ${db.username}
-    password: ${db.password}
+    url: ${db.url.flyway:jdbc:postgresql://localhost:5432/catalog_db}
+    user: ${db.username:user}
+    password: ${db.password:password}
 
 ########### SERVER CONFIGURATION #############
 
 server:
-  port: ${catalog.service.port}
+  port: ${catalog.service.port:8081}
   shutdown: graceful
   netty:
     connection-timeout: 2s
@@ -76,20 +79,20 @@ management:
     tags:
       application: ${spring.application.name}
   server:
-    port: ${catalog.service.actuator.port}
+    port: ${catalog.service.actuator.port:9081}
 
 ############## LOGGING CONFIGURATION ################
 logging:
   level:
-    root: ${catalog.service.logging.level.root}
-    org.springframework: ${catalog.service.logging.level.spring}
-    org.springframework.web.reactive: ${catalog.service.logging.level.reactive}
-    org.springframework.web: ${catalog.service.logging.level.webflux}
-    io.netty: ${catalog.service.logging.level.netty}
-    io.r2dbc: ${catalog.service.logging.level.r2dbc}
-    org.flywaydb: ${catalog.service.logging.level.flyway}
-    reactor: ${catalog.service.logging.level.reactor}
-    com.example.catalog_service: ${catalog.service.logging.level.service}
+    root: ${catalog.service.logging.level.root:INFO}
+    org.springframework: ${catalog.service.logging.level.spring:INFO}
+    org.springframework.web.reactive: ${catalog.service.logging.level.reactive:INFO}
+    org.springframework.web: ${catalog.service.logging.level.webflux:INFO}
+    io.netty: ${catalog.service.logging.level.netty:INFO}
+    io.r2dbc: ${catalog.service.logging.level.r2dbc:INFO}
+    org.flywaydb: ${catalog.service.logging.level.flyway:INFO}
+    reactor: ${catalog.service.logging.level.reactor:INFO}
+    com.example.catalog_service: ${catalog.service.logging.level.service:INFO}
 
 
 
