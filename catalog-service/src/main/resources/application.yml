@@ -1,0 +1,70 @@
+############# Externalized Configuration ##############
+catalog:
+  service:
+    name: catalog-service
+    port: 8081
+    actuator:
+      port: 9081
+db:
+  url:
+    r2dbc: r2dbc:postgresql://localhost:5432/catalog_db
+    flyway: jdbc:postgresql://localhost:5432/catalog_db
+  username: user
+  password: password
+
+############# SPRING CONFIGURATION ###############
+
+spring:
+  application:
+    name: ${catalog.service.name}
+  r2dbc:
+    url: ${db.url.r2dbc}
+    username: ${db.username}
+    password: ${db.password}
+    pool:
+      max-size: 10
+      initial-size: 5
+      max-create-connection-time: 2s
+  flyway:
+    url: ${db.url.flyway}
+    user: ${db.username}
+    password: ${db.password}
+
+########### SERVER CONFIGURATION #############
+
+server:
+  port: ${catalog.service.port}
+  shutdown: graceful
+  netty:
+    connection-timeout: 2s
+    idle-timeout: 15s
+
+############ ACTUATOR CONFIGURATION #############
+management:
+  endpoints:
+    web:
+      exposure:
+        include: *
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState
+  info:
+    git:
+      enabled: true
+      mode: full
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  server:
+    port: ${catalog.service.actuator.port}
+
+
+
