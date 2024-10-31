@@ -10,5 +10,6 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface ProductRepo extends ReactiveCrudRepository<Product, Long> {
     Flux<Product> findBy(Pageable pageable);
+
     Mono<Product> findByCodeIgnoreCase(String code);
 }

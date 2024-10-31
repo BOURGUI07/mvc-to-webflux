@@ -29,7 +29,7 @@
 	</scm>
 	<properties>
 		<spotless-maven-plugin.version>2.43.0</spotless-maven-plugin.version>
-		<java.version>22</java.version>
+		<java.version>21</java.version>
 	</properties>
 	<dependencies>
 		<dependency>

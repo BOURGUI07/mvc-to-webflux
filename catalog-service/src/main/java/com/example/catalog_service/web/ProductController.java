@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static reactor.core.publisher.Operators.as;
-
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
@@ -35,8 +33,7 @@ public class ProductController {
 
     @GetMapping("/{code}")
     public Mono<ProductCreationResponse> getProduct(@PathVariable String code) {
-         log.info("..........Web Layer::Get Product by Code: {}.............",code);
-               return   service.findByCode(code);
-
+        log.info("..........Web Layer::Get Product by Code: {}.............", code);
+        return service.findByCode(code);
     }
 }

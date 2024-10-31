@@ -6,7 +6,6 @@ import com.example.catalog_service.dto.PagedResult;
 import com.example.catalog_service.dto.ProductCreationResponse;
 import java.math.BigDecimal;
 import java.net.URI;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
@@ -85,10 +84,10 @@ public class CatalogServiceGetRequestTests extends AbstractIntegrationTest {
                 .as(StepVerifier::create)
                 .assertNext(response -> {
                     assertEquals("Product Not Found", response.getTitle());
-                    assertEquals("Product with code p999 not found",response.getDetail());
-                    assertEquals(HttpStatus.NOT_FOUND.value(),response.getStatus());
-                    assertEquals("RESOURCE_NOT_FOUND",response.getProperties().get("errorCategory"));
-                    assertEquals(URI.create("/api/products/p999"),response.getInstance());
+                    assertEquals("Product with code p999 not found", response.getDetail());
+                    assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
+                    assertEquals("RESOURCE_NOT_FOUND", response.getProperties().get("errorCategory"));
+                    assertEquals(URI.create("/api/products/p999"), response.getInstance());
                 })
                 .verifyComplete();
     }
@@ -105,12 +104,10 @@ public class CatalogServiceGetRequestTests extends AbstractIntegrationTest {
                 .as(StepVerifier::create)
                 .assertNext(response -> {
                     assertEquals("General Error", response.getTitle());
-                    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(),response.getStatus());
-                    assertEquals("GENERAL_ERROR",response.getProperties().get("errorCategory"));
-                    assertEquals(URI.create("/api/products/p999/99"),response.getInstance());
+                    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatus());
+                    assertEquals("GENERAL_ERROR", response.getProperties().get("errorCategory"));
+                    assertEquals(URI.create("/api/products/p999/99"), response.getInstance());
                 })
                 .verifyComplete();
     }
-
-
 }

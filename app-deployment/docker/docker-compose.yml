@@ -20,6 +20,29 @@ services:
     networks:
       - app-network
 
+  catalog-service:
+    image: youness544/bookstore-catalog-service
+    container_name: catalog-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_URL_R2DBC=r2dbc:postgresql://book-postgres:5432/catalog_db
+      - DB_URL_FLYWAY=jdbc:postgresql://book-postgres:5432/catalog_db
+      - DB_USERNAME=user
+      - DB_PASSWORD=password
+    ports:
+      - "8081:8081"
+      - "9081:9081" #actuator port
+    restart: unless-stopped
+    depends_on:
+      book-postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
