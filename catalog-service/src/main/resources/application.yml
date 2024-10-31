@@ -16,9 +16,9 @@ catalog:
         reactive: INFO
         webflux: INFO
         service: INFO
-    default:
-      page:
-        size: 10
+    defaultPageSize: 10
+    exceptionNotFound: https://api.bookstore.com/errors/not-found
+    exceptionGeneral: https://api.bookstore.com/errors/general
 
 db:
   url:
