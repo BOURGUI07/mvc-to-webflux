@@ -1,13 +1,7 @@
-package com.example.catalog_service.advice;
+package com.example.order_service.advice;
 
-import com.example.catalog_service.dto.CatalogServiceProperties;
-import com.example.catalog_service.exceptions.InvalidProductRequestException;
-import com.example.catalog_service.exceptions.ProductNotFoundException;
-import java.net.URI;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
+import com.example.order_service.dto.OrderServiceProperties;
+import com.example.order_service.exceptions.OrderNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -15,24 +9,22 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ServerWebExchange;
 
+import java.net.URI;
+import java.time.Instant;
+
 @ControllerAdvice
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
-    private final CatalogServiceProperties properties;
+    private final OrderServiceProperties properties;
 
     private ProblemDetail handleException(
             Exception ex, HttpStatus status, String title, String errorCategory, URI type, ServerWebExchange exchange) {
         var problemDetail = ProblemDetail.forStatusAndDetail(status, ex.getMessage());
         problemDetail.setTitle(title);
-
         String path = exchange.getRequest().getPath().value();
         var method = exchange.getRequest().getMethod().name();
-
-        var date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
-
-
         problemDetail.setInstance(URI.create(path));
-        problemDetail.setProperty("date", date);
+        problemDetail.setProperty("timestamp", Instant.now());
         problemDetail.setProperty("errorCategory", errorCategory);
         problemDetail.setProperty("service", properties.name());
         problemDetail.setType(type);
@@ -51,25 +43,14 @@ public class GlobalExceptionHandler {
                 exchange);
     }
 
-    @ExceptionHandler(ProductNotFoundException.class)
-    public ProblemDetail handleProductNotFoundException(ProductNotFoundException ex, ServerWebExchange exchange) {
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ProblemDetail handleProductNotFoundException(OrderNotFoundException ex, ServerWebExchange exchange) {
         return handleException(
                 ex,
                 HttpStatus.NOT_FOUND,
-                "Product Not Found",
+                "Order Not Found",
                 "RESOURCE_NOT_FOUND",
                 properties.exceptionNotFound(),
-                exchange);
-    }
-
-    @ExceptionHandler(InvalidProductRequestException.class)
-    public ProblemDetail handleInvalidRequest(InvalidProductRequestException ex, ServerWebExchange exchange) {
-        return handleException(
-                ex,
-                HttpStatus.BAD_REQUEST,
-                "Invalid Product Request",
-                "INVALID_REQUEST",
-                properties.exceptionBadRequest(),
                 exchange);
     }
 }

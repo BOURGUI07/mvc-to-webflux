@@ -3,9 +3,10 @@ package com.example.catalog_service;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.catalog_service.dto.PagedResult;
-import com.example.catalog_service.dto.ProductCreationResponse;
 import java.math.BigDecimal;
 import java.net.URI;
+
+import com.example.catalog_service.dto.ProductResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import reactor.test.StepVerifier;
 
-public class CatalogServiceGetRequestTests extends AbstractIntegrationTest {
+public class GetRequestTests extends AbstractIntegrationTest {
 
     @Test
     void textGetProducts() {
@@ -22,7 +23,7 @@ public class CatalogServiceGetRequestTests extends AbstractIntegrationTest {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .returnResult(new ParameterizedTypeReference<PagedResult<ProductCreationResponse>>() {})
+                .returnResult(new ParameterizedTypeReference<PagedResult<ProductResponse>>() {})
                 .getResponseBody()
                 .as(StepVerifier::create)
                 .assertNext(response -> {
@@ -44,7 +45,7 @@ public class CatalogServiceGetRequestTests extends AbstractIntegrationTest {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .returnResult(ProductCreationResponse.class)
+                .returnResult(ProductResponse.class)
                 .getResponseBody()
                 .collectList()
                 .as(StepVerifier::create)
@@ -61,7 +62,7 @@ public class CatalogServiceGetRequestTests extends AbstractIntegrationTest {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .returnResult(ProductCreationResponse.class)
+                .returnResult(ProductResponse.class)
                 .getResponseBody()
                 .as(StepVerifier::create)
                 .assertNext(response -> {
@@ -88,6 +89,7 @@ public class CatalogServiceGetRequestTests extends AbstractIntegrationTest {
                     assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
                     assertEquals("RESOURCE_NOT_FOUND", response.getProperties().get("errorCategory"));
                     assertEquals(URI.create("/api/products/p999"), response.getInstance());
+                    assertEquals("GET",response.getProperties().get("httpMethod"));
                 })
                 .verifyComplete();
     }
@@ -107,7 +109,10 @@ public class CatalogServiceGetRequestTests extends AbstractIntegrationTest {
                     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatus());
                     assertEquals("GENERAL_ERROR", response.getProperties().get("errorCategory"));
                     assertEquals(URI.create("/api/products/p999/99"), response.getInstance());
+                    assertEquals("GET",response.getProperties().get("httpMethod"));
                 })
                 .verifyComplete();
     }
+
+
 }

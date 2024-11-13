@@ -1,7 +1,10 @@
 package com.example.catalog_service.web;
 
+import com.example.catalog_service.domain.Product;
 import com.example.catalog_service.dto.PagedResult;
-import com.example.catalog_service.dto.ProductCreationResponse;
+import com.example.catalog_service.dto.ProductCreationRequest;
+import com.example.catalog_service.dto.ProductResponse;
+import com.example.catalog_service.dto.ProductUpdateRequest;
 import com.example.catalog_service.service.ProductService;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
@@ -19,21 +22,40 @@ public class ProductController {
     private final ProductService service;
 
     @GetMapping
-    public Mono<PagedResult<ProductCreationResponse>> getProducts(
+    public Mono<PagedResult<ProductResponse>> getProducts(
             @RequestParam(defaultValue = "1", required = false) int page) {
-        log.info("........Web Layer::Get Products Of Page: {}..........", page);
-        return service.getProducts(page);
+        return service.getProducts(page)
+                .doFirst(()->log.info("........Web Layer::Get Products Of Page: {}..........", page));
     }
 
     @GetMapping(value = "/stream/{maxPrice}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ProductCreationResponse> streamProducts(@PathVariable BigDecimal maxPrice) {
-        log.info("..........Web Layer::Get Products Stream of Max Price: {}............", maxPrice);
-        return service.getProductStream(maxPrice);
+    public Flux<ProductResponse> streamProducts(@PathVariable BigDecimal maxPrice) {
+        return service.getProductStream(maxPrice)
+                .doFirst(()-> log.info("..........Web Layer::Get Products Stream of Max Price: {}............", maxPrice));
     }
 
     @GetMapping("/{code}")
-    public Mono<ProductCreationResponse> getProduct(@PathVariable String code) {
-        log.info("..........Web Layer::Get Product by Code: {}.............", code);
-        return service.findByCode(code);
+    public Mono<ProductResponse> getProduct(@PathVariable String code) {
+        return service.findByCode(code)
+                .doFirst(()->log.info("..........Web Layer::Get Product by Code: {}.............", code));
+    }
+
+
+    @PostMapping
+    public Mono<ProductResponse> create(@RequestBody Mono<ProductCreationRequest> request) {
+        return service.createProduct(request)
+                .doFirst(()->log.info("..........Web Layer::Create Product : {}", request));
+    }
+
+    @PutMapping("/{code}")
+    public Mono<ProductResponse> update(@PathVariable String code,@RequestBody Mono<ProductUpdateRequest> request) {
+        return service.update(code, request)
+                .doFirst(()->log.info("..........Web Layer::Update Product With Code: {}", code));
+    }
+
+    @DeleteMapping("/{code}")
+    public Mono<Void> delete(@PathVariable String code) {
+        return service.deleteByCode(code)
+                .doFirst(()->log.info("..........Web Layer::Delete Product With Code: {}", code));
     }
 }

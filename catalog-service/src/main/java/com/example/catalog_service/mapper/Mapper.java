@@ -3,12 +3,14 @@ package com.example.catalog_service.mapper;
 import com.example.catalog_service.domain.Product;
 import com.example.catalog_service.dto.PagedResult;
 import com.example.catalog_service.dto.ProductCreationRequest;
-import com.example.catalog_service.dto.ProductCreationResponse;
+import com.example.catalog_service.dto.ProductResponse;
+
 import java.util.List;
+import java.util.function.Function;
 
 public class Mapper {
-    public static Product toEntity(ProductCreationRequest request) {
-        return Product.builder()
+    public static Function<ProductCreationRequest,Product> toEntity( ) {
+        return request -> Product.builder()
                 .code(request.code())
                 .name(request.name())
                 .description(request.description())
@@ -17,8 +19,8 @@ public class Mapper {
                 .build();
     }
 
-    public static ProductCreationResponse toDto(Product entity) {
-        return ProductCreationResponse.builder()
+    public static Function<Product, ProductResponse> toDto() {
+        return entity -> ProductResponse.builder()
                 .code(entity.getCode())
                 .name(entity.getName())
                 .description(entity.getDescription())
@@ -28,12 +30,12 @@ public class Mapper {
                 .build();
     }
 
-    public static PagedResult<ProductCreationResponse> toPagedResult(
-            List<ProductCreationResponse> data, long count, int page, int size) {
+    public static PagedResult<ProductResponse> toPagedResult(
+            List<ProductResponse> data, long count, int page, int size) {
         int totalPages = (int) Math.ceil((double) count / size);
         var isFirst = page == 0;
         var isLast = page == totalPages - 1;
-        return PagedResult.<ProductCreationResponse>builder()
+        return PagedResult.<ProductResponse>builder()
                 .data(data)
                 .totalPages(totalPages)
                 .totalElements(count)

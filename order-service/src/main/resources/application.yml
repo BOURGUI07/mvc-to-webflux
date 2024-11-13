@@ -1,10 +1,10 @@
 ############# Externalized Configuration ##############
-catalog:
+order:
   service:
-    name: catalog-service
-    port: 8081
+    name: order-service
+    port: 8082
     actuator:
-      port: 9081
+      port: 9082
     logging:
       level:
         root: INFO
@@ -19,22 +19,29 @@ catalog:
     defaultPageSize: 10
     exceptionNotFound: https://api.bookstore.com/errors/not-found
     exceptionGeneral: https://api.bookstore.com/errors/general
-    exceptionBadRequest: https://api.bookstore.com/errors/bad-request
 
 db:
   url:
-    r2dbc: r2dbc:postgresql://localhost:5432/catalog_db
-    flyway: jdbc:postgresql://localhost:5432/catalog_db
+    r2dbc: r2dbc:postgresql://localhost:5432/order_db
+    flyway: jdbc:postgresql://localhost:5432/order_db
   username: user
   password: password
+
+rabbitmq:
+  username: user
+  password: password
+  host: localhost
+  port: 5672
 
 ############# SPRING CONFIGURATION ###############
 
 spring:
   application:
-    name: ${catalog.service.name:catalog-service}
+    name: ${order.service.name:order-service}
+
+############## DATABASE CONFIGURATION ################
   r2dbc:
-    url: ${db.url.r2dbc:r2dbc:postgresql://localhost:5432/catalog_db}
+    url: ${db.url.r2dbc:r2dbc:postgresql://localhost:5432/order_db}
     username: ${db.username:user}
     password: ${db.password:password}
     pool:
@@ -42,14 +49,23 @@ spring:
       initial-size: 5
       max-create-connection-time: 2s
   flyway:
-    url: ${db.url.flyway:jdbc:postgresql://localhost:5432/catalog_db}
+    url: ${db.url.flyway:jdbc:postgresql://localhost:5432/order_db}
     user: ${db.username:user}
     password: ${db.password:password}
+
+
+############# RABBITMQ CONFIGURATION #############
+  rabbitmq:
+    username: ${rabbitmq.username:user}
+    password: ${rabbitmq.password:password}
+    host: ${rabbitmq.host:localhost}
+    port: ${rabbitmq.port:5672}
+
 
 ########### SERVER CONFIGURATION #############
 
 server:
-  port: ${catalog.service.port:8081}
+  port: ${order.service.port:8082}
   shutdown: graceful
   netty:
     connection-timeout: 2s
@@ -80,20 +96,20 @@ management:
     tags:
       application: ${spring.application.name}
   server:
-    port: ${catalog.service.actuator.port:9081}
+    port: ${order.service.actuator.port:9082}
 
 ############## LOGGING CONFIGURATION ################
 logging:
   level:
-    root: ${catalog.service.logging.level.root:INFO}
-    org.springframework: ${catalog.service.logging.level.spring:INFO}
-    org.springframework.web.reactive: ${catalog.service.logging.level.reactive:INFO}
-    org.springframework.web: ${catalog.service.logging.level.webflux:INFO}
-    io.netty: ${catalog.service.logging.level.netty:INFO}
-    io.r2dbc: ${catalog.service.logging.level.r2dbc:INFO}
-    org.flywaydb: ${catalog.service.logging.level.flyway:INFO}
-    reactor: ${catalog.service.logging.level.reactor:INFO}
-    com.example.catalog_service: ${catalog.service.logging.level.service:INFO}
+    root: ${order.service.logging.level.root:INFO}
+    org.springframework: ${order.service.logging.level.spring:INFO}
+    org.springframework.web.reactive: ${order.service.logging.level.reactive:INFO}
+    org.springframework.web: ${order.service.logging.level.webflux:INFO}
+    io.netty: ${order.service.logging.level.netty:INFO}
+    io.r2dbc: ${order.service.logging.level.r2dbc:INFO}
+    org.flywaydb: ${order.service.logging.level.flyway:INFO}
+    reactor: ${order.service.logging.level.reactor:INFO}
+    com.example.catalog_service: ${order.service.logging.level.service:INFO}
 
 
 

@@ -10,5 +10,7 @@ public record CatalogServiceProperties(
         @DefaultValue("catalog-service") String name,
         @DefaultValue("https://api.bookstore.com/errors/not-found")
         URI exceptionNotFound,
+        @DefaultValue("https://api.bookstore.com/errors/bad-request")
+        URI exceptionBadRequest,
         @DefaultValue("https://api.bookstore.com/errors/general")
         URI exceptionGeneral) {}

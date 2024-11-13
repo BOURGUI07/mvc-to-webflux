@@ -20,6 +20,34 @@ services:
     networks:
       - app-network
 
+
+  book-rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: book-rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - app-network
+    volumes:
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 500m
+
+
+
+
+
+
+
+
   catalog-service:
     image: youness544/bookstore-catalog-service
     container_name: catalog-service
