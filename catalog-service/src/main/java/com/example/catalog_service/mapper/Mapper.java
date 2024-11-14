@@ -1,11 +1,10 @@
 package com.example.catalog_service.mapper;
 
 import com.example.catalog_service.domain.Product;
-import com.example.catalog_service.dto.PagedResult;
-import com.example.catalog_service.dto.ProductCreationRequest;
-import com.example.catalog_service.dto.ProductResponse;
+import com.example.catalog_service.dto.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 public class Mapper {
@@ -44,6 +43,16 @@ public class Mapper {
                 .isFirst(isFirst)
                 .isLast(isLast)
                 .pageNumber(page + 1)
+                .build();
+    }
+
+
+    public static Function<ProductUpdateRequest, OptionalProductUpdateRequest> toOptional(){
+        return request -> OptionalProductUpdateRequest.builder()
+                .description(Optional.ofNullable(request.description()))
+                .imageUrl(Optional.ofNullable(request.imageUrl()))
+                .price(Optional.ofNullable(request.price()))
+                .name(Optional.ofNullable(request.name()))
                 .build();
     }
 }

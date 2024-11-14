@@ -10,35 +10,30 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 @Service
-public class CreationRequestValidator extends RequestValidator<ProductCreationRequest> {
+public class CreationRequestValidator {
 
 
-    @Override
-    public Predicate<ProductCreationRequest> hasName() {
+    public static Predicate<ProductCreationRequest> hasName() {
         return dto -> Objects.nonNull(dto.name());
     }
 
-    @Override
-    public Predicate<ProductCreationRequest> hasValidPrice() {
+    public static Predicate<ProductCreationRequest> hasValidPrice() {
         return dto -> Objects.nonNull(dto.price()) && dto.price().doubleValue() > 0;
     }
 
-    @Override
-    public Predicate<ProductCreationRequest> hasDescription() {
+    public static Predicate<ProductCreationRequest> hasDescription() {
         return dto -> Objects.nonNull(dto.description());
     }
 
-    @Override
-    public Predicate<ProductCreationRequest> hasImageUrl() {
+    public static Predicate<ProductCreationRequest> hasImageUrl() {
         return dto -> Objects.nonNull(dto.imageUrl());
     }
 
-    public Predicate<ProductCreationRequest> hasCode() {
+    public static Predicate<ProductCreationRequest> hasCode() {
         return dto -> Objects.nonNull(dto.code());
     }
 
-    @Override
-    public UnaryOperator<Mono<ProductCreationRequest>> validate(){
+    public static UnaryOperator<Mono<ProductCreationRequest>> validate(){
         return dto -> dto
                 .filter(hasCode())
                 .switchIfEmpty(ApplicationsExceptions.invalidRequest("Product Code is Required"))

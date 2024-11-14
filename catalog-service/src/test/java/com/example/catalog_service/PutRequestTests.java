@@ -19,58 +19,6 @@ public class PutRequestTests extends AbstractPutRequestTests{
         this.validUpdateRequest().apply(request,"p100");
     }
 
-    @Test
-    void invalidPrice(){
-        var request = ProductUpdateRequest.builder()
-                .name("TestName")
-                .description("TestDescription")
-                .price(new BigDecimal("0.00"))
-                .imageUrl("testImageUrl.jpg")
-                .build();
-
-        var detail = "Product Price is Invalid";
-        var title = "Invalid Product Request";
-        this.invalidUpdateRequest(request,"p100",detail,title);
-    }
-
-    @Test
-    void nullImageUrl(){
-        var request = ProductUpdateRequest.builder()
-                .name("TestName")
-                .description("TestDescription")
-                .price(new BigDecimal("10.00"))
-                .build();
-
-        var detail = "Product Image Url is Required";
-        var title = "Invalid Product Request";
-        this.invalidUpdateRequest(request,"p100",detail,title);
-    }
-
-    @Test
-    void nullDescription(){
-        var request = ProductUpdateRequest.builder()
-                .name("TestName")
-                .price(new BigDecimal("10.00"))
-                .imageUrl("testImageUrl.jpg")
-                .build();
-
-        var detail = "Product Description is Required";
-        var title = "Invalid Product Request";
-        this.invalidUpdateRequest(request,"p100",detail,title);
-    }
-
-    @Test
-    void nullName(){
-        var request = ProductUpdateRequest.builder()
-                .description("TestDescription")
-                .price(new BigDecimal("20.00"))
-                .imageUrl("testImageUrl.jpg")
-                .build();
-
-        var detail = "Product Name is Required";
-        var title = "Invalid Product Request";
-        this.invalidUpdateRequest(request,"p100",detail,title);
-    }
 
     @Test
     void updateNotFoundProduct(){
@@ -82,5 +30,53 @@ public class PutRequestTests extends AbstractPutRequestTests{
                 .build();
 
         this.updateNotExistingProduct().apply(request,"p1000");
+    }
+
+    @Test
+    void updateOnlyName(){
+        var request = ProductUpdateRequest.builder()
+                .name("TestName")
+                .build();
+
+        this.validUpdateRequest().apply(request,"p100");
+    }
+
+    @Test
+    void updateOnlyDescription(){
+        var request = ProductUpdateRequest.builder()
+                .description("TestDescription")
+                .build();
+
+        this.validUpdateRequest().apply(request,"p100");
+    }
+
+    @Test
+    void updateOnlyImageUrl(){
+        var request = ProductUpdateRequest.builder()
+                .imageUrl("testImageUrl.jpg")
+                .build();
+
+        this.validUpdateRequest().apply(request,"p100");
+    }
+
+    @Test
+    void updateOnlyPrice(){
+        var request = ProductUpdateRequest.builder()
+                .price(new BigDecimal("20.00"))
+                .build();
+
+        this.validUpdateRequest().apply(request,"p100");
+    }
+
+    @Test
+    void updateWithInvalidPrice(){
+        var request = ProductUpdateRequest.builder()
+                .price(new BigDecimal("00.00"))
+                .build();
+
+        var detail = "Product Price Must be Positive";
+        var title = "Invalid Product Request";
+
+        this.invalidUpdateRequest(request,"p100",detail,title);
     }
 }

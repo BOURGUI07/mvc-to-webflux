@@ -9,6 +9,7 @@ import org.testcontainers.shaded.org.apache.commons.lang3.function.TriFunction;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -40,9 +41,9 @@ public abstract class AbstractPutRequestTests extends AbstractIntegrationTest {
     private TriConsumer<ProductResponse,ProductUpdateRequest,Long> assertValidProductResponse(){
         return (response,request,id) -> {
             assertEquals(id, response.id());
-            assertEquals(request.name(), response.name());
-            assertEquals(request.description(), response.description());
-            assertEquals(request.price(), response.price());
+            if (Objects.nonNull(request.name())) assertEquals(request.name(), response.name());
+            if(Objects.nonNull(request.description())) assertEquals(request.description(), response.description());
+            if (Objects.nonNull(request.price())) assertEquals(request.price(), response.price());
         };
     }
 
