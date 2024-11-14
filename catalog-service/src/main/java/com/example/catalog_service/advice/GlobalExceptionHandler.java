@@ -9,7 +9,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import com.example.catalog_service.util.Util;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -18,6 +20,7 @@ import org.springframework.web.server.ServerWebExchange;
 
 @ControllerAdvice
 @RequiredArgsConstructor
+@Slf4j
 public class GlobalExceptionHandler {
     private final CatalogServiceProperties properties;
 
@@ -38,6 +41,9 @@ public class GlobalExceptionHandler {
         problemDetail.setProperty("service", properties.name());
         problemDetail.setType(type);
         problemDetail.setProperty("httpMethod", method);
+
+        log.error("Problem Detail Response: {}", Util.write(problemDetail));
+
         return problemDetail;
     }
 

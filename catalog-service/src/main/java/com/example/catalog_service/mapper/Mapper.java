@@ -46,13 +46,4 @@ public class Mapper {
                 .build();
     }
 
-
-    public static Function<ProductUpdateRequest, OptionalProductUpdateRequest> toOptional(){
-        return request -> OptionalProductUpdateRequest.builder()
-                .description(Optional.ofNullable(request.description()))
-                .imageUrl(Optional.ofNullable(request.imageUrl()))
-                .price(Optional.ofNullable(request.price()))
-                .name(Optional.ofNullable(request.name()))
-                .build();
-    }
 }
