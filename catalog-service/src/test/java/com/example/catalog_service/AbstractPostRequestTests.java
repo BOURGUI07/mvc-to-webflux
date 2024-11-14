@@ -9,6 +9,7 @@ import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -65,6 +66,27 @@ public abstract class AbstractPostRequestTests extends AbstractIntegrationTest{
         return (problemDetail,detail,title) ->{
             assertEquals(detail,problemDetail.getDetail());
             assertEquals(title,problemDetail.getTitle());
+        };
+    }
+
+
+    protected Function<ProductCreationRequest,Duration> createExistingProduct(){
+        return request ->
+                client.post()
+                        .uri("/api/products")
+                        .bodyValue(request)
+                        .exchange()
+                        .returnResult(ProblemDetail.class)
+                        .getResponseBody()
+                        .as(StepVerifier::create)
+                        .assertNext(response -> assertAlreadyExistsProduct().accept(request.code(), response))
+                        .verifyComplete();
+    }
+
+    private BiConsumer<String,ProblemDetail> assertAlreadyExistsProduct(){
+        return (code,problemDetail) -> {
+            assertEquals("Product with code " + code + " already exists",problemDetail.getDetail());
+            assertEquals("Product Already Exists",problemDetail.getTitle());
         };
     }
 

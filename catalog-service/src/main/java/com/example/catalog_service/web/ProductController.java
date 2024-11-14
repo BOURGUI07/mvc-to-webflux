@@ -24,38 +24,32 @@ public class ProductController {
     @GetMapping
     public Mono<PagedResult<ProductResponse>> getProducts(
             @RequestParam(defaultValue = "1", required = false) int page) {
-        return service.getProducts(page)
-                .doFirst(()->log.info("........Web Layer::Get Products Of Page: {}..........", page));
+        return service.getProducts(page);
     }
 
     @GetMapping(value = "/stream/{maxPrice}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ProductResponse> streamProducts(@PathVariable BigDecimal maxPrice) {
-        return service.getProductStream(maxPrice)
-                .doFirst(()-> log.info("..........Web Layer::Get Products Stream of Max Price: {}............", maxPrice));
+        return service.getProductStream(maxPrice);
     }
 
     @GetMapping("/{code}")
     public Mono<ProductResponse> getProduct(@PathVariable String code) {
-        return service.findByCode(code)
-                .doFirst(()->log.info("..........Web Layer::Get Product by Code: {}.............", code));
+        return service.findByCode(code);
     }
 
 
     @PostMapping
     public Mono<ProductResponse> create(@RequestBody Mono<ProductCreationRequest> request) {
-        return service.createProduct(request)
-                .doFirst(()->log.info("..........Web Layer::Create Product : {}", request));
+        return service.createProduct(request);
     }
 
     @PutMapping("/{code}")
     public Mono<ProductResponse> update(@PathVariable String code,@RequestBody Mono<ProductUpdateRequest> request) {
-        return service.update(code, request)
-                .doFirst(()->log.info("..........Web Layer::Update Product With Code: {}", code));
+        return service.update(code, request);
     }
 
     @DeleteMapping("/{code}")
     public Mono<Void> delete(@PathVariable String code) {
-        return service.deleteByCode(code)
-                .doFirst(()->log.info("..........Web Layer::Delete Product With Code: {}", code));
+        return service.deleteByCode(code);
     }
 }

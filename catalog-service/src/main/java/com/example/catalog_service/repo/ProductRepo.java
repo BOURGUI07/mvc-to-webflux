@@ -12,4 +12,6 @@ public interface ProductRepo extends ReactiveCrudRepository<Product, Long> {
     Flux<Product> findBy(Pageable pageable);
 
     Mono<Product> findByCodeIgnoreCase(String code);
+
+    Mono<Boolean> existsByCodeIgnoreCase(String code);
 }

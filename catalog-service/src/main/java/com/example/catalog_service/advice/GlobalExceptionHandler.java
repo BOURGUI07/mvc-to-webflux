@@ -2,6 +2,7 @@ package com.example.catalog_service.advice;
 
 import com.example.catalog_service.dto.CatalogServiceProperties;
 import com.example.catalog_service.exceptions.InvalidProductRequestException;
+import com.example.catalog_service.exceptions.ProductAlreadyExistsException;
 import com.example.catalog_service.exceptions.ProductNotFoundException;
 import java.net.URI;
 import java.time.Instant;
@@ -68,6 +69,17 @@ public class GlobalExceptionHandler {
                 ex,
                 HttpStatus.BAD_REQUEST,
                 "Invalid Product Request",
+                "INVALID_REQUEST",
+                properties.exceptionBadRequest(),
+                exchange);
+    }
+
+    @ExceptionHandler(ProductAlreadyExistsException.class)
+    public ProblemDetail handleAlreadyExistingProduct(ProductAlreadyExistsException ex, ServerWebExchange exchange) {
+        return handleException(
+                ex,
+                HttpStatus.BAD_REQUEST,
+                "Product Already Exists",
                 "INVALID_REQUEST",
                 properties.exceptionBadRequest(),
                 exchange);

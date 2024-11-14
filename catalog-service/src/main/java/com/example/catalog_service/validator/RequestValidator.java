@@ -19,7 +19,7 @@ public abstract class RequestValidator<T>{
     public  UnaryOperator<Mono<T>> validate(){
         return T -> T.
                 filter(hasValidPrice())
-                .switchIfEmpty(ApplicationsExceptions.invalidRequest("Invalid Price"))
+                .switchIfEmpty(ApplicationsExceptions.invalidRequest("Product Price is Invalid"))
                 .filter(hasName())
                 .switchIfEmpty(ApplicationsExceptions.invalidRequest("Product Name is Required"))
                 .filter(hasDescription())

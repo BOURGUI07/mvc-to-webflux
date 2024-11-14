@@ -47,6 +47,8 @@ public class CreationRequestValidator extends RequestValidator<ProductCreationRe
                 .filter(hasDescription())
                 .switchIfEmpty(ApplicationsExceptions.invalidRequest("Product Description is Required"))
                 .filter(hasValidPrice())
-                .switchIfEmpty(ApplicationsExceptions.invalidRequest("Product Price is Invalid"));
+                .switchIfEmpty(ApplicationsExceptions.invalidRequest("Product Price is Invalid"))
+                .filter(hasImageUrl())
+                .switchIfEmpty(ApplicationsExceptions.invalidRequest("Product Image Url is Required"));
     }
 }
