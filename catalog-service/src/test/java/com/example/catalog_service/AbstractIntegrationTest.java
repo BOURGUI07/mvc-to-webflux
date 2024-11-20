@@ -1,23 +1,48 @@
 package com.example.catalog_service;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
+
+import com.example.catalog_service.domain.Product;
+import com.example.catalog_service.repo.ProductInventoryRepo;
+import com.example.catalog_service.repo.ProductRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Import;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.r2dbc.core.DatabaseClient;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.test.StepVerifier;
 
 @Import(TestcontainersConfiguration.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+properties = {
+        "logging.level.root=ERROR",
+        "logging.level.com.example=INFO",
+        "spring.cloud.stream.kafka.binder.configuration.auto.offset.reset=earliest"
+})
+@DirtiesContext
+@EmbeddedKafka(
+        partitions = 1,
+        bootstrapServersProperty = "spring.kafka.bootstrap-servers"
+)
 @AutoConfigureWebTestClient
 public abstract class AbstractIntegrationTest {
     @Autowired
     protected WebTestClient client;
+
+    @Autowired
+    protected StreamBridge streamBridge;
+
+    @Autowired
+    protected ProductRepo productRepo;
+
+    @Autowired
+    protected ProductInventoryRepo inventoryRepo;
 
     @Autowired
     private DatabaseClient databaseClient;

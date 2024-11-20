@@ -88,9 +88,3 @@ services:
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  zookeeper_data:
-    driver: local
-  kafka_data:
-    driver: local

@@ -1,10 +1,15 @@
 package com.example.catalog_service.mapper;
 
 import com.example.catalog_service.domain.Product;
+import com.example.catalog_service.domain.ProductInventory;
 import com.example.catalog_service.dto.*;
+import com.example.catalog_service.events.InventoryEvent;
+import com.example.catalog_service.events.OrderEvent;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class Mapper {
@@ -47,5 +52,63 @@ public class Mapper {
                 .pageNumber(page + 1)
                 .build();
     }
+
+    public static Function<OrderEvent.Created, PurchaseDTO.Request> toPurchaseRequest(){
+        return event -> PurchaseDTO.Request.builder()
+                .orderId(event.orderId())
+                .productId(event.productId())
+                .quantity(event.quantity())
+                .build();
+    }
+
+    public static Function<PurchaseDTO.Request, ProductInventory> toProductInventoryEntity(){
+        return request -> ProductInventory.builder()
+                .productId(request.productId())
+                .quantity(request.quantity())
+                .orderId(request.orderId())
+                .build();
+    }
+
+    public static BiFunction<ProductInventory,Product,PurchaseDTO> toPurchaseDTO(){
+        return (entity,product) -> PurchaseDTO.Response.builder()
+                .inventoryId(entity.getInventoryId())
+                .productId(entity.getProductId())
+                .quantity(entity.getQuantity())
+                .status(entity.getStatus())
+                .orderId(entity.getOrderId())
+                .price(product.getPrice())
+                .build();
+    }
+
+    public static Function<PurchaseDTO.Response, InventoryEvent> toDeducted(){
+        return dto -> InventoryEvent.Deducted.builder()
+                .deductedQty(dto.quantity())
+                .inventoryId(dto.inventoryId())
+                .productId(dto.productId())
+                .orderId(dto.orderId())
+                .price(dto.price())
+                .build();
+    }
+
+
+    public static Function<PurchaseDTO.Response, InventoryEvent> toRestored(){
+        return dto -> InventoryEvent.Restored.builder()
+                .restoredQty(dto.quantity())
+                .inventoryId(dto.inventoryId())
+                .productId(dto.productId())
+                .orderId(dto.orderId())
+                .build();
+    }
+
+    public static BiFunction<Throwable,OrderEvent.Created,Mono<InventoryEvent>> toDeclined(){
+        return (ex,event) -> Mono.fromSupplier(() ->InventoryEvent.Declined.builder()
+                .declinedQty(event.quantity())
+                .orderId(event.orderId())
+                .productId(event.productId())
+                .reason(ex.getMessage())
+                .build());
+    }
+
+
 
 }

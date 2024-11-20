@@ -1,11 +1,9 @@
 package com.example.catalog_service.exceptions;
 
 public class ProductAlreadyExistsException extends RuntimeException {
-    /**
-     *
-     * @param code
-     */
+    private static final String MESSAGE = "Product with code %s already exists";
+
     public ProductAlreadyExistsException(String code) {
-        super("Product with code " + code + " already exists");
+        super(String.format(MESSAGE, code));
     }
 }
