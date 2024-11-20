@@ -11,6 +11,7 @@ import java.util.function.*;
 
 import com.example.catalog_service.util.Util;
 import com.example.catalog_service.validator.CreationRequestValidator;
+import com.example.catalog_service.validator.PostUpdateProductValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -110,13 +111,15 @@ public class ProductService {
                         Optional.ofNullable(request.name()).ifPresent(product::setName);
                         Optional.ofNullable(request.price()).ifPresent(product::setPrice);
                         Optional.ofNullable(request.imageUrl()).ifPresent(product::setImageUrl);
+                        Optional.ofNullable(request.quantity()).ifPresent(product::setAvailableQuantity);
                 return product;
             })
-                    .filter(p -> p.getPrice().doubleValue()>0)
-                    .switchIfEmpty(ApplicationsExceptions.invalidRequest("Product Price Must be Positive"))
+                    .transform(PostUpdateProductValidator.validate())
                     .flatMap(repo::save)
                     .map(Mapper.toDto());
 
     }
+
+
 
 }

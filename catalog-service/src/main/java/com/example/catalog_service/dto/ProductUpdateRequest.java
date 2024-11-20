@@ -9,6 +9,7 @@ public record ProductUpdateRequest(
         String name,
         String description,
         String imageUrl,
-        BigDecimal price
+        BigDecimal price,
+        Integer quantity
 ) {
 }

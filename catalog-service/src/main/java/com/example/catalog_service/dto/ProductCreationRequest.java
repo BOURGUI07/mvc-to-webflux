@@ -4,4 +4,9 @@ import java.math.BigDecimal;
 import lombok.Builder;
 
 @Builder
-public record ProductCreationRequest(String code, String name, String description, String imageUrl, BigDecimal price) {}
+public record ProductCreationRequest(String code,
+                                     String name,
+                                     String description,
+                                     String imageUrl,
+                                     BigDecimal price,
+                                     Integer quantity) {}

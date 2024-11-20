@@ -15,6 +15,7 @@ public class PostRequestTests extends AbstractPostRequestTests{
                 .code("P888")
                 .price(new BigDecimal("100.00"))
                 .imageUrl("imageTest.jpg")
+                .quantity(45)
                 .build();
 
         validCreateRequest().apply(request);
@@ -28,10 +29,28 @@ public class PostRequestTests extends AbstractPostRequestTests{
                 .code("P888")
                 .price(new BigDecimal("0.00"))
                 .imageUrl("imageTest.jpg")
+                .quantity(45)
                 .build();
 
         var title = "Invalid Product Request";
         var detail = "Product Price is Invalid";
+
+        invalidCreationRequest().apply(request,detail,title);
+    }
+
+    @Test
+    void testInvalidQuantity(){
+        var request = ProductCreationRequest.builder()
+                .name("TestProduct")
+                .description("TestDescription")
+                .code("P888")
+                .price(new BigDecimal("10.00"))
+                .imageUrl("imageTest.jpg")
+                .quantity(0)
+                .build();
+
+        var title = "Invalid Product Request";
+        var detail = "Product Quantity is Invalid";
 
         invalidCreationRequest().apply(request,detail,title);
     }
@@ -43,6 +62,7 @@ public class PostRequestTests extends AbstractPostRequestTests{
                 .code("P888")
                 .price(new BigDecimal("10.00"))
                 .imageUrl("imageTest.jpg")
+                .quantity(45)
                 .build();
 
         var title = "Invalid Product Request";
@@ -58,6 +78,7 @@ public class PostRequestTests extends AbstractPostRequestTests{
                 .description("TestDescription")
                 .price(new BigDecimal("10.00"))
                 .imageUrl("imageTest.jpg")
+                .quantity(45)
                 .build();
 
         var title = "Invalid Product Request";
@@ -73,6 +94,7 @@ public class PostRequestTests extends AbstractPostRequestTests{
                 .code("P888")
                 .price(new BigDecimal("10.00"))
                 .imageUrl("imageTest.jpg")
+                .quantity(45)
                 .build();
 
         var title = "Invalid Product Request";
@@ -88,6 +110,7 @@ public class PostRequestTests extends AbstractPostRequestTests{
                 .description("TestDescription")
                 .code("P888")
                 .price(new BigDecimal("10.00"))
+                .quantity(45)
                 .build();
 
         var title = "Invalid Product Request";
@@ -105,6 +128,7 @@ public class PostRequestTests extends AbstractPostRequestTests{
                 .code("p100")
                 .price(new BigDecimal("10.00"))
                 .imageUrl("imageTest.jpg")
+                .quantity(45)
                 .build();
 
         this.createExistingProduct().apply(request);

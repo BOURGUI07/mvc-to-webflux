@@ -54,5 +54,4 @@ public class Order {
     @LastModifiedDate
     private Instant updatedAt;
 
-    private List<OrderItem> orderItems;
 }

@@ -14,6 +14,7 @@ public class PutRequestTests extends AbstractPutRequestTests{
                 .description("TestDescription")
                 .price(new BigDecimal("24.00"))
                 .imageUrl("testImageUrl.jpg")
+                .quantity(44)
                 .build();
 
         this.validUpdateRequest().apply(request,"p100");
@@ -27,6 +28,7 @@ public class PutRequestTests extends AbstractPutRequestTests{
                 .description("TestDescription")
                 .price(new BigDecimal("20.00"))
                 .imageUrl("testImageUrl.jpg")
+                .quantity(44)
                 .build();
 
         this.updateNotExistingProduct().apply(request,"p1000");
@@ -69,12 +71,33 @@ public class PutRequestTests extends AbstractPutRequestTests{
     }
 
     @Test
+    void updateOnlyQuantity(){
+        var request = ProductUpdateRequest.builder()
+                .quantity(77)
+                .build();
+
+        this.validUpdateRequest().apply(request,"p100");
+    }
+
+    @Test
     void updateWithInvalidPrice(){
         var request = ProductUpdateRequest.builder()
                 .price(new BigDecimal("00.00"))
                 .build();
 
-        var detail = "Product Price Must be Positive";
+        var detail = "Product Price is Invalid";
+        var title = "Invalid Product Request";
+
+        this.invalidUpdateRequest(request,"p100",detail,title);
+    }
+
+    @Test
+    void updateWithInvalidQuantity(){
+        var request = ProductUpdateRequest.builder()
+                .quantity(0)
+                .build();
+
+        var detail = "Product Quantity is Invalid";
         var title = "Invalid Product Request";
 
         this.invalidUpdateRequest(request,"p100",detail,title);

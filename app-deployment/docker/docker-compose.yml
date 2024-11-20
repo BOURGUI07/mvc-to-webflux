@@ -21,25 +21,38 @@ services:
       - app-network
 
 
-  book-rabbitmq:
-    image: rabbitmq:3.13-management
-    container_name: book-rabbitmq
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
     ports:
-      - 5672:5672
-      - 15672:15672
+      - "2181:2181"
     networks:
       - app-network
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    ports:
+      - "9092:9092"
+    expose:
+      - "9093"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    depends_on:
+      - zookeeper
     volumes:
-      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
-    healthcheck:
-      test: [ "CMD", "rabbitmqctl", "status" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    deploy:
-      resources:
-        limits:
-          memory: 500m
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - app-network
+
 
 
 
@@ -55,6 +68,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - DB_URL_R2DBC=r2dbc:postgresql://book-postgres:5432/catalog_db
       - DB_URL_FLYWAY=jdbc:postgresql://book-postgres:5432/catalog_db
+      - SPRING_FLYWAY_ENABLED=true
       - DB_USERNAME=user
       - DB_PASSWORD=password
     ports:
@@ -74,3 +88,9 @@ services:
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local

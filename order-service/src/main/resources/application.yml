@@ -27,11 +27,6 @@ db:
   username: user
   password: password
 
-rabbitmq:
-  username: user
-  password: password
-  host: localhost
-  port: 5672
 
 ############# SPRING CONFIGURATION ###############
 
@@ -54,12 +49,8 @@ spring:
     password: ${db.password:password}
 
 
-############# RABBITMQ CONFIGURATION #############
-  rabbitmq:
-    username: ${rabbitmq.username:user}
-    password: ${rabbitmq.password:password}
-    host: ${rabbitmq.host:localhost}
-    port: ${rabbitmq.port:5672}
+############# KAFKA CONFIGURATION #############
+
 
 
 ########### SERVER CONFIGURATION #############

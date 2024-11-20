@@ -44,6 +44,7 @@ public abstract class AbstractPutRequestTests extends AbstractIntegrationTest {
             if (Objects.nonNull(request.name())) assertEquals(request.name(), response.name());
             if(Objects.nonNull(request.description())) assertEquals(request.description(), response.description());
             if (Objects.nonNull(request.price())) assertEquals(request.price(), response.price());
+            if (Objects.nonNull(request.quantity())) assertEquals(request.quantity(), response.availableQuantity());
         };
     }
 

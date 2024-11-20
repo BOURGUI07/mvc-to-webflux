@@ -69,6 +69,7 @@ public class GetRequestTests extends AbstractIntegrationTest {
                     assertEquals("P111", response.code());
                     assertEquals(new BigDecimal("32.0"), response.price());
                     assertEquals("A Game of Thrones", response.name());
+                    assertEquals(80, response.availableQuantity());
                 })
                 .verifyComplete();
     }

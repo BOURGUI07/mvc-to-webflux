@@ -15,6 +15,7 @@ public class Mapper {
                 .description(request.description())
                 .price(request.price())
                 .imageUrl(request.imageUrl())
+                .availableQuantity(request.quantity())
                 .build();
     }
 
@@ -26,6 +27,7 @@ public class Mapper {
                 .price(entity.getPrice())
                 .imageUrl(entity.getImageUrl())
                 .id(entity.getId())
+                .availableQuantity(entity.getAvailableQuantity())
                 .build();
     }
 

@@ -45,6 +45,7 @@ spring:
     url: ${db.url.flyway:jdbc:postgresql://localhost:5432/catalog_db}
     user: ${db.username:user}
     password: ${db.password:password}
+    enabled: true
 
 ########### SERVER CONFIGURATION #############
 

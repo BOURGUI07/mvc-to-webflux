@@ -21,6 +21,10 @@ public class CreationRequestValidator {
         return dto -> Objects.nonNull(dto.price()) && dto.price().doubleValue() > 0;
     }
 
+    public static Predicate<ProductCreationRequest> hasValidQuantity() {
+        return dto -> Objects.nonNull(dto.quantity()) && dto.quantity() > 0;
+    }
+
     public static Predicate<ProductCreationRequest> hasDescription() {
         return dto -> Objects.nonNull(dto.description());
     }
@@ -43,6 +47,8 @@ public class CreationRequestValidator {
                 .switchIfEmpty(ApplicationsExceptions.invalidRequest("Product Description is Required"))
                 .filter(hasValidPrice())
                 .switchIfEmpty(ApplicationsExceptions.invalidRequest("Product Price is Invalid"))
+                .filter(hasValidQuantity())
+                .switchIfEmpty(ApplicationsExceptions.invalidRequest("Product Quantity is Invalid"))
                 .filter(hasImageUrl())
                 .switchIfEmpty(ApplicationsExceptions.invalidRequest("Product Image Url is Required"));
     }

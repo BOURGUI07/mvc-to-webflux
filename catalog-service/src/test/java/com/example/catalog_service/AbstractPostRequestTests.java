@@ -43,6 +43,7 @@ public abstract class AbstractPostRequestTests extends AbstractIntegrationTest{
           assertEquals(request.description(), response.description());
           assertEquals(request.price(), response.price());
           assertEquals(request.code(), response.code());
+          assertEquals(request.quantity(), response.availableQuantity());
         };
     }
 
