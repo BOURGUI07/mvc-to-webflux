@@ -85,6 +85,33 @@ services:
     networks:
       - app-network
 
+
+
+
+  customer-service:
+    image: youness544/bookstore-customer-service
+    container_name: customer-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_URL_R2DBC=r2dbc:postgresql://book-postgres:5432/customer_db
+      - DB_URL_FLYWAY=jdbc:postgresql://book-postgres:5432/customer_db
+      - SPRING_FLYWAY_ENABLED=true
+      - DB_USERNAME=user
+      - DB_PASSWORD=password
+    ports:
+      - "8082:8082"
+      - "9082:9082" #actuator port
+    restart: unless-stopped
+    depends_on:
+      book-postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
