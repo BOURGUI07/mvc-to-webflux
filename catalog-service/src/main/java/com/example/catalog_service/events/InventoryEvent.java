@@ -25,4 +25,7 @@ public sealed interface InventoryEvent extends OrderSaga{
                     Long productId,
                     Integer declinedQty,
                     String reason) implements InventoryEvent {}
+
+
+
 }

@@ -8,7 +8,6 @@ public interface OrderEventProcessor extends EventProcessor<OrderEvent,Inventory
     default Mono<InventoryEvent> process(OrderEvent orderEvent) {
         return switch (orderEvent){
           case OrderEvent.Cancelled e -> this.handle(e);
-          case OrderEvent.PriceCalculated e -> this.handle(e);
           case OrderEvent.Completed e -> this.handle(e);
           case OrderEvent.Created e -> this.handle(e);
         };
@@ -17,5 +16,4 @@ public interface OrderEventProcessor extends EventProcessor<OrderEvent,Inventory
     Mono<InventoryEvent> handle(OrderEvent.Created event);
     Mono<InventoryEvent> handle(OrderEvent.Completed event);
     Mono<InventoryEvent> handle(OrderEvent.Cancelled event);
-    Mono<InventoryEvent> handle(OrderEvent.PriceCalculated event);
 }

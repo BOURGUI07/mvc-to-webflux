@@ -1,0 +1,29 @@
+package com.example.catalog_service.events;
+
+import lombok.Builder;
+
+import java.math.BigDecimal;
+
+public sealed interface ProductEvent {
+
+    String code();
+
+    @Builder
+    record Created(
+            Long productId,
+            String code,
+            BigDecimal price
+    )implements ProductEvent{}
+
+    @Builder
+    record Updated(
+            String code,
+            BigDecimal price
+    )implements ProductEvent{}
+
+
+    @Builder
+    record Deleted(String code) implements ProductEvent{}
+
+
+}

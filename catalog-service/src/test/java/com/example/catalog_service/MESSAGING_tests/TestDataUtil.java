@@ -5,6 +5,7 @@ import org.apache.commons.lang3.function.TriFunction;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
 public class TestDataUtil {
@@ -15,18 +16,10 @@ public class TestDataUtil {
                 .customerId(customerId)
                 .quantity(quantity)
                 .orderId(UUID.randomUUID())
+                .price(BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(15, 100)))
                 .build();
     }
 
-    public static OrderEvent.PriceCalculated toPriceCalculatedEvent(Long productId, Long customerId, Integer quantity, BigDecimal price){
-        return OrderEvent.PriceCalculated.builder()
-                .productId(productId)
-                .customerId(customerId)
-                .quantity(quantity)
-                .price(price)
-                .orderId(UUID.randomUUID())
-                .build();
-    }
 
     public static Function<UUID,OrderEvent.Completed> toCompletedOrderEvent(){
         return orderId -> OrderEvent.Completed.builder()
@@ -39,4 +32,6 @@ public class TestDataUtil {
                 .orderId(orderId)
                 .build();
     }
+
+
 }

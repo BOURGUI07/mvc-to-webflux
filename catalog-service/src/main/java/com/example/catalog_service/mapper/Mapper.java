@@ -5,6 +5,7 @@ import com.example.catalog_service.domain.ProductInventory;
 import com.example.catalog_service.dto.*;
 import com.example.catalog_service.events.InventoryEvent;
 import com.example.catalog_service.events.OrderEvent;
+import com.example.catalog_service.events.ProductEvent;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -108,6 +109,31 @@ public class Mapper {
                 .reason(ex.getMessage())
                 .build());
     }
+
+
+    public static Function<ProductResponse, ProductEvent> toCreatedProductEvent(){
+        return dto -> ProductEvent.Created.builder()
+                .code(dto.code())
+                .price(dto.price())
+                .productId(dto.id())
+                .build();
+    }
+
+    public static Function<ProductResponse, ProductEvent> toUpdatedProductEvent(){
+        return dto -> ProductEvent.Updated.builder()
+                .price(dto.price())
+                .code(dto.code())
+                .build();
+    }
+
+
+    public static Function<String, ProductEvent> toDeletedProductEvent(){
+        return code -> ProductEvent.Deleted.builder()
+                .code(code)
+                .build();
+    }
+
+
 
 
 

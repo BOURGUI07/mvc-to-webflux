@@ -47,11 +47,7 @@ public class OrderEventProcessorImpl implements OrderEventProcessor {
                 .doOnNext(inventoryEvent -> log.info("OrderEventProcessorImpl Processing Result: {}", Util.write(inventoryEvent)));
     }
 
-    @Override
-    public Mono<InventoryEvent> handle(OrderEvent.PriceCalculated event) {
-        return Mono.<InventoryEvent>empty()
-                .doFirst(() -> log.info("OrderEventProcessorImpl Received OrderEvent.PriceCalculated: {}",Util.write(event)));
-    }
+
 
 
 }

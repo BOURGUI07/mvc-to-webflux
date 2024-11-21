@@ -2,6 +2,7 @@ package com.example.catalog_service.service;
 
 import com.example.catalog_service.domain.Product;
 import com.example.catalog_service.dto.*;
+import com.example.catalog_service.events.ProductEvent;
 import com.example.catalog_service.exceptions.ApplicationsExceptions;
 import com.example.catalog_service.mapper.Mapper;
 import com.example.catalog_service.repo.ProductRepo;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 
 @Service
 @Transactional
@@ -28,6 +30,11 @@ import reactor.core.publisher.Mono;
 public class ProductService {
     private final ProductRepo repo;
     private final CatalogServiceProperties properties;
+    private final Sinks.Many<ProductEvent> sink = Sinks.many().unicast().onBackpressureBuffer();
+
+    public Flux<ProductEvent> products(){
+        return sink.asFlux();
+    }
 
 
 
@@ -62,6 +69,7 @@ public class ProductService {
                 .map(Mapper.toEntity())
                 .flatMap(repo::save)
                 .map(Mapper.toDto())
+                .doOnNext(dto -> sink.tryEmitNext(Mapper.toCreatedProductEvent().apply(dto)))
                 .doOnNext(response -> log.info("A New Product is Created: {}", Util.write(response)));
 
     }
@@ -85,7 +93,10 @@ public class ProductService {
         return  repo.findByCodeIgnoreCase(code)
                 .switchIfEmpty(ApplicationsExceptions.productNotFound(code))
                 .flatMap(repo::delete)
-                .doOnSuccess(x-> log.info("Product Deleted Successfully"));
+                .doOnSuccess(x->{
+                    sink.tryEmitNext(Mapper.toDeletedProductEvent().apply(code));
+                    log.info("Product Deleted Successfully");
+                });
     }
 
 
@@ -96,7 +107,10 @@ public class ProductService {
                 .switchIfEmpty(ApplicationsExceptions.productNotFound(code))
                 .zipWhen(product -> request.transform(print()),processUpdate())
                 .flatMap(Function.identity())
-                .doOnNext(response -> log.info("Product Updated Successfully: {}", Util.write(response)));
+                .doOnNext(response -> {
+                    log.info("Product Updated Successfully: {}", Util.write(response));
+                    sink.tryEmitNext(Mapper.toUpdatedProductEvent().apply(response));
+                });
     }
 
     private UnaryOperator<Mono<ProductUpdateRequest>> print(){

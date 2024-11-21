@@ -1,13 +1,12 @@
 package com.example.catalog_service.MESSAGING_tests;
 
-import com.example.catalog_service.MESSAGING_abstract_tests.AbstractMessagingTest;
+import com.example.catalog_service.MESSAGING_abstract_tests.AbstractOrderEventProcessorTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
-public class MessagingTests extends AbstractMessagingTest {
+public class OrderEventProcessorTests extends AbstractOrderEventProcessorTest {
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
@@ -50,10 +49,5 @@ public class MessagingTests extends AbstractMessagingTest {
         whenNotEnoughInventoryThenInventoryEventDeclined(event);
     }
 
-    @Test
-    void test7(){
-        var event = TestDataUtil.toPriceCalculatedEvent(751L, 1L,20,new BigDecimal("17.5"));
-        whenOrderEventPriceCalculatedThenMonoEmpty(event);
-    }
 
 }

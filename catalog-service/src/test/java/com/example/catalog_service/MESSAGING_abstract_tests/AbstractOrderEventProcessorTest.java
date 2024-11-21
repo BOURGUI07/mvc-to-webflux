@@ -23,12 +23,12 @@ import java.util.function.Consumer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@Import(AbstractMessagingTest.testConfig.class)
+@Import(AbstractOrderEventProcessorTest.testConfig.class)
 @TestPropertySource(properties = {
         "spring.cloud.function.definition=processor;consumer",
         "spring.cloud.stream.bindings.consumer-in-0.destination=catalog-events"
 })
-public abstract class AbstractMessagingTest extends AbstractIntegrationTest {
+public abstract class AbstractOrderEventProcessorTest extends AbstractIntegrationTest {
     private final static Sinks.Many<InventoryEvent> sink = Sinks.many().unicast().onBackpressureBuffer();
     private final static Flux<InventoryEvent> resFlux = sink.asFlux().cache(0);
 
@@ -132,9 +132,6 @@ public abstract class AbstractMessagingTest extends AbstractIntegrationTest {
         expectNoEvent(event);
     }
 
-    protected void whenOrderEventPriceCalculatedThenMonoEmpty(OrderEvent.PriceCalculated event){
-        expectNoEvent(event);
-    }
 
     protected void whenProductNotFoundThenInventoryEventDeclined(OrderEvent.Created orderEvent){
         expectEvent(orderEvent, InventoryEvent.Declined.class, response -> {

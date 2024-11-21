@@ -52,7 +52,7 @@ spring:
 ############# SPRING CLOUD STREAM WITH KAFKA CONFIGURATION ###############
   cloud:
     function:
-      definition: processor
+      definition: processor;producer
     stream:
       default:
         producer:
@@ -63,6 +63,8 @@ spring:
           destination: order-events
           group: "catalog-service-group"
         processor-out-0:
+          destination: catalog-events
+        producer-out-0:
           destination: catalog-events
       kafka:
         binder:
