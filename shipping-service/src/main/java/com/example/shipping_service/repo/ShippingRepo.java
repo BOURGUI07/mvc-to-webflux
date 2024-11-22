@@ -15,4 +15,6 @@ public interface ShippingRepo extends ReactiveCrudRepository<Shipment, UUID> {
     Mono<Boolean> existsByOrderId(UUID orderId);
 
     Mono<Shipment> findByOrderIdAndStatus(UUID orderId, ShippingStatus status);
+
+    Mono<Shipment> findByOrderId(UUID orderId);
 }

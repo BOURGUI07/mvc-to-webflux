@@ -44,7 +44,7 @@ public class Mapper {
 
     public static Function<ShippingDTO.Response, ShippingEvent> toReady(){
         return response -> ShippingEvent.Ready.builder()
-                .shipping(response.shippingId())
+                .shippingId(response.shippingId())
                 .orderId(response.orderId())
                 .build();
     }

@@ -10,7 +10,7 @@ public sealed interface ShippingEvent extends OrderSaga {
 
     @Builder
     record Ready(UUID orderId,
-                    UUID shipping) implements ShippingEvent {}
+                    UUID shippingId) implements ShippingEvent {}
 
     @Builder
     record Scheduled(UUID orderId,

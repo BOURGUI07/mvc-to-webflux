@@ -5,5 +5,5 @@ CREATE TABLE shipment (
                                   product_id BIGINT NOT NULL,
                                   status TEXT NOT NULL,
                                   quantity INT NOT NULL,
-                                    deliveryDate TIMESTAMP
+                                    delivery_date TIMESTAMP
 );
