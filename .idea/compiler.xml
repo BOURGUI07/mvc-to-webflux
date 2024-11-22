@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="customer-service" />
         <module name="catalog-service" />
+        <module name="shipping-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -20,6 +21,7 @@
       <module name="catalog-service" options="-parameters" />
       <module name="customer-service" options="-parameters" />
       <module name="order-service" options="-parameters" />
+      <module name="shipping-service" options="-parameters" />
     </option>
   </component>
 </project>

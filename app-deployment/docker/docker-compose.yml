@@ -112,6 +112,33 @@ services:
     networks:
       - app-network
 
+
+
+
+  shipping-service:
+    image: youness544/bookstore-shipping-service
+    container_name: shipping-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_URL_R2DBC=r2dbc:postgresql://book-postgres:5432/shipping_db
+      - DB_URL_FLYWAY=jdbc:postgresql://book-postgres:5432/shipping_db
+      - SPRING_FLYWAY_ENABLED=true
+      - DB_USERNAME=user
+      - DB_PASSWORD=password
+    ports:
+      - "8083:8083"
+      - "9083:9083" #actuator port
+    restart: unless-stopped
+    depends_on:
+      book-postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge

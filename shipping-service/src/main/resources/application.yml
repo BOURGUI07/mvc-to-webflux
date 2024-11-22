@@ -1,0 +1,125 @@
+############# Externalized Configuration ##############
+shipping:
+  service:
+    name: shipping-service
+    port: 8083
+    actuator:
+      port: 9083
+    logging:
+      level:
+        root: INFO
+        spring: INFO
+        flyway: INFO
+        r2dbc: INFO
+        netty: INFO
+        reactor: INFO
+        reactive: INFO
+        webflux: INFO
+        service: INFO
+    exceptionGeneral: https://api.bookstore.com/errors/general
+
+db:
+  url:
+    r2dbc: r2dbc:postgresql://localhost:5432/shipping_db
+    flyway: jdbc:postgresql://localhost:5432/shipping_db
+  username: user
+  password: password
+
+############# SPRING CONFIGURATION ###############
+
+spring:
+  application:
+    name: ${shipping.service.name:shipping-service}
+  r2dbc:
+    url: ${db.url.r2dbc:r2dbc:postgresql://localhost:5432/shipping_db}
+    username: ${db.username:user}
+    password: ${db.password:password}
+    pool:
+      max-size: 10
+      initial-size: 5
+      max-create-connection-time: 2s
+  flyway:
+    url: ${db.url.flyway:jdbc:postgresql://localhost:5432/shipping_db}
+    user: ${db.username:user}
+    password: ${db.password:password}
+    enabled: true
+
+
+
+  ############# SPRING CLOUD STREAM WITH KAFKA CONFIGURATION ###############
+  cloud:
+    function:
+      definition: processor
+    stream:
+      default:
+        producer:
+          useNativeEncoding: true
+
+      bindings:
+        processor-in-0:
+          destination: order-events
+          group: "shipping-service-group"
+        processor-out-0:
+          destination: shipping-events
+      kafka:
+        binder:
+          consumer-properties:
+            "value.deserializer": org.springframework.kafka.support.serializer.JsonDeserializer
+            "key.deserializer": org.apache.kafka.common.serialization.StringDeserializer
+            "auto.offset.reset": "earliest"
+            "spring.json.trusted.packages": "com.example.shipping_service.events"
+          producer-properties:
+            "value.serializer": org.springframework.kafka.support.serializer.JsonSerializer
+            "key.serializer": org.apache.kafka.common.serialization.StringSerializer
+
+########### SERVER CONFIGURATION #############
+
+server:
+  port: ${shipping.service.port:8083}
+  shutdown: graceful
+  netty:
+    connection-timeout: 2s
+    idle-timeout: 15s
+
+############ ACTUATOR CONFIGURATION #############
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState
+  info:
+    git:
+      enabled: true
+      mode: full
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  server:
+    port: ${shipping.service.actuator.port:9083}
+
+############## LOGGING CONFIGURATION ################
+logging:
+  level:
+    root: ${shipping.service.logging.level.root:INFO}
+    org.springframework: ${shipping.service.logging.level.spring:INFO}
+    org.springframework.web.reactive: ${shipping.service.logging.level.reactive:INFO}
+    org.springframework.web: ${shipping.service.logging.level.webflux:INFO}
+    io.netty: ${shipping.service.logging.level.netty:INFO}
+    io.r2dbc: ${shipping.service.logging.level.r2dbc:INFO}
+    org.flywaydb: ${shipping.service.logging.level.flyway:INFO}
+    reactor: ${shipping.service.logging.level.reactor:INFO}
+    com.example.shipping_service: ${shipping.service.logging.level.service:INFO}
+
+
+
