@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 public class Customer {
 
     @Id
-    private Long customerId;
+    private Long id;
     private String username;
     private BigDecimal balance;
     private String email;

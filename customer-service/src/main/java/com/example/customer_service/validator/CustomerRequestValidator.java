@@ -15,9 +15,9 @@ public class CustomerRequestValidator {
         public static UnaryOperator<Mono<CustomerDTO.Request>> validate(){
             return request -> request
                     .filter(hasValidBalance())
-                    .switchIfEmpty(ApplicationExceptions.invalidRequest("Balance Must be Positive"))
+                    .switchIfEmpty(ApplicationExceptions.invalidRequest("Balance is Required and Must be Positive"))
                     .filter(hasValidEmail())
-                    .switchIfEmpty(ApplicationExceptions.invalidRequest("Email Must be Valid"))
+                    .switchIfEmpty(ApplicationExceptions.invalidRequest("Email is Required and Must be Valid"))
                     .filter(hasCity())
                     .switchIfEmpty(ApplicationExceptions.invalidRequest("City is Required"))
                     .filter(hasCountry())

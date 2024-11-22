@@ -18,8 +18,8 @@ public class ApplicationExceptions {
         return Mono.error(new DuplicateEventException(orderId));
     }
 
-    public static <T>Mono<T> alreadyExists(String email, String username){
-        return Mono.error(new CustomerAlreadyExistsException(email, username));
+    public static <T>Mono<T> alreadyExists(String message){
+        return Mono.error(new CustomerAlreadyExistsException(message));
     }
 
     public static <T>Mono<T> invalidRequest(String message){

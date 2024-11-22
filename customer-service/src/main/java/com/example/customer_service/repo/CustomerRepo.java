@@ -10,7 +10,8 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface CustomerRepo extends ReactiveCrudRepository<Customer, Long> {
 
-    Mono<Boolean> existsByEmailOrUsername(String email, String username);
+    Mono<Boolean> existsByUsername(String username);
+    Mono<Boolean> existsByEmail(String email);
 
     Flux<Customer> findBy(Pageable pageable);
 }

@@ -29,7 +29,7 @@ public class CustomerMapper {
                 .email(entity.getEmail())
                 .username(entity.getUsername())
                 .street(entity.getStreet())
-                .customerId(entity.getCustomerId())
+                .customerId(entity.getId())
                 .build();
     }
 }
