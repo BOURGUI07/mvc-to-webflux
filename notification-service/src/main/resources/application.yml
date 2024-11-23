@@ -1,0 +1,157 @@
+############# Externalized Configuration ##############
+notification:
+  service:
+    name: notification-service
+    port: 8084
+    actuator:
+      port: 9084
+    logging:
+      level:
+        root: INFO
+        spring: INFO
+        flyway: INFO
+        r2dbc: INFO
+        netty: INFO
+        reactor: INFO
+        reactive: INFO
+        webflux: INFO
+        service: INFO
+    exceptionGeneral: https://api.bookstore.com/errors/general
+    emailFaulure: https://api.bookstore.com/errors/email_failure
+    support-email: "younessbourgui07@gmail.com"
+
+
+mail:
+  username: PLACEHOLDER
+  password: PLACEHOLDER
+  host: 127.0.0.1
+  port: 1025
+
+
+db:
+  url:
+    r2dbc: r2dbc:postgresql://localhost:5432/notification_db
+    flyway: jdbc:postgresql://localhost:5432/notification_db
+  username: user
+  password: password
+
+############# SPRING CONFIGURATION ###############
+
+spring:
+  application:
+    name: ${notification.service.name:notification-service}
+  r2dbc:
+    url: ${db.url.r2dbc:r2dbc:postgresql://localhost:5432/notification_db}
+    username: ${db.username:user}
+    password: ${db.password:password}
+    pool:
+      max-size: 10
+      initial-size: 5
+      max-create-connection-time: 2s
+  flyway:
+    url: ${db.url.flyway:jdbc:postgresql://localhost:5432/notification_db}
+    user: ${db.username:user}
+    password: ${db.password:password}
+    enabled: true
+
+
+  ############# SPRING CLOUD STREAM WITH KAFKA CONFIGURATION ###############
+  cloud:
+    function:
+      definition: orderEventConsumer, customerEventConsumer
+    stream:
+      default:
+        producer:
+          useNativeEncoding: true
+
+      bindings:
+        orderEventConsumer-in-0:
+          destination: order-events
+          group: "notification-service-group"
+
+        customerEventConsumer-in-0:
+          destination: customer-events
+          group: "notification-service-group"
+      kafka:
+        binder:
+          consumer-properties:
+            "value.deserializer": org.springframework.kafka.support.serializer.JsonDeserializer
+            "key.deserializer": org.apache.kafka.common.serialization.StringDeserializer
+            "auto.offset.reset": "earliest"
+            "spring.json.trusted.packages": "com.example.notification_service.events"
+          producer-properties:
+            "value.serializer": org.springframework.kafka.support.serializer.JsonSerializer
+            "key.serializer": org.apache.kafka.common.serialization.StringSerializer
+
+
+
+######################## MAIL CONFIGURATION ######################
+  mail:
+    host: ${mail.host:127.0.0.1}
+    port: ${mail.port:1025}
+    username: ${mail.username:PLACEHOLDER}
+    password: ${mail.password:PLACEHOLDER}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+
+
+
+
+
+
+########### SERVER CONFIGURATION #############
+
+server:
+  port: ${notification.service.port:8084}
+  shutdown: graceful
+  netty:
+    connection-timeout: 2s
+    idle-timeout: 15s
+
+############ ACTUATOR CONFIGURATION #############
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState
+  info:
+    git:
+      enabled: true
+      mode: full
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  server:
+    port: ${notification.service.actuator.port:9084}
+
+############## LOGGING CONFIGURATION ################
+logging:
+  level:
+    root: ${notification.service.logging.level.root:INFO}
+    org.springframework: ${notification.service.logging.level.spring:INFO}
+    org.springframework.web.reactive: ${notification.service.logging.level.reactive:INFO}
+    org.springframework.web: ${notification.service.logging.level.webflux:INFO}
+    io.netty: ${notification.service.logging.level.netty:INFO}
+    io.r2dbc: ${notification.service.logging.level.r2dbc:INFO}
+    org.flywaydb: ${notification.service.logging.level.flyway:INFO}
+    reactor: ${notification.service.logging.level.reactor:INFO}
+    com.example.notification_service: ${notification.service.logging.level.service:INFO}
+
+
+
