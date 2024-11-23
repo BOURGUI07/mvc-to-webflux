@@ -16,16 +16,16 @@ public class OrderEventConsumerImpl implements OrderEventConsumer {
 
     @Override
     public Mono<Void> handle(OrderEvent.Cancelled event) {
-        return null;
+        return service.sendEmailCancelled(event);
     }
 
     @Override
     public Mono<Void> handle(OrderEvent.Completed event) {
-        return null;
+        return service.sendEmailCompleted(event);
     }
 
     @Override
     public Mono<Void> handle(OrderEvent.Created event) {
-        return null;
+        return service.sendEmailCreated(event);
     }
 }

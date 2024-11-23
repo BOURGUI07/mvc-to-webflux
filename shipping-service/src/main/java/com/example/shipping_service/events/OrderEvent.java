@@ -20,8 +20,8 @@ public sealed interface OrderEvent extends OrderSaga{
 
 
     @Builder
-    record Cancelled(UUID orderId) implements OrderEvent {}
+    record Cancelled(UUID orderId,Long customerId) implements OrderEvent {}
 
     @Builder
-    record Completed(UUID orderId) implements OrderEvent {}
+    record Completed(UUID orderId,Long customerId) implements OrderEvent {}
 }

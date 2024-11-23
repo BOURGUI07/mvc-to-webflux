@@ -17,6 +17,6 @@ public class CustomerEventConsumerImpl implements CustomerEventConsumer {
 
     @Override
     public Mono<Void> handle(CustomerEvent.Created e) {
-        return null;
+        return service.saveCustomer(e);
     }
 }
