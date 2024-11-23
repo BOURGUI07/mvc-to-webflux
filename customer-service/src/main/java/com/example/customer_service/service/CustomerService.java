@@ -3,8 +3,10 @@ package com.example.customer_service.service;
 import com.example.customer_service.dto.CustomerDTO;
 import com.example.customer_service.dto.CustomerServiceProperties;
 import com.example.customer_service.dto.PageResult;
+import com.example.customer_service.events.CustomerEvent;
 import com.example.customer_service.exceptions.ApplicationExceptions;
 import com.example.customer_service.mapper.CustomerMapper;
+import com.example.customer_service.mapper.EventMapper;
 import com.example.customer_service.repo.CustomerRepo;
 import com.example.customer_service.util.Util;
 import com.example.customer_service.validator.CustomerRequestValidator;
@@ -15,7 +17,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -26,7 +30,11 @@ import java.util.function.Predicate;
 public class CustomerService {
     private final CustomerRepo repo;
     private final CustomerServiceProperties properties;
+    private final Sinks.Many<CustomerEvent> sink = Sinks.many().unicast().onBackpressureBuffer();
 
+    public Flux<CustomerEvent> events(){
+        return sink.asFlux();
+    }
 
     @Transactional
     public Mono<CustomerDTO> create(Mono<CustomerDTO.Request> dto) {
@@ -43,6 +51,7 @@ public class CustomerService {
                 .map(CustomerMapper.toEntity())
                 .flatMap(repo::save)
                 .map(CustomerMapper.toDTO())
+                .doOnNext(x -> sink.tryEmitNext(EventMapper.toCustomerEvent().apply(((CustomerDTO.Response) x))))
                 .doOnNext(res -> log.info("Created New Customer: {}", Util.write(res)));
 
     }

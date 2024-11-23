@@ -1,6 +1,8 @@
 package com.example.customer_service.mapper;
 
+import com.example.customer_service.dto.CustomerDTO;
 import com.example.customer_service.dto.PaymentDTO;
+import com.example.customer_service.events.CustomerEvent;
 import com.example.customer_service.events.OrderEvent;
 import com.example.customer_service.events.PaymentEvent;
 import reactor.core.publisher.Mono;
@@ -41,6 +43,15 @@ public class EventMapper {
                 .amount(event.amount())
                 .orderId(event.orderId())
                 .customerId(event.customerId())
+                .build();
+    }
+
+
+    public static Function<CustomerDTO.Response, CustomerEvent> toCustomerEvent(){
+        return dto -> CustomerEvent.Created.builder()
+                .customerId(dto.customerId())
+                .email(dto.email())
+                .username(dto.username())
                 .build();
     }
 }

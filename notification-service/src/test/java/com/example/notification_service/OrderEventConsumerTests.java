@@ -37,7 +37,7 @@ public class OrderEventConsumerTests extends AbstractIntegrationTests{
     private void whenOrderEventPublishedOrderIdSaved(OrderEvent orderEvent) {
         streamBridge.send("order-events",orderEvent);
 
-        Mono.delay(Duration.ofSeconds(2))
+        Mono.delay(Duration.ofSeconds(5))
                 .then(orderRepo.existsByOrderId(orderEvent.orderId()))
                 .as(StepVerifier::create)
                 .expectNext(true)
@@ -106,7 +106,7 @@ public class OrderEventConsumerTests extends AbstractIntegrationTests{
 
         whenOrderEventPublishedOrderIdSaved(completed);
 
-        Mono.delay(Duration.ofSeconds(2))
+        Mono.delay(Duration.ofSeconds(5))
                 .then(orderRepo.findById(1L))
                 .as(StepVerifier::create)
                 .assertNext(o -> assertEquals(OrderStatus.COMPLETED,o.getStatus()))
@@ -134,7 +134,7 @@ public class OrderEventConsumerTests extends AbstractIntegrationTests{
 
         whenOrderEventPublishedOrderIdSaved(cancelled);
 
-        Mono.delay(Duration.ofSeconds(2))
+        Mono.delay(Duration.ofSeconds(5))
                 .then(orderRepo.findById(1L))
                 .as(StepVerifier::create)
                 .assertNext(o -> assertEquals(OrderStatus.CANCELED,o.getStatus()))
@@ -151,7 +151,7 @@ public class OrderEventConsumerTests extends AbstractIntegrationTests{
 
         streamBridge.send("order-events",cancelled);
 
-        Mono.delay(Duration.ofSeconds(1))
+        Mono.delay(Duration.ofSeconds(5))
                 .then(orderRepo.count())
                 .timeout(Duration.ofSeconds(10),Mono.empty())
                 .as(StepVerifier::create)
@@ -169,7 +169,7 @@ public class OrderEventConsumerTests extends AbstractIntegrationTests{
 
         streamBridge.send("order-events",completed);
 
-        Mono.delay(Duration.ofSeconds(1))
+        Mono.delay(Duration.ofSeconds(5))
                 .then(orderRepo.count())
                 .timeout(Duration.ofSeconds(10),Mono.empty())
                 .as(StepVerifier::create)

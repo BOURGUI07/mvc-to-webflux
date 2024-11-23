@@ -16,6 +16,7 @@ public class CustomerMapper {
                 .country(request.country())
                 .email(request.email())
                 .username(request.username())
+                .street(request.street())
                 .build();
     }
 
