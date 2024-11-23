@@ -20,4 +20,5 @@ public class Order {
     @Id
     private Long id;
     private UUID orderId;
+    private OrderStatus status;
 }

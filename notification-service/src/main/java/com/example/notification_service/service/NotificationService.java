@@ -2,6 +2,7 @@ package com.example.notification_service.service;
 
 import com.example.notification_service.dto.NotificationServiceProperties;
 import com.example.notification_service.entity.Order;
+import com.example.notification_service.entity.OrderStatus;
 import com.example.notification_service.events.OrderEvent;
 import com.example.notification_service.exception.ApplicationExceptions;
 import com.example.notification_service.exception.DuplicateEventException;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
@@ -72,50 +74,84 @@ public class NotificationService {
     }
 
 
-    private Function<OrderEvent,Mono<OrderEvent>> validate(){
+    private Function<OrderEvent.Created,Mono<OrderEvent.Created>> validateCreatedOrderEvent(){
         return event -> repo.existsByOrderId(event.orderId())
                 .filter(Predicate.not(b->b))
-                .flatMap(x -> repo.save(Order.builder().orderId(event.orderId()).build()))
+                .flatMap(x -> repo.save(Order.builder().orderId(event.orderId()).build().setStatus(OrderStatus.CREATED)))
                 .switchIfEmpty(ApplicationExceptions.duplicateEvent())
                 .thenReturn(event);
     }
 
+    private Function<OrderEvent.Cancelled,Mono<OrderEvent.Cancelled>> validateCancelledOrderEvent(){
+        return event -> repo.findByOrderIdAndStatus(event.orderId(),OrderStatus.CREATED)
+                .flatMap(x -> repo.save(x.setStatus(OrderStatus.CANCELED)))
+                .map( o ->OrderEvent.Cancelled.builder()
+                        .orderId(o.getOrderId())
+                        .customerId(event.customerId())
+                        .build());
 
 
-    private Mono<Void> sendEmailFromOrder(OrderEvent event, String subject, String action) {
-        return validate().apply(event)
+
+    }
+
+    private Function<OrderEvent.Completed,Mono<OrderEvent.Completed>> validateCompletedOrderEvent(){
+        return event -> repo.findByOrderIdAndStatus(event.orderId(),OrderStatus.CREATED)
+                .flatMap(x -> repo.save(x.setStatus(OrderStatus.COMPLETED)))
+                .map(x -> OrderEvent.Completed.builder()
+                        .orderId(x.getOrderId())
+                        .customerId(event.customerId())
+                        .build());
+
+
+    }
+
+
+
+    @Transactional
+    public Mono<Void> sendEmailCreated(OrderEvent.Created event) {
+        return validateCreatedOrderEvent().apply(event)
                 .flatMap(e -> customerRepo.findByCustomerId(e.customerId())
-                        .flatMap(c -> sendEmail(c.getEmail(),subject,GENERIC_MESSAGE.formatted(
-                                subject,c.getUsername(),event.orderId().toString(),action)))
+                        .flatMap(c -> sendEmail(c.getEmail(),CREATED_SUBJECT,GENERIC_MESSAGE.formatted(
+                                CREATED_SUBJECT,c.getUsername(),event.orderId().toString(),"Created")))
                         .filter(b->b)
                         .doOnNext(x -> log.info("MESSAGE SUCCESSFULLY SENT"))
                         .switchIfEmpty(ApplicationExceptions.emailFailure())
                         .then()
                 )
-                .onErrorResume(EmailFailureException.class, ex -> Mono.empty())
-                .onErrorResume(DuplicateEventException.class, ex -> Mono.empty())
                 .doOnError(EmailFailureException.class, ex -> log.warn("Failed to send email to customer with id: {}", event.customerId()))
-                .doOnError(DuplicateEventException.class, ex -> log.info("DUPLICATE EVENT"));
+                .doOnError(DuplicateEventException.class, ex -> log.info("DUPLICATE EVENT"))
+                .onErrorResume(EmailFailureException.class, ex -> Mono.empty())
+                .onErrorResume(DuplicateEventException.class, ex -> Mono.empty());
     }
 
-    public Mono<Void> sendEmailCreated(OrderEvent.Created event) {
-        return sendEmailFromOrder(event,CREATED_SUBJECT,"Created");
-    }
 
+    @Transactional
     public Mono<Void> sendEmailCancelled(OrderEvent.Cancelled event) {
-        return sendEmailFromOrder(event,CANCELLED_SUBJECT,"Cancelled");
+        return validateCancelledOrderEvent().apply(event)
+                .flatMap(e -> customerRepo.findByCustomerId(e.customerId())
+                        .flatMap(c -> sendEmail(c.getEmail(),CANCELLED_SUBJECT,GENERIC_MESSAGE.formatted(
+                                CANCELLED_SUBJECT,c.getUsername(),event.orderId().toString(),"Cancelled")))
+                        .filter(b->b)
+                        .doOnNext(x -> log.info("MESSAGE SUCCESSFULLY SENT"))
+                        .switchIfEmpty(ApplicationExceptions.emailFailure())
+                        .then()
+                )
+                .doOnError(EmailFailureException.class, ex -> log.warn("Failed to send email to customer with id: {}", event.customerId()))
+                .onErrorResume(EmailFailureException.class, ex -> Mono.empty());
     }
 
+    @Transactional
     public Mono<Void> sendEmailCompleted(OrderEvent.Completed event) {
-        return sendEmailFromOrder(event,COMPLETED_SUBJECT,"Completed");
+        return validateCompletedOrderEvent().apply(event)
+                .flatMap(e -> customerRepo.findByCustomerId(e.customerId())
+                        .flatMap(c -> sendEmail(c.getEmail(),COMPLETED_SUBJECT,GENERIC_MESSAGE.formatted(
+                                COMPLETED_SUBJECT,c.getUsername(),event.orderId().toString(),"Completed")))
+                        .filter(b->b)
+                        .doOnNext(x -> log.info("MESSAGE SUCCESSFULLY SENT"))
+                        .switchIfEmpty(ApplicationExceptions.emailFailure())
+                        .then()
+                )
+                .doOnError(EmailFailureException.class, ex -> log.warn("Failed to send email to customer with id: {}", event.customerId()))
+                .onErrorResume(EmailFailureException.class, ex -> Mono.empty());
     }
-
-
-
-
-
-
-
-
-
 }

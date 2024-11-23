@@ -22,9 +22,10 @@ public class CustomerService {
     @Transactional
     public Mono<Void> saveCustomer(CustomerEvent.Created event) {
         return repo.existsByCustomerId(event.customerId())
+                .doOnNext(exists -> log.info("Does Customer Exists? {}",exists))
                 .filter(Predicate.not(b->b))
-                .switchIfEmpty(Mono.empty())
-                .then(repo.save(Mapper.toCustomer().apply(event)))
+                .doOnDiscard(Boolean.class, x -> log.info("Discard customer event: {}", Util.write(event)))
+                .flatMap(x ->repo.save(Mapper.toCustomer().apply(event)))
                 .doOnNext(c -> log.info("Saved New Customer: {}", Util.write(c)))
                 .then();
     }

@@ -27,6 +27,7 @@ public class CustomerEventConsumerConfig {
                 .concatMap(record -> customerEventConsumer.consume(record.message())
                         .doOnSuccess(x -> record.receiverOffset().acknowledge())
                 )
+                .doOnError(ex -> log.info("Error while consuming event: {}", ex.getMessage()))
                 .subscribe();
     }
 }

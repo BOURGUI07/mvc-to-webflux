@@ -58,7 +58,7 @@ spring:
   ############# SPRING CLOUD STREAM WITH KAFKA CONFIGURATION ###############
   cloud:
     function:
-      definition: orderEventConsumer, customerEventConsumer
+      definition: orderEventConsumer;customerEventConsumer
     stream:
       default:
         producer:

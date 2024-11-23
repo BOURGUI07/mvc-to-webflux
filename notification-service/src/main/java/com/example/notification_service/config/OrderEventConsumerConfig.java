@@ -28,6 +28,7 @@ public class OrderEventConsumerConfig {
                 .concatMap(record -> orderEventConsumer.consume(record.message())
                         .doOnSuccess(x -> record.receiverOffset().acknowledge())
                 )
+                .doOnError(ex -> log.warn("Error while processing the order-event: {}", ex.getMessage()))
                 .subscribe();
     }
 }
