@@ -25,5 +25,8 @@ public sealed interface ProductEvent {
     @Builder
     record Deleted(String code) implements ProductEvent{}
 
+    @Builder
+    record View(String code) implements ProductEvent{}
+
 
 }

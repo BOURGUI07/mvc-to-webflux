@@ -19,6 +19,11 @@ public class ProductEventPublisher {
     }
 
 
+    public Flux<ProductEvent> publishViewedProducts() {
+        return service.viewedProducts();
+    }
+
+
 
 
 }

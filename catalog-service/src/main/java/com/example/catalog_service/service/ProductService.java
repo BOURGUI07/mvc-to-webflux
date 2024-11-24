@@ -31,9 +31,14 @@ public class ProductService {
     private final ProductRepo repo;
     private final CatalogServiceProperties properties;
     private final Sinks.Many<ProductEvent> sink = Sinks.many().unicast().onBackpressureBuffer();
+    private final Sinks.Many<ProductEvent> viewedProductsSink = Sinks.many().unicast().onBackpressureBuffer();
 
     public Flux<ProductEvent> products(){
         return sink.asFlux();
+    }
+
+    public Flux<ProductEvent> viewedProducts(){
+        return viewedProductsSink.asFlux();
     }
 
 
@@ -58,6 +63,7 @@ public class ProductService {
         return  repo.findByCodeIgnoreCase(code)
                 .switchIfEmpty(ApplicationsExceptions.productNotFound(code))
                 .map(Mapper.toDto())
+                .doOnNext(dto -> viewedProductsSink.tryEmitNext(ProductEvent.View.builder().code(code).build()))
                 .doOnNext(response -> log.info("Product with code: {} is: {}", code, Util.write(response)));
     }
 

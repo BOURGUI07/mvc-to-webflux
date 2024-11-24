@@ -1,10 +1,10 @@
 ############# Externalized Configuration ##############
-catalog:
+analytics:
   service:
-    name: catalog-service
-    port: 8081
+    name: analytics-service
+    port: 8085
     actuator:
-      port: 9081
+      port: 9085
     logging:
       level:
         root: INFO
@@ -16,15 +16,13 @@ catalog:
         reactive: INFO
         webflux: INFO
         service: INFO
-    defaultPageSize: 10
-    exceptionNotFound: https://api.bookstore.com/errors/not-found
-    exceptionGeneral: https://api.bookstore.com/errors/general
-    exceptionBadRequest: https://api.bookstore.com/errors/bad-request
+
+
 
 db:
   url:
-    r2dbc: r2dbc:postgresql://localhost:5432/catalog_db
-    flyway: jdbc:postgresql://localhost:5432/catalog_db
+    r2dbc: r2dbc:postgresql://localhost:5432/analytics_db
+    flyway: jdbc:postgresql://localhost:5432/analytics_db
   username: user
   password: password
 
@@ -32,9 +30,9 @@ db:
 
 spring:
   application:
-    name: ${catalog.service.name:catalog-service}
+    name: ${analytics.service.name:analytics-service}
   r2dbc:
-    url: ${db.url.r2dbc:r2dbc:postgresql://localhost:5432/catalog_db}
+    url: ${db.url.r2dbc:r2dbc:postgresql://localhost:5432/analytics_db}
     username: ${db.username:user}
     password: ${db.password:password}
     pool:
@@ -42,47 +40,42 @@ spring:
       initial-size: 5
       max-create-connection-time: 2s
   flyway:
-    url: ${db.url.flyway:jdbc:postgresql://localhost:5432/catalog_db}
+    url: ${db.url.flyway:jdbc:postgresql://localhost:5432/analytics_db}
     user: ${db.username:user}
     password: ${db.password:password}
     enabled: true
 
 
-
-############# SPRING CLOUD STREAM WITH KAFKA CONFIGURATION ###############
+  ############# SPRING CLOUD STREAM WITH KAFKA CONFIGURATION ###############
   cloud:
     function:
-      definition: processor;producer;productViewProducer
+      definition: productViewConsumer
     stream:
       default:
         producer:
           useNativeEncoding: true
 
       bindings:
-        processor-in-0:
-          destination: order-events
-          group: "catalog-service-group"
-        processor-out-0:
+        productViewConsumer-in-0:
           destination: catalog-events
-        producer-out-0:
-          destination: catalog-events
-        productViewProducer-out-0:
-          destination: catalog-events
+          group: "analytics-service-group"
       kafka:
         binder:
           consumer-properties:
             "value.deserializer": org.springframework.kafka.support.serializer.JsonDeserializer
             "key.deserializer": org.apache.kafka.common.serialization.StringDeserializer
             "auto.offset.reset": "earliest"
-            "spring.json.trusted.packages": "com.example.catalog_service.events"
+            "spring.json.trusted.packages": "*"
           producer-properties:
             "value.serializer": org.springframework.kafka.support.serializer.JsonSerializer
             "key.serializer": org.apache.kafka.common.serialization.StringSerializer
 
+
+
 ########### SERVER CONFIGURATION #############
 
 server:
-  port: ${catalog.service.port:8081}
+  port: ${analytics.service.port:8085}
   shutdown: graceful
   netty:
     connection-timeout: 2s
@@ -113,21 +106,20 @@ management:
     tags:
       application: ${spring.application.name}
   server:
-    port: ${catalog.service.actuator.port:9081}
+    port: ${analytics.service.actuator.port:9085}
 
 ############## LOGGING CONFIGURATION ################
 logging:
   level:
-    root: ${catalog.service.logging.level.root:INFO}
-    org.springframework: ${catalog.service.logging.level.spring:INFO}
-    org.springframework.web.reactive: ${catalog.service.logging.level.reactive:INFO}
-    org.springframework.web: ${catalog.service.logging.level.webflux:INFO}
-    io.netty: ${catalog.service.logging.level.netty:INFO}
-    io.r2dbc: ${catalog.service.logging.level.r2dbc:INFO}
-    org.flywaydb: ${catalog.service.logging.level.flyway:INFO}
-    reactor: ${catalog.service.logging.level.reactor:INFO}
-    com.example.catalog_service: ${catalog.service.logging.level.service:INFO}
-
+    root: ${analytics.service.logging.level.root:INFO}
+    org.springframework: ${analytics.service.logging.level.spring:INFO}
+    org.springframework.web.reactive: ${analytics.service.logging.level.reactive:INFO}
+    org.springframework.web: ${analytics.service.logging.level.webflux:INFO}
+    io.netty: ${analytics.service.logging.level.netty:INFO}
+    io.r2dbc: ${analytics.service.logging.level.r2dbc:INFO}
+    org.flywaydb: ${analytics.service.logging.level.flyway:INFO}
+    reactor: ${analytics.service.logging.level.reactor:INFO}
+    com.example.analytics_service: ${analytics.service.logging.level.service:INFO}
 
 
 
