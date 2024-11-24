@@ -16,7 +16,6 @@ order:
         reactive: INFO
         webflux: INFO
         service: INFO
-    defaultPageSize: 10
     exceptionNotFound: https://api.bookstore.com/errors/not-found
     exceptionGeneral: https://api.bookstore.com/errors/general
     exceptionBadRequest: https://api.bookstore.com/errors/bad-request

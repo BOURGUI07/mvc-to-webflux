@@ -9,6 +9,9 @@ import reactor.core.publisher.Mono;
 public interface ProductRepo extends ReactiveCrudRepository<Product, Long> {
 
     Mono<Product> findByCodeIgnoreCase(String code);
+    Mono<Product> findByProductId(Long productId);
 
     Mono<Boolean> existsByCodeIgnoreCase(String code);
+
+
 }
