@@ -50,6 +50,7 @@ public class InventoryMapper {
                 .orderId(dto.orderId())
                 .status(dto.status())
                 .message(dto.message())
+                .inventoryId(dto.inventoryId())
                 .build();
     }
 

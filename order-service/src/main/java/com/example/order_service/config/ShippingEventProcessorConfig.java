@@ -33,7 +33,7 @@ public class ShippingEventProcessorConfig {
                         .doOnSuccess(__-> record.receiverOffset().acknowledge())
                 )
                 .map(MessageConverter.toMessage())
-                .doOnNext(msg -> log.info("The Order Service Product Order Event: {}", Util.write(msg.getPayload())));
+                .doOnNext(msg -> log.info("The Order Service Produced Order Event: {}", Util.write(msg.getPayload())));
     }
 
 

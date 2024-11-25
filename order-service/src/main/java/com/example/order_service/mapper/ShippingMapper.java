@@ -64,6 +64,7 @@ public class ShippingMapper {
                 .status(dto.status())
                 .message(dto.message())
                 .deliveryDate(dto.deliveryDate())
+                .shippingId(dto.shippingId())
                 .build();
     }
 

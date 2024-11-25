@@ -51,6 +51,7 @@ public class PaymentMapper {
                 .orderId(dto.orderId())
                 .status(dto.status())
                 .message(dto.message())
+                .paymentId(dto.paymentId())
                 .build();
     }
 
