@@ -13,8 +13,8 @@ public interface ShippingEventProcessor extends EventProcessor<ShippingEvent,Ord
         };
     }
 
-    Mono<OrderEvent> handle(ShippingEvent.Ready paymentEvent);
-    Mono<OrderEvent> handle(ShippingEvent.Declined paymentEvent);
-    Mono<OrderEvent> handle(ShippingEvent.Cancelled paymentEvent);
-    Mono<OrderEvent> handle(ShippingEvent.Scheduled paymentEvent);
+    Mono<OrderEvent> handle(ShippingEvent.Ready shippingEvent);
+    Mono<OrderEvent> handle(ShippingEvent.Declined shippingEvent);
+    Mono<OrderEvent> handle(ShippingEvent.Cancelled shippingEvent);
+    Mono<OrderEvent> handle(ShippingEvent.Scheduled shippingEvent);
 }

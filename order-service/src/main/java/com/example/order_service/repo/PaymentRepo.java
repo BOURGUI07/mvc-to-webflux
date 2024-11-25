@@ -12,5 +12,5 @@ import java.util.UUID;
 
 @Repository
 public interface PaymentRepo extends ReactiveCrudRepository<OrderPayment,Long> {
-    Mono<OrderPayment> findByOrderIdAndStatus(UUID orderId, PaymentStatus status);
+    Mono<OrderPayment> findByOrderId(UUID orderId);
 }

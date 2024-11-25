@@ -13,5 +13,7 @@ import java.util.UUID;
 
 @Repository
 public interface InventoryRepo extends ReactiveCrudRepository<OrderInventory, Long> {
-    Mono<OrderInventory> findByOrderIdAndStatus(UUID orderId, InventoryStatus status);
+    Mono<OrderInventory> findByOrderId(UUID orderId);
+
+
 }

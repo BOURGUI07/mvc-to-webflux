@@ -1,6 +1,6 @@
 package com.example.order_service.mapper;
 
-import com.example.order_service.dto.OrderDTO;
+import com.example.order_service.dto.*;
 import com.example.order_service.entity.Product;
 import com.example.order_service.entity.PurchaseOrder;
 import com.example.order_service.enums.OrderStatus;
@@ -45,4 +45,29 @@ public class OrderMapper {
                 .price(response.price())
                 .build();
     }
+
+    public static Function<OrderDTO.Response, OrderEvent> toCancelledOrderEvent(){
+        return response -> OrderEvent.Cancelled.builder()
+                .customerId(response.customerId())
+                .orderId(response.orderId())
+                .build();
+    }
+
+    public static Function<OrderDTO.Response, OrderEvent> toCompletedOrderEvent(){
+        return response -> OrderEvent.Completed.builder()
+                .customerId(response.customerId())
+                .orderId(response.orderId())
+                .build();
+    }
+
+    public static OrderDetails toOrderDetails(OrderDTO.Response order, OrderShippingDTO shipping , OrderInventoryDTO inventory, OrderPaymentDTO payment){
+        return OrderDetails.builder()
+                .order(order)
+                .shipping(shipping)
+                .inventory(inventory)
+                .payment(payment)
+                .build();
+    }
+
+
 }

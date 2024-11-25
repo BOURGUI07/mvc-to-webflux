@@ -12,8 +12,8 @@ public interface InventoryEventProcessor extends EventProcessor<InventoryEvent,O
         };
     }
 
-    Mono<OrderEvent> handle(InventoryEvent.Deducted paymentEvent);
-    Mono<OrderEvent> handle(InventoryEvent.Declined paymentEvent);
-    Mono<OrderEvent> handle(InventoryEvent.Restored paymentEvent);
+    Mono<OrderEvent> handle(InventoryEvent.Deducted inventoryEvent);
+    Mono<OrderEvent> handle(InventoryEvent.Declined inventoryEvent);
+    Mono<OrderEvent> handle(InventoryEvent.Restored inventoryEvent);
 
 }
