@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Import(AbstractEventProcessorTests.testConfiguration.class)
 @TestPropertySource(properties = {
-        "spring.cloud.function.definition=consumer;orderEventProducer;inventoryEventProcessor;paymentEventProcessor;shippingEventProcessor",
+        "spring.cloud.function.definition=consumer;paymentEventListener;inventoryEventListener;shippingEventListener;orderEventProducer",
         "spring.cloud.stream.bindings.consumer-in-0.destination=order-events"
 })
 public class AbstractEventProcessorTests extends AbstractIntegrationTests {

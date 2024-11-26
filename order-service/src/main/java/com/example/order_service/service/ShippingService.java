@@ -18,19 +18,20 @@ import reactor.core.publisher.Mono;
 @Transactional
 public class ShippingService {
     private final ShippingRepo repo;
+    private final OrderFulfillmentService service;
 
     public Mono<Void> handleReadyShipping(OrderShippingDTO dto){
         return repo.findByOrderId(dto.orderId())
                 .defaultIfEmpty(ShippingMapper.toEntity().apply(dto))
                 .flatMap(shipping -> repo.save(shipping.setSuccess(true)))
-                .then();
+                .then(service.completeOrder(dto.orderId()));
     }
 
     public Mono<Void> handleFailedShipping(OrderShippingDTO dto){
         return repo.findByOrderId(dto.orderId())
                 .defaultIfEmpty(ShippingMapper.toEntity().apply(dto))
                 .flatMap(shipping -> repo.save(shipping.setSuccess(false)))
-                .then();
+                .then(service.cancelOrder(dto.orderId()));
     }
 
     public Mono<Void> handleCancelledShipping(OrderShippingDTO dto){

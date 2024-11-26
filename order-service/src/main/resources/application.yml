@@ -51,7 +51,7 @@ spring:
 ############# SPRING CLOUD STREAM WITH KAFKA CONFIGURATION ###############
   cloud:
     function:
-      definition: productEventConsumer;paymentEventProcessor;inventoryEventProcessor;shippingEventProcessor;orderEventProducer
+      definition: productEventConsumer;paymentEventListener;inventoryEventListener;shippingEventListener;orderEventProducer
     stream:
       default:
         producer:
@@ -61,17 +61,18 @@ spring:
         productEventConsumer-in-0:
           destination: catalog-events
           group: "order-service-group"
-        paymentEventProcessor-in-0:
+        paymentEventListener-in-0:
           destination: customer-events
           group: "order-service-group"
-        inventoryEventProcessor-in-0:
+        inventoryEventListener-in-0:
           destination: catalog-events
           group: "order-service-group"
-        shippingEventProcessor-in-0:
+        shippingEventListener-in-0:
           destination: shipping-events
           group: "order-service-group"
-        order-events-channel:
+        orderEventProducer-out-0:
           destination: order-events
+
       kafka:
         binder:
           consumer-properties:
@@ -82,6 +83,10 @@ spring:
           producer-properties:
             "value.serializer": org.springframework.kafka.support.serializer.JsonSerializer
             "key.serializer": org.apache.kafka.common.serialization.StringSerializer
+        bindings:
+          orderEventProducer-out-0:
+            producer:
+              record-metadata-channel: orderEventResults
 
 ########### SERVER CONFIGURATION #############
 

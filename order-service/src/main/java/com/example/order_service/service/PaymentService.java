@@ -18,19 +18,21 @@ import reactor.core.publisher.Mono;
 public class PaymentService {
 
     private final PaymentRepo repo;
+    private final OrderFulfillmentService service;
+
 
     public Mono<Void> handleSuccessfulPayment(OrderPaymentDTO dto){
         return repo.findByOrderId(dto.orderId())
                 .defaultIfEmpty(PaymentMapper.toEntity().apply(dto))
                 .flatMap(payment -> repo.save(payment.setSuccess(true)))
-                .then();
+                .then(service.completeOrder(dto.orderId()));
     }
 
     public Mono<Void> handleFailedPayment(OrderPaymentDTO dto){
         return repo.findByOrderId(dto.orderId())
                 .defaultIfEmpty(PaymentMapper.toEntity().apply(dto))
                 .flatMap(payment -> repo.save(payment.setSuccess(false)))
-                .then();
+                .then(service.cancelOrder(dto.orderId()));
     }
 
     public Mono<Void> handleRolledBackPayment(OrderPaymentDTO dto){

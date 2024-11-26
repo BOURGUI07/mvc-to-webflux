@@ -18,19 +18,20 @@ import reactor.core.publisher.Mono;
 @Transactional
 public class InventoryService {
     private final InventoryRepo repo;
+    private final OrderFulfillmentService service;
 
     public Mono<Void> handleSuccessfulInventory(OrderInventoryDTO dto){
         return repo.findByOrderId(dto.orderId())
                 .defaultIfEmpty(InventoryMapper.toEntity().apply(dto))
                 .flatMap(inventory -> repo.save(inventory.setSuccess(true)))
-                .then();
+                .then(service.completeOrder(dto.orderId()));
     }
 
     public Mono<Void> handleFailedInventory(OrderInventoryDTO dto){
         return repo.findByOrderId(dto.orderId())
                 .defaultIfEmpty(InventoryMapper.toEntity().apply(dto))
                 .flatMap(inventory -> repo.save(inventory.setSuccess(false)))
-                .then();
+                .then(service.cancelOrder(dto.orderId()));
     }
 
     public Mono<Void> handleRolledBackInventory(OrderInventoryDTO dto){

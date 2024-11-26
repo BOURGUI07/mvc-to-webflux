@@ -3,6 +3,7 @@ package com.example.order_service.service;
 import com.example.order_service.dto.*;
 import com.example.order_service.entity.PurchaseOrder;
 import com.example.order_service.events.OrderEvent;
+import com.example.order_service.listener.OrderEventListener;
 import com.example.order_service.mapper.InventoryMapper;
 import com.example.order_service.mapper.OrderMapper;
 import com.example.order_service.mapper.PaymentMapper;
@@ -29,17 +30,11 @@ public class OrderService {
     private final InventoryRepo inventoryRepo;
     private final PaymentRepo paymentRepo;
     private final ShippingRepo shippingRepo;
+    private final OrderEventListener listener;
 
     private static final OrderPaymentDTO DEFAULT_PAYMENT = OrderPaymentDTO.builder().build();
     private static final OrderInventoryDTO DEFAULT_INVENTORY = OrderInventoryDTO.builder().build();
     private static final OrderShippingDTO DEFAULT_SHIPPING = OrderShippingDTO.builder().build();
-
-    private final Sinks.Many<OrderEvent> sink = Sinks.many().unicast().onBackpressureBuffer();
-
-    public Flux<OrderEvent> events(){
-        return sink.asFlux();
-    }
-
 
     @Transactional
     public Mono<OrderDTO.Response> placeOrder(Mono<OrderDTO.Request> request) {
@@ -47,7 +42,7 @@ public class OrderService {
                 .zipWhen(req -> productRepo.findByProductId(req.productId()), OrderMapper.toEntity())
                 .flatMap(repo::save)
                 .map(OrderMapper.toDto())
-                .doOnNext(dto -> sink.tryEmitNext(OrderMapper.toCreatedOrderEvent().apply(dto)));
+                .flatMap(dto -> listener.onOrderCreated(dto).thenReturn(dto)); //we didn't use doOnNext() since we wanna make this transactionnally
     }
 
 

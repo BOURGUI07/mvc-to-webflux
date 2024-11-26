@@ -21,7 +21,7 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void test(){
+    void test() throws InterruptedException {
         //when all events(payment, shipping, inventory) react positively to CreatedOrderEvent
         // then OrderEventCompleted
         // in other words if PaymentDeducted AND InventoryDeducted AND ShippingReady then OrderEventCompleted
@@ -79,6 +79,9 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
                 .build();
 
         emitShippingEvent(shippingEvent);
+
+
+        Thread.sleep(10_000);
 
 
         // verify OrderCompleted

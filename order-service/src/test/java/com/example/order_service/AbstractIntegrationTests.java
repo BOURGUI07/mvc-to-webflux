@@ -55,7 +55,7 @@ public abstract class AbstractIntegrationTests {
 	protected PaymentRepo paymentRepo;
 
 	private static final String TEST_DATA = """
-			TRUNCATE TABLE order_shipping, order_payment, order_inventory, purchase_order, product RESTART IDENTITY CASCADE;
+			TRUNCATE TABLE order_shipping, order_payment, order_inventory, purchase_order, product, order_outbox RESTART IDENTITY CASCADE;
 			""";
 
 

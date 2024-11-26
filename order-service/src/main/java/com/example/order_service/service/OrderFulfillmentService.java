@@ -5,6 +5,7 @@ import com.example.order_service.entity.OrderInventory;
 import com.example.order_service.entity.OrderPayment;
 import com.example.order_service.entity.OrderShipping;
 import com.example.order_service.enums.OrderStatus;
+import com.example.order_service.listener.OrderEventListener;
 import com.example.order_service.mapper.OrderMapper;
 import com.example.order_service.repo.InventoryRepo;
 import com.example.order_service.repo.PaymentRepo;
@@ -31,7 +32,9 @@ public class OrderFulfillmentService {
     private final InventoryRepo inventoryRepo;
     private final ShippingRepo shippingRepo;
 
-    public Mono<OrderDTO.Response> completeOrder(UUID orderId) {
+    private final OrderEventListener listener;
+
+    public Mono<Void> completeOrder(UUID orderId) {
         return Mono.zip(
                 repo.findByOrderIdAndStatus(orderId, OrderStatus.CREATED),
                 paymentRepo.findByOrderId(orderId).map(OrderPayment::getSuccess),
@@ -50,14 +53,19 @@ public class OrderFulfillmentService {
                 })
                 .flatMap(order -> repo.save(order.setStatus(OrderStatus.COMPLETED)))
                 .retryWhen(Retry.max(1).filter(OptimisticLockingFailureException.class::isInstance))
-                .map(OrderMapper.toDto());
+                .map(OrderMapper.toDto())
+                .flatMap(listener::onOrderCompleted);
 
     }
 
-    public Mono<OrderDTO.Response> cancelOrder(UUID orderId) {
+    public Mono<Void> cancelOrder(UUID orderId) {
         return repo.findByOrderIdAndStatus(orderId,OrderStatus.CREATED)
                 .flatMap(order -> repo.save(order.setStatus(OrderStatus.CANCELLED)))
                 .retryWhen(Retry.max(1).filter(OptimisticLockingFailureException.class::isInstance))
-                .map(OrderMapper.toDto());
+                .map(OrderMapper.toDto())
+                .flatMap(listener::onOrderCancelled);
     }
+
+
+
 }
