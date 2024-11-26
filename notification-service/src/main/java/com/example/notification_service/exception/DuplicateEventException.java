@@ -1,8 +1,9 @@
 package com.example.notification_service.exception;
 
+import static com.example.notification_service.util.Constants.Exceptions.DUPLICATE_EVENT;
+
 public class DuplicateEventException extends RuntimeException {
-    private static final String MESSAGE = "Duplicate Event Exception";
     public DuplicateEventException() {
-        super(MESSAGE);
+        super(DUPLICATE_EVENT);
     }
 }

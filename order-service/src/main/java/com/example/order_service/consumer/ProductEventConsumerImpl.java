@@ -1,7 +1,6 @@
 package com.example.order_service.consumer;
 
 import com.example.order_service.events.ProductEvent;
-import com.example.order_service.events.ProductEventConsumer;
 import com.example.order_service.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

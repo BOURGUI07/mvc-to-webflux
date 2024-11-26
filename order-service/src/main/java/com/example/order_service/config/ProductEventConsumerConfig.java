@@ -1,7 +1,7 @@
 package com.example.order_service.config;
 
 import com.example.order_service.events.ProductEvent;
-import com.example.order_service.events.ProductEventConsumer;
+import com.example.order_service.consumer.ProductEventConsumer;
 import com.example.order_service.util.MessageConverter;
 import com.example.order_service.util.Util;
 import lombok.RequiredArgsConstructor;

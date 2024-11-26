@@ -11,10 +11,6 @@ import java.util.function.Function;
 
 public class MessageConverter {
 
-    private static final String DESTINATION_HEADER = "spring.cloud.stream.sendto.destination";
-    private static final String ORDER_EVENT_CHANNEL = "order-events-channel";
-
-
     public static <T> Function<Message<T>, Record<T>> toRecord() {
         return message -> Record.<T>builder().message(message.getPayload())
                 .key(message.getHeaders().get(KafkaHeaders.RECEIVED_KEY, String.class))
@@ -23,13 +19,4 @@ public class MessageConverter {
 
     }
 
-
-
-    public static <T extends OrderEvent> Function<T,Message<T>> toMessage() {
-        return event -> MessageBuilder.withPayload(event)
-                .setHeader(KafkaHeaders.KEY,event.orderId().toString())
-                .setHeader(DESTINATION_HEADER, ORDER_EVENT_CHANNEL)
-                .build();
-
-    }
 }

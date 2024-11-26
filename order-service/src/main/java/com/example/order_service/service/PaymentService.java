@@ -1,7 +1,10 @@
 package com.example.order_service.service;
 
+import com.example.order_service.dto.OrderInventoryDTO;
 import com.example.order_service.dto.OrderPaymentDTO;
+import com.example.order_service.entity.OrderInventory;
 import com.example.order_service.entity.OrderPayment;
+import com.example.order_service.mapper.InventoryMapper;
 import com.example.order_service.mapper.PaymentMapper;
 import com.example.order_service.repo.PaymentRepo;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import reactor.core.publisher.Mono;
+
+import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
 @Service
@@ -22,16 +27,12 @@ public class PaymentService {
 
 
     public Mono<Void> handleSuccessfulPayment(OrderPaymentDTO dto){
-        return repo.findByOrderId(dto.orderId())
-                .defaultIfEmpty(PaymentMapper.toEntity().apply(dto))
-                .flatMap(payment -> repo.save(payment.setSuccess(true)))
+        return save().apply(dto,true)
                 .then(service.completeOrder(dto.orderId()));
     }
 
     public Mono<Void> handleFailedPayment(OrderPaymentDTO dto){
-        return repo.findByOrderId(dto.orderId())
-                .defaultIfEmpty(PaymentMapper.toEntity().apply(dto))
-                .flatMap(payment -> repo.save(payment.setSuccess(false)))
+        return save().apply(dto,false)
                 .then(service.cancelOrder(dto.orderId()));
     }
 
@@ -39,6 +40,12 @@ public class PaymentService {
         return repo.findByOrderId(dto.orderId())
                 .flatMap(payment -> repo.save(payment.setStatus(dto.status())))
                 .then();
+    }
+
+    private BiFunction<OrderPaymentDTO, Boolean, Mono<OrderPayment>> save(){
+        return (dto, success) -> repo.findByOrderId(dto.orderId())
+                .defaultIfEmpty(PaymentMapper.toEntity().apply(dto))
+                .flatMap(payment -> repo.save(payment.setSuccess(success)));
     }
 
 

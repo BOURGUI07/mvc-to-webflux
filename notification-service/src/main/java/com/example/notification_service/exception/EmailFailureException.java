@@ -1,9 +1,10 @@
 package com.example.notification_service.exception;
 
+import static com.example.notification_service.util.Constants.Exceptions.EMAIL_FAILURE;
+
 public class EmailFailureException extends RuntimeException {
-    private final static String MESSAGE = "Failed to send email";
 
     public EmailFailureException() {
-        super(MESSAGE);
+        super(EMAIL_FAILURE);
     }
 }

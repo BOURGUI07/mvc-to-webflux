@@ -1,9 +1,10 @@
 package com.example.shipping_service.exception;
 
+import com.example.shipping_service.util.Constants;
+
 public class DuplicateEventException extends RuntimeException {
-    private static final String MESSAGE = "Duplicate Event";
 
     public DuplicateEventException() {
-        super(MESSAGE);
+        super(Constants.Exceptions.DUPLICATE_EVENT);
     }
 }

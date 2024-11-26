@@ -17,6 +17,8 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static com.example.shipping_service.util.Constants.BusinessLogic.QUANTITY_LIMIT;
+
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -31,7 +33,7 @@ public class ShippingService {
                     .filter(Predicate.not(b->b))
                     .switchIfEmpty(ApplicationExceptions.duplicateEvent())
                     .thenReturn(request)
-                    .filter(x -> x.quantity()<=10)
+                    .filter(x -> x.quantity()<=QUANTITY_LIMIT)
                     .switchIfEmpty(ApplicationExceptions.quantityLimit(orderId))
                     .map(Mapper.toEntity())
                     .flatMap(entity -> repo.save(entity.setStatus(ShippingStatus.PENDING)))

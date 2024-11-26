@@ -1,5 +1,6 @@
-package com.example.order_service.events;
+package com.example.order_service.consumer;
 
+import com.example.order_service.events.ProductEvent;
 import reactor.core.publisher.Mono;
 
 public interface ProductEventConsumer {

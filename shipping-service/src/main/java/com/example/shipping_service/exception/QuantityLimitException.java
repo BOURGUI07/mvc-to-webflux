@@ -1,11 +1,12 @@
 package com.example.shipping_service.exception;
 
+import com.example.shipping_service.util.Constants;
+
 import java.util.UUID;
 
 public class QuantityLimitException extends RuntimeException {
-  private final static String MESSAGE = "Quantity of order with id %s exceeded the limit";
 
     public QuantityLimitException(UUID orderId) {
-        super(String.format(MESSAGE, orderId));
+        super(String.format(Constants.Exceptions.QUANTITY_LIMIT, orderId));
     }
 }

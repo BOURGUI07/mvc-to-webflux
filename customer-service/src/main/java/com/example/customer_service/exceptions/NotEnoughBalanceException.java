@@ -1,9 +1,12 @@
 package com.example.customer_service.exceptions;
 
+import com.example.customer_service.util.Constants;
+
+import static com.example.customer_service.util.Constants.Exceptions.NOT_ENOUGH_BALANCE;
+
 public class NotEnoughBalanceException extends RuntimeException {
-    private static final String MESSAGE = "Customer with id %s doesn't have enough balance";
 
     public NotEnoughBalanceException(Long customerId) {
-        super(String.format(MESSAGE, customerId));
+        super(String.format(NOT_ENOUGH_BALANCE, customerId));
     }
 }
