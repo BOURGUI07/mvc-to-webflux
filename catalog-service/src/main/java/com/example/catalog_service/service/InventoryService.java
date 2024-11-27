@@ -24,6 +24,7 @@ import java.util.function.Predicate;
 public class InventoryService {
     private final ProductRepo repo;
     private final ProductInventoryRepo inventoryRepo;
+    private final CacheService cacheService;
 
 
     public Mono<PurchaseDTO> processRequest(PurchaseDTO.Request request) {
@@ -32,8 +33,7 @@ public class InventoryService {
                 .filter(Predicate.not(b->b))
                 .doOnDiscard(Boolean.class, b -> log.info("DISCARDED REQUEST WITH ORDER_ID: {}", orderId))
                 .switchIfEmpty(ApplicationsExceptions.duplicateEvent(orderId))
-                .then(repo.findById(request.productId()))
-                .switchIfEmpty(ApplicationsExceptions.productNotFound(request.productId()))
+                .then(cacheService.findById(request.productId()))
                 .filter(p -> p.getAvailableQuantity()>= request.quantity())
                 .switchIfEmpty(ApplicationsExceptions.notEnoughInventory(request.productId()))
                 .zipWhen(p -> Mono.fromSupplier(() -> Mapper.toProductInventoryEntity().apply(request)),executeProcess())
@@ -42,7 +42,7 @@ public class InventoryService {
     }
 
     private BiFunction<Product, ProductInventory,Mono<PurchaseDTO>> executeProcess(){
-        return (product,inventory) -> repo.save(product)
+        return (product,inventory) -> repo.save(product).then(cacheService.doOnChanged(product))
                 .then(inventoryRepo.save(inventory))
                 .map(inv -> Mapper.toPurchaseDTO().apply(inv,product))
                 .doFirst(() -> {
@@ -53,12 +53,12 @@ public class InventoryService {
 
     public Mono<PurchaseDTO> restore(UUID orderId){
         return inventoryRepo.findByOrderIdAndStatus(orderId,InventoryStatus.DEDUCTED)
-                .zipWhen( inv -> repo.findById(inv.getProductId()), executeRestore())
+                .zipWhen( inv -> cacheService.findById(inv.getProductId()), executeRestore())
                 .flatMap(Function.identity());
     }
 
     private BiFunction<ProductInventory,Product,Mono<PurchaseDTO>> executeRestore(){
-        return (inventory,product) -> repo.save(product)
+        return (inventory,product) -> repo.save(product).then(cacheService.doOnChanged(product))
                 .then(inventoryRepo.save(inventory))
                 .map(inv -> Mapper.toPurchaseDTO().apply(inv,product))
                 .doFirst(() -> {

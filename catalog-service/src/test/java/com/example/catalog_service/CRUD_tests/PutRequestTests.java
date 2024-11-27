@@ -3,12 +3,14 @@ package com.example.catalog_service.CRUD_tests;
 import com.example.catalog_service.CRUD_abstract_tests.AbstractPutRequestTests;
 import com.example.catalog_service.dto.ProductUpdateRequest;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.math.BigDecimal;
 
 public class PutRequestTests extends AbstractPutRequestTests {
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void validUpdateRequestTest(){
         var request = ProductUpdateRequest.builder()
                 .name("TestName")
@@ -23,6 +25,7 @@ public class PutRequestTests extends AbstractPutRequestTests {
 
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void updateNotFoundProduct(){
         var request = ProductUpdateRequest.builder()
                 .name("TestName")
@@ -36,6 +39,7 @@ public class PutRequestTests extends AbstractPutRequestTests {
     }
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void updateOnlyName(){
         var request = ProductUpdateRequest.builder()
                 .name("TestName")
@@ -45,6 +49,7 @@ public class PutRequestTests extends AbstractPutRequestTests {
     }
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void updateOnlyDescription(){
         var request = ProductUpdateRequest.builder()
                 .description("TestDescription")
@@ -54,6 +59,7 @@ public class PutRequestTests extends AbstractPutRequestTests {
     }
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void updateOnlyImageUrl(){
         var request = ProductUpdateRequest.builder()
                 .imageUrl("testImageUrl.jpg")
@@ -63,6 +69,7 @@ public class PutRequestTests extends AbstractPutRequestTests {
     }
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void updateOnlyPrice(){
         var request = ProductUpdateRequest.builder()
                 .price(new BigDecimal("20.00"))
@@ -72,6 +79,7 @@ public class PutRequestTests extends AbstractPutRequestTests {
     }
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void updateOnlyQuantity(){
         var request = ProductUpdateRequest.builder()
                 .quantity(77)
@@ -81,6 +89,7 @@ public class PutRequestTests extends AbstractPutRequestTests {
     }
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void updateWithInvalidPrice(){
         var request = ProductUpdateRequest.builder()
                 .price(new BigDecimal("00.00"))
@@ -93,6 +102,7 @@ public class PutRequestTests extends AbstractPutRequestTests {
     }
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void updateWithInvalidQuantity(){
         var request = ProductUpdateRequest.builder()
                 .quantity(0)

@@ -13,15 +13,10 @@ import java.util.function.*;
 import com.example.catalog_service.util.Util;
 import com.example.catalog_service.validator.CreationRequestValidator;
 import com.example.catalog_service.validator.PostUpdateProductValidator;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RMapReactive;
-import org.redisson.api.RedissonReactiveClient;
-import org.redisson.codec.TypedJsonJacksonCodec;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -38,13 +33,7 @@ public class ProductService {
     private final Sinks.Many<ProductEvent> sink = Sinks.many().unicast().onBackpressureBuffer();
     private final Sinks.Many<ProductEvent> viewedProductsSink = Sinks.many().unicast().onBackpressureBuffer();
 
-    private final RedissonReactiveClient redissonClient;
-    private RMapReactive<String,Product> map;
-
-    @PostConstruct
-    public void initializeMap() {
-        this.map = redissonClient.getMap("products",new TypedJsonJacksonCodec(String.class,Product.class));
-    }
+    private final CacheService cacheService;
 
     public Flux<ProductEvent> products(){
         return sink.asFlux();
@@ -54,19 +43,9 @@ public class ProductService {
         return viewedProductsSink.asFlux();
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
-    public void evictCache(){
-        map.readAllKeySet()
-                .as(Flux::from)
-                .flatMap(Flux::fromIterable)
-                .flatMap(map::fastRemove)
-                .subscribe();
-    }
-
-
 
     public Flux<ProductResponse> getProductStream(BigDecimal maxPrice) {
-        return repo.findAll()
+        return cacheService.findAll()
                 .map(Mapper.toDto())
                 .filter(x -> x.price().compareTo(maxPrice) < 0);
     }
@@ -82,13 +61,7 @@ public class ProductService {
 
 
     public Mono<ProductResponse> findByCode(String code) {
-        return map.get(code)
-                .switchIfEmpty(
-                        repo.findByCodeIgnoreCase(code)
-                                .flatMap(product -> map.fastPut(code,product).thenReturn(product))
-
-                )
-
+        return cacheService.findByCode(code)
                 .map(Mapper.toDto())
                 .doOnNext(dto -> viewedProductsSink.tryEmitNext(ProductEvent.View.builder().code(code).build()))
                 .doOnNext(response -> log.info("Product with code: {} is: {}", code, Util.write(response)));
@@ -100,7 +73,7 @@ public class ProductService {
         return request
                 .transform(CreationRequestValidator.validate().andThen(validateCodeUniqueness()))
                 .map(Mapper.toEntity())
-                .flatMap(p -> repo.save(p).then(map.fastPut(p.getCode(),p).thenReturn(p)))
+                .flatMap(repo::save)
                 .map(Mapper.toDto())
                 .doOnNext(dto -> sink.tryEmitNext(Mapper.toCreatedProductEvent().apply(dto)))
                 .doOnNext(response -> log.info("A New Product is Created: {}", Util.write(response)));
@@ -123,9 +96,8 @@ public class ProductService {
 
     @Transactional
     public Mono<Void> deleteByCode(String code){
-        return  repo.findByCodeIgnoreCase(code)
-                .switchIfEmpty(ApplicationsExceptions.productNotFound(code))
-                .flatMap(product -> repo.delete(product).then(map.fastRemove(product.getCode()).then()))
+        return  cacheService.findByCode(code)
+                .flatMap(product -> repo.delete(product).then(cacheService.doOnChanged(product)).then())
                 .doOnSuccess(x->{
                     sink.tryEmitNext(Mapper.toDeletedProductEvent().apply(code));
                     log.info("Product Deleted Successfully");
@@ -136,8 +108,7 @@ public class ProductService {
 
     @Transactional
     public Mono<ProductResponse> update(String code, Mono<ProductUpdateRequest> request) {
-        return repo.findByCodeIgnoreCase(code)
-                .switchIfEmpty(ApplicationsExceptions.productNotFound(code))
+        return cacheService.findByCode(code)
                 .zipWhen(product -> request.transform(print()),processUpdate())
                 .flatMap(Function.identity())
                 .doOnNext(response -> {
@@ -162,7 +133,7 @@ public class ProductService {
                 return product;
             })
                     .transform(PostUpdateProductValidator.validate())
-                    .flatMap(entity -> repo.save(entity).then(map.fastRemove(entity.getCode()).thenReturn(entity)))
+                    .flatMap(p -> repo.save(p).then(cacheService.doOnChanged(p).thenReturn(p)))
                     .map(Mapper.toDto());
 
     }
