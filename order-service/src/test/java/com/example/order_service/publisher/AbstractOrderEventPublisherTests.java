@@ -5,6 +5,7 @@ import com.example.order_service.dto.OrderDTO;
 import com.example.order_service.entity.Product;
 import com.example.order_service.enums.OrderStatus;
 import com.example.order_service.events.OrderEvent;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -27,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         "spring.cloud.function.definition=orderEventProducer;consumer",
         "spring.cloud.stream.bindings.consumer-in-0.destination=order-events"
 })
+@Slf4j
 public class AbstractOrderEventPublisherTests extends AbstractIntegrationTests {
     private final static Sinks.Many<OrderEvent> sink = Sinks.many().unicast().onBackpressureBuffer();
     private final static Flux<OrderEvent> resFlux = sink.asFlux().cache(0);
@@ -107,8 +109,27 @@ public class AbstractOrderEventPublisherTests extends AbstractIntegrationTests {
     }
 
 
-    protected void whenOrderPlacedThenOrderEventCreated(Long productId, Long customerId, Integer quantity){
+    protected void whenOrderPlacedThenOrderEventCreated(Long productId, Long customerId, Integer quantity) throws InterruptedException {
         validRequest().apply(productId, customerId, quantity);
+
+        Thread.sleep(5000);
+
+        //verify all orders
+        client.get()
+                .uri("/api/orders")
+                .exchange()
+                .returnResult(OrderDTO.Response.class)
+                .getResponseBody()
+                .collectList()
+                .doOnNext(list -> log.info("ORDERS LIST: {}", list))
+                .as(StepVerifier::create)
+                .assertNext(list -> {
+                    var firstOrder = list.getFirst();
+                    assertEquals(productId,firstOrder.productId());
+                    assertEquals(customerId,firstOrder.customerId());
+                    assertEquals(quantity,firstOrder.quantity());
+                })
+                .verifyComplete();
 
         resFlux
                 .next()
@@ -121,6 +142,7 @@ public class AbstractOrderEventPublisherTests extends AbstractIntegrationTests {
                     assertEquals(quantity,event.quantity());
                 })
                 .verifyComplete();
+
     }
 
 

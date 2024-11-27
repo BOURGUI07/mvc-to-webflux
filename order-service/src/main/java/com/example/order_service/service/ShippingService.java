@@ -8,6 +8,7 @@ import com.example.order_service.mapper.PaymentMapper;
 import com.example.order_service.mapper.ShippingMapper;
 import com.example.order_service.repo.PaymentRepo;
 import com.example.order_service.repo.ShippingRepo;
+import com.example.order_service.service.cache.ShippingCacheService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,8 @@ import java.util.function.BiFunction;
 @Slf4j
 @Transactional
 public class ShippingService {
+    private final ShippingCacheService shippingCacheService;
+
     private final ShippingRepo repo;
     private final OrderFulfillmentService service;
 
@@ -36,7 +39,7 @@ public class ShippingService {
 
     public Mono<Void> handleCancelledShipping(OrderShippingDTO dto){
         return repo.findByOrderId(dto.orderId())
-                .flatMap(shipping -> repo.save(shipping.setStatus(dto.status())))
+                .flatMap(shipping -> repo.save(shipping.setStatus(dto.status())).then(shippingCacheService.doOnChanged(shipping)))
                 .then();
     }
 
@@ -49,7 +52,7 @@ public class ShippingService {
     private BiFunction<OrderShippingDTO, Boolean, Mono<OrderShipping>> save(){
         return (dto, success) -> repo.findByOrderId(dto.orderId())
                 .defaultIfEmpty(ShippingMapper.toEntity().apply(dto))
-                .flatMap(shipping -> repo.save(shipping.setSuccess(success)));
+                .flatMap(shipping -> repo.save(shipping.setSuccess(success)).then(shippingCacheService.doOnChanged(shipping)).thenReturn(shipping));
     }
 
 }

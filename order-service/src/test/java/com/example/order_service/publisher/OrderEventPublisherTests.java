@@ -8,8 +8,8 @@ public class OrderEventPublisherTests extends AbstractOrderEventPublisherTests{
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void test(){
-        whenOrderPlacedThenOrderEventCreated(1L,1L,45);
+    void test() throws InterruptedException {
+        whenOrderPlacedThenOrderEventCreated(1L,1L,4);
     }
 
     @Test

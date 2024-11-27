@@ -9,6 +9,10 @@ import com.example.order_service.mapper.OrderMapper;
 import com.example.order_service.mapper.PaymentMapper;
 import com.example.order_service.mapper.ShippingMapper;
 import com.example.order_service.repo.*;
+import com.example.order_service.service.cache.InventoryCacheService;
+import com.example.order_service.service.cache.OrderCacheService;
+import com.example.order_service.service.cache.PaymentCacheService;
+import com.example.order_service.service.cache.ShippingCacheService;
 import com.example.order_service.validator.OrderRequestValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +33,12 @@ public class OrderService {
 
     private final PurchaseOrderRepo repo;
     private final ProductRepo productRepo;
-    private final InventoryRepo inventoryRepo;
-    private final PaymentRepo paymentRepo;
-    private final ShippingRepo shippingRepo;
+
+    private final OrderCacheService orderCacheService;
+    private final ShippingCacheService shippingCacheService;
+    private final InventoryCacheService inventoryCacheService;
+    private final PaymentCacheService paymentCacheService;
+
     private final OrderEventListener listener;
 
 
@@ -47,20 +54,16 @@ public class OrderService {
 
     public Mono<OrderDetails> getOrderDetails(UUID orderId) {
         return Mono.zip(
-                repo.findByOrderId(orderId).map(OrderMapper.toDto()),
-                shippingRepo.findByOrderId(orderId).map(ShippingMapper.toDTO()).defaultIfEmpty(DEFAULT_SHIPPING),
-                inventoryRepo.findByOrderId(orderId).map(InventoryMapper.toDTO()).defaultIfEmpty(DEFAULT_INVENTORY),
-                paymentRepo.findByOrderId(orderId).map(PaymentMapper.toDTO()).defaultIfEmpty(DEFAULT_PAYMENT)
+                orderCacheService.findById(orderId).map(OrderMapper.toDto()),
+                shippingCacheService.findById(orderId).map(ShippingMapper.toDTO()).defaultIfEmpty(DEFAULT_SHIPPING),
+                inventoryCacheService.findById(orderId).map(InventoryMapper.toDTO()).defaultIfEmpty(DEFAULT_INVENTORY),
+                paymentCacheService.findById(orderId).map(PaymentMapper.toDTO()).defaultIfEmpty(DEFAULT_PAYMENT)
         )
                 .map(x -> OrderMapper.toOrderDetails(x.getT1(),x.getT2(),x.getT3(),x.getT4()));
     }
 
 
     public Flux<OrderDTO.Response> findAll() {
-        return repo.findAll().map(OrderMapper.toDto());
+        return orderCacheService.findAll().map(OrderMapper.toDto());
     }
-
-
-
-
 }

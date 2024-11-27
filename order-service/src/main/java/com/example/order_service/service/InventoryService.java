@@ -7,6 +7,7 @@ import com.example.order_service.mapper.InventoryMapper;
 import com.example.order_service.mapper.PaymentMapper;
 import com.example.order_service.repo.InventoryRepo;
 import com.example.order_service.repo.PaymentRepo;
+import com.example.order_service.service.cache.InventoryCacheService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,8 @@ import java.util.function.BiFunction;
 @Slf4j
 @Transactional
 public class InventoryService {
+    private final InventoryCacheService inventoryCacheService;
+
     private final InventoryRepo repo;
     private final OrderFulfillmentService service;
 
@@ -35,7 +38,7 @@ public class InventoryService {
 
     public Mono<Void> handleRolledBackInventory(OrderInventoryDTO dto){
         return repo.findByOrderId(dto.orderId())
-                .flatMap(inventory -> repo.save(inventory.setStatus(dto.status())))
+                .flatMap(inventory -> repo.save(inventory.setStatus(dto.status())).then(inventoryCacheService.doOnChanged(inventory)))
                 .then();
     }
 
@@ -43,6 +46,6 @@ public class InventoryService {
     private BiFunction<OrderInventoryDTO, Boolean, Mono<OrderInventory>> save(){
         return (dto, success) -> repo.findByOrderId(dto.orderId())
                 .defaultIfEmpty(InventoryMapper.toEntity().apply(dto))
-                .flatMap(inventory -> repo.save(inventory.setSuccess(success)));
+                .flatMap(inventory -> repo.save(inventory.setSuccess(success)).then(inventoryCacheService.doOnChanged(inventory)).thenReturn(inventory));
     }
 }
