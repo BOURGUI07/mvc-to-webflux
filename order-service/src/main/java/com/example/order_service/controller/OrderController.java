@@ -6,6 +6,7 @@ import com.example.order_service.service.OrderService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -26,5 +27,11 @@ public class OrderController {
     @GetMapping("/{orderId}")
     public Mono<OrderDetails> getOrderDetails(@PathVariable UUID orderId) {
         return service.getOrderDetails(orderId);
+    }
+
+
+    @GetMapping
+    public Flux<OrderDTO.Response> getAllOrders() {
+        return service.findAll();
     }
 }

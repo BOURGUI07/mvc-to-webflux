@@ -7,7 +7,6 @@ import com.example.order_service.events.OrderEvent;
 import com.example.order_service.listener.OrderEventListener;
 import com.example.order_service.mapper.OrderMapper;
 import com.example.order_service.mapper.OutboxMapper;
-import com.example.order_service.outbox.OrderOutbox;
 import com.example.order_service.outbox.OrderOutboxRepo;
 import com.example.order_service.outbox.OutboxDTO;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.Sinks;
 
 import java.util.List;
 import java.util.function.BiFunction;

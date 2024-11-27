@@ -20,6 +20,8 @@ import reactor.core.publisher.Sinks;
 
 import java.util.UUID;
 
+import static com.example.order_service.util.Constants.Logic.*;
+
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -32,9 +34,6 @@ public class OrderService {
     private final ShippingRepo shippingRepo;
     private final OrderEventListener listener;
 
-    private static final OrderPaymentDTO DEFAULT_PAYMENT = OrderPaymentDTO.builder().build();
-    private static final OrderInventoryDTO DEFAULT_INVENTORY = OrderInventoryDTO.builder().build();
-    private static final OrderShippingDTO DEFAULT_SHIPPING = OrderShippingDTO.builder().build();
 
     @Transactional
     public Mono<OrderDTO.Response> placeOrder(Mono<OrderDTO.Request> request) {
@@ -54,6 +53,11 @@ public class OrderService {
                 paymentRepo.findByOrderId(orderId).map(PaymentMapper.toDTO()).defaultIfEmpty(DEFAULT_PAYMENT)
         )
                 .map(x -> OrderMapper.toOrderDetails(x.getT1(),x.getT2(),x.getT3(),x.getT4()));
+    }
+
+
+    public Flux<OrderDTO.Response> findAll() {
+        return repo.findAll().map(OrderMapper.toDto());
     }
 
 

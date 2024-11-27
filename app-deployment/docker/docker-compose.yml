@@ -20,6 +20,15 @@ services:
     networks:
       - app-network
 
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - app-network
+
 
   zookeeper:
     image: wurstmeister/zookeeper:latest
@@ -57,10 +66,20 @@ services:
       - app-network
 
 
-
-
-
-
+  redis:
+    container_name: redis
+    image: 'redis:latest'
+    hostname: redis
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - app-network
 
 
 
@@ -83,6 +102,8 @@ services:
       book-postgres:
         condition: service_healthy
       kafka:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     deploy:
       resources:
@@ -113,6 +134,8 @@ services:
       book-postgres:
         condition: service_healthy
       kafka:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     deploy:
       resources:
@@ -185,16 +208,6 @@ services:
 
 
 
-  mailhog:
-    image: mailhog/mailhog:v1.0.1
-    container_name: mailhog
-    ports:
-      - "1025:1025"
-      - "8025:8025"
-    networks:
-      - app-network
-
-
 
 
   analytics-service:
@@ -245,6 +258,8 @@ services:
       book-postgres:
         condition: service_healthy
       kafka:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     deploy:
       resources:
