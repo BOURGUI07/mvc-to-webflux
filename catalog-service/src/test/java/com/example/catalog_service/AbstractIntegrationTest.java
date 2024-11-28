@@ -8,6 +8,7 @@ import com.example.catalog_service.repo.ProductInventoryRepo;
 import com.example.catalog_service.repo.ProductRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -46,6 +47,9 @@ public abstract class AbstractIntegrationTest {
 
     @Autowired
     private DatabaseClient databaseClient;
+
+    @Value("${test.timeout}")
+    protected Long timeout;
 
     private static final String TEST_DATA =
             """

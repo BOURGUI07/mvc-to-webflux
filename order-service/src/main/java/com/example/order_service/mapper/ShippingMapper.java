@@ -48,6 +48,8 @@ public class ShippingMapper {
                 .status(entity.getStatus())
                 .message(entity.getMessage())
                 .deliveryDate(entity.getDeliveryDate())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 

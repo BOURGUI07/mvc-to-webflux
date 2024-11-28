@@ -31,6 +31,8 @@ public class CustomerMapper {
                 .username(entity.getUsername())
                 .street(entity.getStreet())
                 .customerId(entity.getId())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 }

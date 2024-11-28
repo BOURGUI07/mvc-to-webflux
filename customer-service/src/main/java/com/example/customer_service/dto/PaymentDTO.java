@@ -4,6 +4,7 @@ import com.example.customer_service.domain.PaymentStatus;
 import lombok.Builder;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public sealed interface PaymentDTO {
@@ -25,6 +26,8 @@ public sealed interface PaymentDTO {
             UUID paymentId,
             BigDecimal amount,
             Long customerId,
-            PaymentStatus status
+            PaymentStatus status,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
     )implements PaymentDTO {}
 }

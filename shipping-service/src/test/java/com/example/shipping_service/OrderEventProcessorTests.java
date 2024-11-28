@@ -58,7 +58,7 @@ public class OrderEventProcessorTests extends AbstractIntegrationTests {
         resFlux
                 .doFirst(() -> streamBridge.send("order-events", createdEvent))
                 .next()
-                .timeout(Duration.ofSeconds(10))
+                .timeout(Duration.ofMillis(timeout))
                 .cast(ShippingEvent.Ready.class)
                 .as(StepVerifier::create)
                 .assertNext(response -> {
@@ -90,7 +90,7 @@ public class OrderEventProcessorTests extends AbstractIntegrationTests {
         resFlux
                 .doFirst(() -> streamBridge.send("order-events", createdEvent))
                 .next()
-                .timeout(Duration.ofSeconds(10))
+                .timeout(Duration.ofMillis(timeout))
                 .cast(ShippingEvent.Ready.class)
                 .as(StepVerifier::create)
                 .assertNext(response -> {
@@ -129,7 +129,7 @@ public class OrderEventProcessorTests extends AbstractIntegrationTests {
         resFlux
                 .doFirst(() -> streamBridge.send("order-events", createdEvent))
                 .next()
-                .timeout(Duration.ofSeconds(10))
+                .timeout(Duration.ofMillis(timeout))
                 .cast(ShippingEvent.Declined.class)
                 .as(StepVerifier::create)
                 .assertNext(response -> {
@@ -184,7 +184,7 @@ public class OrderEventProcessorTests extends AbstractIntegrationTests {
         resFlux
                 .doFirst(() -> streamBridge.send("order-events", createdEvent))
                 .next()
-                .timeout(Duration.ofSeconds(10))
+                .timeout(Duration.ofMillis(timeout))
                 .cast(ShippingEvent.Ready.class)
                 .as(StepVerifier::create)
                 .assertNext(response -> {
@@ -206,7 +206,7 @@ public class OrderEventProcessorTests extends AbstractIntegrationTests {
         resFlux
                 .doFirst(() -> streamBridge.send("order-events", cancelledEvent))
                 .next()
-                .timeout(Duration.ofSeconds(10))
+                .timeout(Duration.ofMillis(timeout))
                 .cast(ShippingEvent.Cancelled.class)
                 .as(StepVerifier::create)
                 .assertNext(response -> {
@@ -240,7 +240,7 @@ public class OrderEventProcessorTests extends AbstractIntegrationTests {
         resFlux
                 .doFirst(() -> streamBridge.send("order-events", createdEvent))
                 .next()
-                .timeout(Duration.ofSeconds(10))
+                .timeout(Duration.ofMillis(timeout))
                 .cast(ShippingEvent.Ready.class)
                 .as(StepVerifier::create)
                 .assertNext(response -> {
@@ -262,7 +262,7 @@ public class OrderEventProcessorTests extends AbstractIntegrationTests {
         resFlux
                 .doFirst(() -> streamBridge.send("order-events", completedEvent))
                 .next()
-                .timeout(Duration.ofSeconds(10))
+                .timeout(Duration.ofMillis(timeout))
                 .cast(ShippingEvent.Scheduled.class)
                 .as(StepVerifier::create)
                 .assertNext(response -> {

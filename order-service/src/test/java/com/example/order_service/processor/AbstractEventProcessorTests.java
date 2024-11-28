@@ -74,7 +74,7 @@ public class AbstractEventProcessorTests extends AbstractIntegrationTests {
     private <T extends OrderEvent> void expectEvent(Class<T> type, Consumer<T> consumer) {
         flux.next()
                 .cast(type)
-                .timeout(Duration.ofSeconds(15))
+                .timeout(Duration.ofMillis(timeout))
                 .as(StepVerifier::create)
                 .assertNext(consumer)
                 .verifyComplete();

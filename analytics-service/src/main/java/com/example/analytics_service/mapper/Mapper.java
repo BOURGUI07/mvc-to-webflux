@@ -12,6 +12,8 @@ public class Mapper {
         return entity -> ProductViewDTO.builder()
                 .productCode(entity.getProductCode())
                 .viewCount(entity.getViewCount())
+                .createdAt(entity.getCreatedAt())
+                .updateAt(entity.getUpdatedAt())
                 .build();
     }
 }

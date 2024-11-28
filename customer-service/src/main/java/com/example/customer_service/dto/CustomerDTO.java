@@ -3,6 +3,7 @@ package com.example.customer_service.dto;
 import lombok.Builder;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public sealed interface CustomerDTO {
 
@@ -37,6 +38,8 @@ public sealed interface CustomerDTO {
             String street,
             String state,
             String country,
-            BigDecimal balance
+            BigDecimal balance,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
     ) implements CustomerDTO {}
 }

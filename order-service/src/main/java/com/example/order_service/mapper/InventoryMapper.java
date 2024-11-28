@@ -38,6 +38,8 @@ public class InventoryMapper {
                 .orderId(entity.getOrderId())
                 .status(entity.getStatus())
                 .message(entity.getMessage())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 

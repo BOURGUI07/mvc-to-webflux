@@ -60,7 +60,7 @@ public class AbstractProductEventPublisherTest extends AbstractIntegrationTest {
 
         resFlux
                 .next()
-                .timeout(Duration.ofSeconds(15))
+                .timeout(Duration.ofMillis(timeout))
                 .cast(ProductEvent.Created.class)
                 .as(StepVerifier::create)
                 .assertNext(event -> {
@@ -87,7 +87,7 @@ public class AbstractProductEventPublisherTest extends AbstractIntegrationTest {
 
         resFlux
                 .next()
-                .timeout(Duration.ofSeconds(15))
+                .timeout(Duration.ofMillis(timeout))
                 .cast(ProductEvent.Updated.class)
                 .as(StepVerifier::create)
                 .assertNext(event -> {
@@ -112,7 +112,7 @@ public class AbstractProductEventPublisherTest extends AbstractIntegrationTest {
 
         resFlux
                 .next()
-                .timeout(Duration.ofSeconds(15))
+                .timeout(Duration.ofMillis(timeout))
                 .cast(ProductEvent.Deleted.class)
                 .as(StepVerifier::create)
                 .assertNext(event -> {

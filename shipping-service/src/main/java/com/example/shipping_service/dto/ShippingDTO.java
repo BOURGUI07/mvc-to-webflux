@@ -4,6 +4,7 @@ import com.example.shipping_service.domain.ShippingStatus;
 import lombok.Builder;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public sealed interface ShippingDTO {
@@ -24,6 +25,8 @@ public sealed interface ShippingDTO {
             Integer quantity,
             UUID shippingId,
             Instant deliveryDate,
-            ShippingStatus status
+            ShippingStatus status,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
     ) implements ShippingDTO {}
 }

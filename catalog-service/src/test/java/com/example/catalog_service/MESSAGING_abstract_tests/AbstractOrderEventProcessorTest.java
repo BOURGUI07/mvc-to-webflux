@@ -49,7 +49,7 @@ public abstract class AbstractOrderEventProcessorTest extends AbstractIntegratio
         resFlux
                 .doFirst(() ->streamBridge.send("order-events", orderEvent))
                 .next()
-                .timeout(Duration.ofSeconds(15))
+                .timeout(Duration.ofMillis(timeout))
                 .cast(InventoryEvent.Deducted.class)
                 .doOnNext(x -> {
                     orderId.set(x.orderId());
@@ -86,7 +86,7 @@ public abstract class AbstractOrderEventProcessorTest extends AbstractIntegratio
         resFlux
                 .doFirst(() ->streamBridge.send("order-events", cancelledEvent))
                 .next()
-                .timeout(Duration.ofSeconds(15))
+                .timeout(Duration.ofMillis(timeout))
                 .cast(InventoryEvent.Restored.class)
                 .as(StepVerifier::create)
                 .assertNext( response -> {
@@ -110,7 +110,7 @@ public abstract class AbstractOrderEventProcessorTest extends AbstractIntegratio
         resFlux
                 .doFirst(() ->streamBridge.send("order-events", orderEvent))
                 .next()
-                .timeout(Duration.ofSeconds(15))
+                .timeout(Duration.ofMillis(timeout))
                 .cast(type)
                 .as(StepVerifier::create)
                 .assertNext(consumer)

@@ -63,7 +63,7 @@ public class CustomerEventProducerTest extends AbstractIntegrationTests {
                 .getResponseBody()
                 .thenMany(resFlux)
                 .next()
-                .timeout(Duration.ofSeconds(10))
+                .timeout(Duration.ofMillis(timeout))
                 .cast(CustomerEvent.Created.class)
                 .as(StepVerifier::create)
                 .assertNext(response -> {

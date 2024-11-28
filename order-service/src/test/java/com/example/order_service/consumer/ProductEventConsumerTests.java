@@ -23,7 +23,7 @@ public class ProductEventConsumerTests extends AbstractIntegrationTests {
 
         streamBridge.send("catalog-events", event);
 
-        Thread.sleep(10_000);
+        Thread.sleep(timeout);
 
         productRepo
                 .findByCodeIgnoreCase("p100")
@@ -48,7 +48,7 @@ public class ProductEventConsumerTests extends AbstractIntegrationTests {
 
         streamBridge.send("catalog-events", event);
 
-        Thread.sleep(10_000);
+        Thread.sleep(timeout);
 
         productRepo
                 .findByCodeIgnoreCase("p100")
@@ -68,7 +68,7 @@ public class ProductEventConsumerTests extends AbstractIntegrationTests {
 
         streamBridge.send("catalog-events", event1);
 
-        Thread.sleep(10_000);
+        Thread.sleep(timeout);
 
         productRepo
                 .findByCodeIgnoreCase("p100")
@@ -92,7 +92,7 @@ public class ProductEventConsumerTests extends AbstractIntegrationTests {
 
         streamBridge.send("catalog-events", event);
 
-        Thread.sleep(10_000);
+        Thread.sleep(timeout);
 
         productRepo
                 .existsByCodeIgnoreCase("p100")
@@ -104,7 +104,7 @@ public class ProductEventConsumerTests extends AbstractIntegrationTests {
 
         streamBridge.send("catalog-events", event1);
 
-        Thread.sleep(10_000);
+        Thread.sleep(timeout);
 
         productRepo
                 .existsByCodeIgnoreCase("p100")

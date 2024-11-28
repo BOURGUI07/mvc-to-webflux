@@ -25,6 +25,10 @@ db:
   username: user
   password: password
 
+
+test:
+  timeout: 15000
+
 ############# SPRING CONFIGURATION ###############
 
 spring:

@@ -6,14 +6,12 @@ import java.time.Instant;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
+@EqualsAndHashCode(callSuper = true)
 @Builder
 @Data
 @NoArgsConstructor
@@ -21,7 +19,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Accessors(chain = true)
 @Table
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OrderShipping {
+public class OrderShipping extends BaseEntity{
     @Id
     private Long id;
 

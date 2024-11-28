@@ -39,6 +39,8 @@ public class Mapper {
                 .quantity(entity.getQuantity())
                 .orderId(entity.getOrderId())
                 .customerId(entity.getCustomerId())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 

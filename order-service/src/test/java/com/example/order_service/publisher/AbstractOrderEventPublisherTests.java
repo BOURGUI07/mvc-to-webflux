@@ -123,7 +123,7 @@ public class AbstractOrderEventPublisherTests extends AbstractIntegrationTests {
 
         resFlux.next()
                 .cast(OrderEvent.Created.class)
-                .timeout(Duration.ofSeconds(15))
+                .timeout(Duration.ofMillis(timeout))
                 .as(StepVerifier::create)
                 .assertNext(event -> {
                     assertEquals(productId, event.productId());

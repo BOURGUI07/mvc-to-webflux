@@ -2,6 +2,7 @@ package com.example.order_service.dto;
 
 import com.example.order_service.enums.OrderStatus;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Builder;
 
@@ -24,6 +25,8 @@ public sealed interface OrderDTO {
             OrderStatus status,
             Long productId,
             Long customerId,
-            Integer quantity)
+            Integer quantity,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt)
             implements OrderDTO {}
 }

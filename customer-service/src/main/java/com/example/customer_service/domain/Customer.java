@@ -1,20 +1,18 @@
 package com.example.customer_service.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 
 import java.math.BigDecimal;
 
+@EqualsAndHashCode(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Accessors(chain = true)
-public class Customer {
+public class Customer extends BaseEntity{
 
     @Id
     private Long id;

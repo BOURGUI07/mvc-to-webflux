@@ -34,6 +34,8 @@ public class Mapper {
                 .imageUrl(entity.getImageUrl())
                 .id(entity.getId())
                 .availableQuantity(entity.getAvailableQuantity())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 
@@ -78,6 +80,8 @@ public class Mapper {
                 .status(entity.getStatus())
                 .orderId(entity.getOrderId())
                 .price(product.getPrice())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 

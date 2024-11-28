@@ -1,21 +1,19 @@
 package com.example.shipping_service.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 
 import java.time.Instant;
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = true)
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class Shipment {
+public class Shipment extends BaseEntity{
 
     @Id
     private UUID shippingId;

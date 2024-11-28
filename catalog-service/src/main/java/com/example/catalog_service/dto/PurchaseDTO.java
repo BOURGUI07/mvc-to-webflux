@@ -4,6 +4,7 @@ import com.example.catalog_service.domain.InventoryStatus;
 import lombok.Builder;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public sealed interface PurchaseDTO {
@@ -27,6 +28,8 @@ public sealed interface PurchaseDTO {
             InventoryStatus status,
             Long productId,
             Integer quantity,
-            UUID orderId
+            UUID orderId,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
     ) implements PurchaseDTO {}
 }

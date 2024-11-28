@@ -5,6 +5,7 @@ import com.example.customer_service.repo.PaymentRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -46,6 +47,9 @@ public class AbstractIntegrationTests {
 
 	@Autowired
 	private DatabaseClient databaseClient;
+
+	@Value("${test.timeout}")
+	protected Long timeout;
 
 	private static final String TEST_DATA = """
 			truncate table customer_payment cascade;

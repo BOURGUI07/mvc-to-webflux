@@ -29,6 +29,8 @@ jobs:
           mvn spotless:apply  # Run the Spotless apply command
 
       - name: Build with Maven
+        env:
+          TEST_TIMEOUT: 30000  # Set the test timeout property
         run: |
           cd order-service  # Navigate to the order-service directory
           mvn -ntp verify     # Run the Maven build

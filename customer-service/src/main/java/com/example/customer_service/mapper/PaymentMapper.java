@@ -22,6 +22,8 @@ public class PaymentMapper {
                 .orderId(entity.getOrderId())
                 .paymentId(entity.getPaymentId())
                 .status(entity.getStatus())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 }

@@ -1,23 +1,21 @@
 package com.example.catalog_service.domain;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = true)
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 @Table
-public class ProductInventory {
+public class ProductInventory extends BaseEntity{
     @Id
     private UUID inventoryId;
     private UUID orderId;

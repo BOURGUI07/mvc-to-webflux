@@ -4,6 +4,7 @@ import com.example.order_service.repo.*;
 import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -50,6 +51,9 @@ public abstract class AbstractIntegrationTests {
 
     @Autowired
     protected PaymentRepo paymentRepo;
+
+    @Value("${test.timeout}")
+    protected Long timeout;
 
     private static final String TEST_DATA =
             """
