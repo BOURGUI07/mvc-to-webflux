@@ -5,6 +5,7 @@ import com.example.order_service.dto.OrderPaymentDTO;
 import com.example.order_service.dto.OrderShippingDTO;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Constants {
@@ -23,5 +24,9 @@ public final class Constants {
         public static final String INVENTORY_KEY = "inventory";
         public static final String SHIPPING_KEY = "shipping";
         public static final String PAYMENT_KEY = "payment";
+    }
+
+    public static final class ApiBaseUrl{
+        public static final String ORDER_BASE_URL = "/api/orders";
     }
 }

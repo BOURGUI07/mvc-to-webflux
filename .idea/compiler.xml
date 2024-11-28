@@ -7,11 +7,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="edge-service" />
+        <module name="customer-service" />
+        <module name="catalog-service" />
         <module name="analytics-service" />
         <module name="order-service" />
-        <module name="customer-service" />
         <module name="notification-service" />
-        <module name="catalog-service" />
         <module name="shipping-service" />
       </profile>
     </annotationProcessing>
@@ -21,6 +22,7 @@
       <module name="analytics-service" options="-parameters" />
       <module name="catalog-service" options="-parameters" />
       <module name="customer-service" options="-parameters" />
+      <module name="edge-service" options="-parameters" />
       <module name="notification-service" options="-parameters" />
       <module name="order-service" options="-parameters" />
       <module name="shipping-service" options="-parameters" />

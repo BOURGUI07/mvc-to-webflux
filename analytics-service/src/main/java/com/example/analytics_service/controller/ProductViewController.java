@@ -12,9 +12,11 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+import static com.example.analytics_service.util.Constants.API_BASE_URL.PRODUCT_VIEW_BASE_URL;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/analytics")
+@RequestMapping(PRODUCT_VIEW_BASE_URL)
 public class ProductViewController {
 
     private final ProductViewService service;

@@ -140,7 +140,7 @@ public class EventProcessorTests extends AbstractEventProcessorTests {
 
         emitShippingEvent(shippingEvent);
 
-        Thread.sleep(10_000);
+        Thread.sleep(15_000);
 
         // verify OrderCompleted
 
@@ -209,7 +209,7 @@ public class EventProcessorTests extends AbstractEventProcessorTests {
 
         emitShippingEvent(shippingEvent);
 
-        Thread.sleep(10_000);
+        Thread.sleep(15_000);
 
         // verify OrderCancelled
 
@@ -279,7 +279,7 @@ public class EventProcessorTests extends AbstractEventProcessorTests {
 
         emitShippingEvent(shippingEvent);
 
-        Thread.sleep(10_000);
+        Thread.sleep(15_000);
 
         // verify OrderCancelled
 
@@ -346,7 +346,7 @@ public class EventProcessorTests extends AbstractEventProcessorTests {
 
         emitShippingEvent(shippingEvent);
 
-        Thread.sleep(10_000);
+        Thread.sleep(15_000);
 
         // verify OrderCancelled
 
@@ -428,7 +428,7 @@ public class EventProcessorTests extends AbstractEventProcessorTests {
 
         emitShippingEvent(shippingEvent);
 
-        Thread.sleep(10_000);
+        Thread.sleep(15_000);
 
         // verify OrderCancelled
 

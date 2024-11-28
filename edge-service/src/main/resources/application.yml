@@ -1,0 +1,90 @@
+############# Externalized Configuration ##############
+edge:
+  service:
+    name: edge-service
+    port: 8888
+    actuator:
+      port: 9888
+
+
+
+redis:
+  port: 6379
+  host: 127.0.0.1
+
+
+service:
+  url:
+    catalog: http://localhost:8081
+    customer: http://localhost:8082
+    shipping: http://localhost:8083
+    notification: http://localhost:8084
+    analytics: http://localhost:8085
+    order: http://localhost:8086
+
+############# SPRING CONFIGURATION ###############
+
+spring:
+  application:
+    name: ${edge.service.name:catalog-service}
+
+
+################### REDIS CONFIGURATION #################
+
+  data:
+    redis:
+      port: ${redis.port:6379}
+      host: ${redis.host:127.0.0.1}
+
+################## GATEWAY CONFIGURATION ##################
+
+  cloud:
+    gateway:
+      routes:
+        - id: catalog-route
+          uri: ${service.url.catalog:http://localhost:8081}
+          predicates:
+            - Path=/api/products/**
+
+
+########### SERVER CONFIGURATION #############
+
+server:
+  port: ${edge.service.port:8888}
+  shutdown: graceful
+  netty:
+    connection-timeout: 2s
+    idle-timeout: 15s
+
+############ ACTUATOR CONFIGURATION #############
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState
+  info:
+    git:
+      enabled: true
+      mode: full
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  server:
+    port: ${edge.service.actuator.port:9888}
+
+
+
+
+
+

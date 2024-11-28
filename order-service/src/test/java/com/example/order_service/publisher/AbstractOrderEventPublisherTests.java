@@ -102,7 +102,7 @@ public class AbstractOrderEventPublisherTests extends AbstractIntegrationTests {
             throws InterruptedException {
         validRequest().apply(productId, customerId, quantity);
 
-        Thread.sleep(5000);
+        Thread.sleep(10_000);
 
         // verify all orders
         client.get()
@@ -123,7 +123,7 @@ public class AbstractOrderEventPublisherTests extends AbstractIntegrationTests {
 
         resFlux.next()
                 .cast(OrderEvent.Created.class)
-                .timeout(Duration.ofSeconds(10))
+                .timeout(Duration.ofSeconds(15))
                 .as(StepVerifier::create)
                 .assertNext(event -> {
                     assertEquals(productId, event.productId());

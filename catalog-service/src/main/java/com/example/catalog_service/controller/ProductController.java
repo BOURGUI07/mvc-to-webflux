@@ -1,6 +1,5 @@
-package com.example.catalog_service.web;
+package com.example.catalog_service.controller;
 
-import com.example.catalog_service.domain.Product;
 import com.example.catalog_service.dto.PagedResult;
 import com.example.catalog_service.dto.ProductCreationRequest;
 import com.example.catalog_service.dto.ProductResponse;
@@ -14,8 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static com.example.catalog_service.util.Constants.API_BASE_URL.PRODUCT_BASE_URL;
+
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping(PRODUCT_BASE_URL)
 @RequiredArgsConstructor
 @Slf4j
 public class ProductController {

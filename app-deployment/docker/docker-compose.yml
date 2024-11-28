@@ -94,6 +94,8 @@ services:
       - DB_USERNAME=user
       - DB_PASSWORD=password
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9093
+      - REDIS_PORT=6379
+      - REDIS_HOST=redis
     ports:
       - "8081:8081"
       - "9081:9081" #actuator port
@@ -134,8 +136,6 @@ services:
       book-postgres:
         condition: service_healthy
       kafka:
-        condition: service_healthy
-      redis:
         condition: service_healthy
     deploy:
       resources:
@@ -250,6 +250,8 @@ services:
       - DB_USERNAME=user
       - DB_PASSWORD=password
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9093
+      - REDIS_PORT=6379
+      - REDIS_HOST=redis
     ports:
       - "8086:8086"
       - "9086:9086" #actuator port

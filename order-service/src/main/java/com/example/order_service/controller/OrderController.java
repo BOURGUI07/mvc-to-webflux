@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static com.example.order_service.util.Constants.ApiBaseUrl.ORDER_BASE_URL;
+
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping(ORDER_BASE_URL)
 @RequiredArgsConstructor
 public class OrderController {
 
