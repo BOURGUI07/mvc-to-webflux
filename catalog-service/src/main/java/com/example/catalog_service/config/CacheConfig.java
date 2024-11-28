@@ -1,31 +1,31 @@
 package com.example.catalog_service.config;
 
-import org.redisson.Redisson;
-import org.redisson.api.RedissonClient;
-import org.redisson.api.RedissonReactiveClient;
-import org.redisson.config.Config;
-import org.redisson.spring.cache.RedissonSpringCacheManager;
-import org.springframework.cache.CacheManager;
+
+import com.example.catalog_service.domain.Product;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
+import org.springframework.data.redis.core.ReactiveHashOperations;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class CacheConfig {
-    @Bean
-    public RedissonClient redisson() {
-        var config = new Config();
-        config.useSingleServer()
-                .setAddress("redis://localhost:6379");
-        return Redisson.create(config);
+    private <T> ReactiveHashOperations<String, String, T> genericTemplate(
+            ReactiveRedisConnectionFactory redisConnectionFactory, Class<T> type) {
+        var template = new ReactiveRedisTemplate<>(
+                redisConnectionFactory,
+                RedisSerializationContext.<String, T>newSerializationContext(new StringRedisSerializer())
+                        .hashKey(new StringRedisSerializer())
+                        .hashValue(new Jackson2JsonRedisSerializer<>(type))
+                        .build());
+        return template.opsForHash();
     }
 
     @Bean
-    public RedissonReactiveClient redissonReactiveClient() {
-        return redisson().reactive();
-    }
-
-    @Bean
-    public CacheManager cacheManager(RedissonClient redisson) {
-        return new RedissonSpringCacheManager(redisson);
+    public ReactiveHashOperations<String, String, Product> orderTemplate(ReactiveRedisConnectionFactory factory) {
+        return genericTemplate(factory, Product.class);
     }
 }

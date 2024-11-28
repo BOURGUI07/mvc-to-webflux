@@ -15,7 +15,7 @@ catalog:
         reactor: INFO
         reactive: INFO
         webflux: INFO
-        redisson: INFO
+        redis: INFO
         service: INFO
     defaultPageSize: 10
     exceptionNotFound: https://api.bookstore.com/errors/not-found
@@ -28,6 +28,11 @@ db:
     flyway: jdbc:postgresql://localhost:5432/catalog_db
   username: user
   password: password
+
+
+redis:
+  port: 6379
+  host: 127.0.0.1
 
 ############# SPRING CONFIGURATION ###############
 
@@ -47,6 +52,7 @@ spring:
     user: ${db.username:user}
     password: ${db.password:password}
     enabled: true
+
 
 
 
@@ -80,6 +86,13 @@ spring:
             "value.serializer": org.springframework.kafka.support.serializer.JsonSerializer
             "key.serializer": org.apache.kafka.common.serialization.StringSerializer
 
+
+################### REDIS CONFIGURATION #################
+
+  data:
+    redis:
+      port: ${redis.port:6379}
+      host: ${redis.host:127.0.0.1}
 ########### SERVER CONFIGURATION #############
 
 server:
@@ -127,7 +140,7 @@ logging:
     io.r2dbc: ${catalog.service.logging.level.r2dbc:INFO}
     org.flywaydb: ${catalog.service.logging.level.flyway:INFO}
     reactor: ${catalog.service.logging.level.reactor:INFO}
-    org.redisson: ${catalog.service.logging.level.redisson:INFO}
+    org.springframework.redis: ${catalog.service.logging.level.redis:INFO}
     com.example.catalog_service: ${catalog.service.logging.level.service:INFO}
 
 

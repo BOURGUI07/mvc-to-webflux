@@ -18,37 +18,36 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class CacheConfig {
 
-    @Bean
-    public <T> ReactiveHashOperations<String, UUID, T> genericTemplate(
+    private <T> ReactiveHashOperations<String, String, T> genericTemplate(
             ReactiveRedisConnectionFactory redisConnectionFactory, Class<T> type) {
         var template = new ReactiveRedisTemplate<>(
                 redisConnectionFactory,
                 RedisSerializationContext.<String, T>newSerializationContext(new StringRedisSerializer())
-                        .hashKey(new  Jackson2JsonRedisSerializer<>(UUID.class))
+                        .hashKey(new StringRedisSerializer())
                         .hashValue(new Jackson2JsonRedisSerializer<>(type))
                         .build());
         return template.opsForHash();
     }
 
     @Bean
-    public ReactiveHashOperations<String, UUID, PurchaseOrder> orderTemplate(ReactiveRedisConnectionFactory factory) {
+    public ReactiveHashOperations<String, String, PurchaseOrder> orderTemplate(ReactiveRedisConnectionFactory factory) {
         return genericTemplate(factory, PurchaseOrder.class);
     }
 
     @Bean
-    public ReactiveHashOperations<String, UUID, OrderInventory> inventoryTemplate(
+    public ReactiveHashOperations<String, String, OrderInventory> inventoryTemplate(
             ReactiveRedisConnectionFactory factory) {
         return genericTemplate(factory, OrderInventory.class);
     }
 
     @Bean
-    public ReactiveHashOperations<String, UUID, OrderShipping> shippingTemplate(
+    public ReactiveHashOperations<String, String, OrderShipping> shippingTemplate(
             ReactiveRedisConnectionFactory factory) {
         return genericTemplate(factory, OrderShipping.class);
     }
 
     @Bean
-    public ReactiveHashOperations<String, UUID, OrderPayment> paymentTemplate(ReactiveRedisConnectionFactory factory) {
+    public ReactiveHashOperations<String, String, OrderPayment> paymentTemplate(ReactiveRedisConnectionFactory factory) {
         return genericTemplate(factory, OrderPayment.class);
     }
 }

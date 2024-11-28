@@ -3,77 +3,57 @@ package com.example.catalog_service.service;
 import com.example.catalog_service.domain.Product;
 import com.example.catalog_service.exceptions.ApplicationsExceptions;
 import com.example.catalog_service.repo.ProductRepo;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.redisson.api.RMapReactive;
-import org.redisson.api.RedissonReactiveClient;
-import org.redisson.codec.TypedJsonJacksonCodec;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.ReactiveHashOperations;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.function.Function;
-import java.util.stream.Collectors;
+
+import static com.example.catalog_service.util.Constants.RedisKeys.PRODUCT_KEY;
+
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CacheService {
 
     private final ProductRepo repo;
-    private final RedissonReactiveClient redissonClient;
-    private RMapReactive<String, Product> mapCode;
-    private RMapReactive<Long, Product> mapId;
+    private final ReactiveHashOperations<String, String, Product> operations;
 
-    @PostConstruct
-    public void initializeMap() {
-        this.mapCode = redissonClient.getMap("productsCode",new TypedJsonJacksonCodec(String.class,Product.class));
-        this.mapId = redissonClient.getMap("productsId",new TypedJsonJacksonCodec(Long.class,Product.class));
-    }
 
     @Scheduled(cron = "0 0 0 * * *")
     public void evictCache(){
-        mapCode.readAllKeySet()
-                .as(Flux::from)
-                .flatMap(Flux::fromIterable)
-                .flatMap(mapCode::fastRemove)
+        operations.delete(PRODUCT_KEY)
+                .doOnError(ex -> log.info("Failed to evict cache"))
                 .subscribe();
     }
 
     @Scheduled(fixedRate = 10_000)
     public void updateCache(){
         repo.findAll()
-                .collectList()
-                .map(list -> list.stream().collect(Collectors.toMap(Product::getCode, Function.identity())))
-                .flatMap(mapCode::putAll)
+                .flatMap(p -> operations.putIfAbsent(PRODUCT_KEY,p.getCode(),p))
+                .doOnError(ex -> log.info("Failed to update cache"))
                 .subscribe();
     }
 
     public Mono<Product> findByCode(String code){
-        return mapCode.get(code)
+        return operations.get(PRODUCT_KEY,code)
                 .switchIfEmpty(repo.findByCodeIgnoreCase(code)
+                        .flatMap(product -> operations.put(PRODUCT_KEY,code,product).thenReturn(product))
                         .switchIfEmpty(ApplicationsExceptions.productNotFound(code))
-                        .flatMap(product -> mapCode.fastPut(code,product).thenReturn(product))
-                );
-    }
-
-    public Mono<Product> findById(Long id){
-        return mapId.get(id)
-                .switchIfEmpty(repo.findById(id)
-                        .switchIfEmpty(ApplicationsExceptions.productNotFound(id))
-                        .flatMap(product -> mapId.fastPut(id,product).thenReturn(product))
                 );
     }
 
 
     public Mono<Long> doOnChanged(Product product){
-        return mapCode.fastRemove(product.getCode());
+        return operations.remove(PRODUCT_KEY,product.getCode());
     }
 
     public Flux<Product> findAll(){
-        return mapCode.readAllValues()
-                .as(Flux::from)
-                .flatMap(Flux::fromIterable);
+        return operations.values(PRODUCT_KEY);
     }
 
 

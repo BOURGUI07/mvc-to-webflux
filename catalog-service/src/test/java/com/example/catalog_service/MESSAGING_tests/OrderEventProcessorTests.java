@@ -38,7 +38,7 @@ public class OrderEventProcessorTests extends AbstractOrderEventProcessorTest {
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void test5(){
-        var event = TestDataUtil.toCreatedOrderEvent().apply(1L,1L,10);
+        var event = TestDataUtil.toCreatedOrderEvent().apply(2L,1L,10);
         whenProductNotFoundThenInventoryEventDeclined(event);
     }
 

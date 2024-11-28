@@ -33,7 +33,8 @@ public class InventoryService {
                 .filter(Predicate.not(b->b))
                 .doOnDiscard(Boolean.class, b -> log.info("DISCARDED REQUEST WITH ORDER_ID: {}", orderId))
                 .switchIfEmpty(ApplicationsExceptions.duplicateEvent(orderId))
-                .then(cacheService.findById(request.productId()))
+                .then(repo.findById(request.productId()))
+                .switchIfEmpty(ApplicationsExceptions.productNotFound(request.productId()))
                 .filter(p -> p.getAvailableQuantity()>= request.quantity())
                 .switchIfEmpty(ApplicationsExceptions.notEnoughInventory(request.productId()))
                 .zipWhen(p -> Mono.fromSupplier(() -> Mapper.toProductInventoryEntity().apply(request)),executeProcess())
@@ -53,7 +54,7 @@ public class InventoryService {
 
     public Mono<PurchaseDTO> restore(UUID orderId){
         return inventoryRepo.findByOrderIdAndStatus(orderId,InventoryStatus.DEDUCTED)
-                .zipWhen( inv -> cacheService.findById(inv.getProductId()), executeRestore())
+                .zipWhen( inv -> repo.findById(inv.getProductId()), executeRestore())
                 .flatMap(Function.identity());
     }
 

@@ -18,33 +18,33 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class OrderCacheService implements CacheService<PurchaseOrder> {
     private final PurchaseOrderRepo repo;
-    private final ReactiveHashOperations<String, UUID, PurchaseOrder> operations;
+    private final ReactiveHashOperations<String, String, PurchaseOrder> operations;
 
     @Scheduled(cron = "0 0 0 * * *")
     public void evictCache() {
         operations
-                .keys(ORDER_KEY)
-                .flatMap(key -> operations.remove(ORDER_KEY, key))
+                .delete(ORDER_KEY)
+                .doOnError(ex -> log.error("Failed to evict cache: {}", ex.getMessage()))
                 .subscribe();
     }
 
     @Override
     public Mono<PurchaseOrder> findById(UUID id) {
         return operations
-                .get(ORDER_KEY, id)
+                .get(ORDER_KEY, id.toString())
                 .switchIfEmpty(repo.findByOrderId(id)
-                        .flatMap(order -> operations.put(ORDER_KEY, id, order).thenReturn(order)));
+                        .flatMap(order -> operations.put(ORDER_KEY, id.toString(), order).thenReturn(order)));
     }
 
     @Override
     public Mono<Long> doOnChanged(PurchaseOrder purchaseOrder) {
-        return operations.remove(ORDER_KEY, purchaseOrder.getOrderId());
+        return operations.remove(ORDER_KEY, purchaseOrder.getOrderId().toString());
     }
 
     @Scheduled(fixedRate = 1_000)
     public void updateCache() {
         repo.findAll()
-                .flatMap(order -> operations.putIfAbsent(ORDER_KEY, order.getOrderId(), order))
+                .flatMap(order -> operations.putIfAbsent(ORDER_KEY, order.getOrderId().toString(), order))
                 .subscribe();
     }
 

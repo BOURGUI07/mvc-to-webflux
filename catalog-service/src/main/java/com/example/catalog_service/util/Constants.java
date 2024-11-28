@@ -14,6 +14,10 @@ public final class Constants {
         public static final String ALREADY_EXISTS ="Product with code %s already exists";
     }
 
+    public static final class RedisKeys{
+        public static final String PRODUCT_KEY = "products";
+    }
+
 
 
 }
