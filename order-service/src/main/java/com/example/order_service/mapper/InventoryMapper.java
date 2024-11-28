@@ -1,12 +1,9 @@
 package com.example.order_service.mapper;
 
 import com.example.order_service.dto.OrderInventoryDTO;
-import com.example.order_service.dto.OrderPaymentDTO;
 import com.example.order_service.entity.OrderInventory;
-import com.example.order_service.entity.OrderPayment;
 import com.example.order_service.enums.InventoryStatus;
 import com.example.order_service.events.InventoryEvent;
-
 import java.util.function.Function;
 
 public class InventoryMapper {
@@ -35,8 +32,7 @@ public class InventoryMapper {
                 .build();
     }
 
-
-    public static Function<OrderInventory,OrderInventoryDTO> toDTO(){
+    public static Function<OrderInventory, OrderInventoryDTO> toDTO() {
         return entity -> OrderInventoryDTO.builder()
                 .inventoryId(entity.getInventoryId())
                 .orderId(entity.getOrderId())
@@ -45,7 +41,7 @@ public class InventoryMapper {
                 .build();
     }
 
-    public static Function<OrderInventoryDTO, OrderInventory> toEntity(){
+    public static Function<OrderInventoryDTO, OrderInventory> toEntity() {
         return dto -> OrderInventory.builder()
                 .orderId(dto.orderId())
                 .status(dto.status())
@@ -53,6 +49,4 @@ public class InventoryMapper {
                 .inventoryId(dto.inventoryId())
                 .build();
     }
-
-
 }

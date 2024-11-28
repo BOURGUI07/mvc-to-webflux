@@ -1,15 +1,9 @@
 package com.example.order_service.mapper;
 
-import com.example.order_service.dto.OrderInventoryDTO;
-import com.example.order_service.dto.OrderPaymentDTO;
 import com.example.order_service.dto.OrderShippingDTO;
-import com.example.order_service.entity.OrderPayment;
 import com.example.order_service.entity.OrderShipping;
-import com.example.order_service.enums.InventoryStatus;
 import com.example.order_service.enums.ShippingStatus;
-import com.example.order_service.events.InventoryEvent;
 import com.example.order_service.events.ShippingEvent;
-
 import java.util.function.Function;
 
 public class ShippingMapper {
@@ -21,7 +15,6 @@ public class ShippingMapper {
                 .orderId(event.orderId())
                 .build();
     }
-
 
     public static Function<ShippingEvent.Declined, OrderShippingDTO> fromDeclinedToShippingDTO() {
         return event -> OrderShippingDTO.builder()
@@ -48,7 +41,7 @@ public class ShippingMapper {
                 .build();
     }
 
-    public static Function<OrderShipping, OrderShippingDTO> toDTO(){
+    public static Function<OrderShipping, OrderShippingDTO> toDTO() {
         return entity -> OrderShippingDTO.builder()
                 .shippingId(entity.getShippingId())
                 .orderId(entity.getOrderId())
@@ -58,7 +51,7 @@ public class ShippingMapper {
                 .build();
     }
 
-    public static Function<OrderShippingDTO,OrderShipping> toEntity(){
+    public static Function<OrderShippingDTO, OrderShipping> toEntity() {
         return dto -> OrderShipping.builder()
                 .orderId(dto.orderId())
                 .status(dto.status())
@@ -67,6 +60,4 @@ public class ShippingMapper {
                 .shippingId(dto.shippingId())
                 .build();
     }
-
-
 }

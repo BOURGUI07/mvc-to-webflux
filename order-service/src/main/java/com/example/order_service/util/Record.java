@@ -4,9 +4,4 @@ import lombok.Builder;
 import reactor.kafka.receiver.ReceiverOffset;
 
 @Builder
-public record Record<T>(
-        T message,
-        String key,
-        ReceiverOffset receiverOffset
-) {
-}
+public record Record<T>(T message, String key, ReceiverOffset receiverOffset) {}

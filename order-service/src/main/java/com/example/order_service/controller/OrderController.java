@@ -3,13 +3,11 @@ package com.example.order_service.controller;
 import com.example.order_service.dto.OrderDTO;
 import com.example.order_service.dto.OrderDetails;
 import com.example.order_service.service.OrderService;
-import jakarta.annotation.PostConstruct;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -23,12 +21,10 @@ public class OrderController {
         return service.placeOrder(request);
     }
 
-
     @GetMapping("/{orderId}")
     public Mono<OrderDetails> getOrderDetails(@PathVariable UUID orderId) {
         return service.getOrderDetails(orderId);
     }
-
 
     @GetMapping
     public Flux<OrderDTO.Response> getAllOrders() {

@@ -4,9 +4,4 @@ import lombok.Builder;
 
 @Builder
 public record OrderDetails(
-        OrderDTO.Response order,
-        OrderInventoryDTO inventory,
-        OrderPaymentDTO payment,
-        OrderShippingDTO shipping
-) {
-}
+        OrderDTO.Response order, OrderInventoryDTO inventory, OrderPaymentDTO payment, OrderShippingDTO shipping) {}

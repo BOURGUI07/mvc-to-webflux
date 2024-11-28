@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableConfigurationProperties(CatalogServiceProperties.class)
-@EnableCaching
 @EnableScheduling
 public class CatalogServiceApplication {
 

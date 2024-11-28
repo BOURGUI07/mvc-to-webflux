@@ -34,12 +34,14 @@ jobs:
           mvn -ntp verify     # Run the Maven build
 
       - name: Login to Docker Hub
+        if: success()
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and Publish Docker Image
+        if: success()
         run: |
           cd customer-service  # Navigate to the customer-service directory
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/bookstore-customer-service .

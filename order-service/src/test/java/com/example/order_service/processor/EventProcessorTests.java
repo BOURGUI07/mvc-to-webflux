@@ -1,33 +1,29 @@
 package com.example.order_service.processor;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.example.order_service.dto.OrderDTO;
 import com.example.order_service.enums.InventoryStatus;
 import com.example.order_service.enums.PaymentStatus;
 import com.example.order_service.enums.ShippingStatus;
 import com.example.order_service.events.InventoryEvent;
-import com.example.order_service.events.OrderEvent;
 import com.example.order_service.events.PaymentEvent;
 import com.example.order_service.events.ShippingEvent;
+import java.math.BigDecimal;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.math.BigDecimal;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-public class EventProcessorTests extends AbstractEventProcessorTests{
+public class EventProcessorTests extends AbstractEventProcessorTests {
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void test() throws InterruptedException {
-        //when all events(payment, shipping, inventory) react positively to CreatedOrderEvent
+        // when all events(payment, shipping, inventory) react positively to CreatedOrderEvent
         // then OrderEventCompleted
         // in other words if PaymentDeducted AND InventoryDeducted AND ShippingReady then OrderEventCompleted
 
-
-        //initiate order
+        // initiate order
         var request = OrderDTO.Request.builder()
                 .customerId(1L)
                 .productId(1L)
@@ -36,7 +32,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         var orderId = initiateOrder(request);
 
-
         // verify OrderCreated
 
         verifyOrderEventCreated(orderId, event -> {
@@ -44,7 +39,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
             assertEquals(1L, event.productId());
             assertEquals(4, event.quantity());
         });
-
 
         // emit PaymentEventDeducted
 
@@ -56,7 +50,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
                 .build();
 
         emitPaymentEvent(paymentEvent);
-
 
         // emit InventoryEventDeducted
 
@@ -70,7 +63,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         emitInventoryEvent(inventoryEvent);
 
-
         // emit ShippingEventReady
 
         var shippingEvent = ShippingEvent.Ready.builder()
@@ -80,16 +72,13 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         emitShippingEvent(shippingEvent);
 
-
         Thread.sleep(15_000);
-
 
         // verify OrderCompleted
 
-       verifyOrderEventCompleted(orderId);
+        verifyOrderEventCompleted(orderId);
 
-
-       // verify OrderDetails
+        // verify OrderDetails
 
         verifyOrderDetails(orderId, detail -> {
             assertEquals(InventoryStatus.DEDUCTED, detail.inventory().status());
@@ -98,16 +87,13 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
         });
     }
 
-
-
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void test1() throws InterruptedException {
-        //whenInventoryDeclined Then No matter what status of both payment/shipping services
+        // whenInventoryDeclined Then No matter what status of both payment/shipping services
         // the order will be nonetheless cancelled
 
-
-        //initiate order
+        // initiate order
         var request = OrderDTO.Request.builder()
                 .customerId(1L)
                 .productId(1L)
@@ -116,7 +102,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         var orderId = initiateOrder(request);
 
-
         // verify OrderCreated
 
         verifyOrderEventCreated(orderId, event -> {
@@ -124,8 +109,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
             assertEquals(1L, event.productId());
             assertEquals(4, event.quantity());
         });
-
-
 
         // emit InventoryEventDeclined
 
@@ -137,8 +120,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         emitInventoryEvent(inventoryEvent);
 
-
-
         // emit PaymentEventDeducted
 
         var paymentEvent = PaymentEvent.Deducted.builder()
@@ -150,7 +131,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         emitPaymentEvent(paymentEvent);
 
-
         // emit ShippingEventReady
 
         var shippingEvent = ShippingEvent.Ready.builder()
@@ -160,15 +140,11 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         emitShippingEvent(shippingEvent);
 
-
-
         Thread.sleep(10_000);
-
 
         // verify OrderCompleted
 
         verifyOrderEventCancelled(orderId);
-
 
         // verify OrderDetails
 
@@ -178,18 +154,15 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
             assertEquals(PaymentStatus.DEDUCTED, detail.payment().status());
             assertEquals(ShippingStatus.PENDING, detail.shipping().status());
         });
-
     }
-
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void test2() throws InterruptedException {
-        //whenPaymentDeclined Then No matter what status of both inventory/shipping services
+        // whenPaymentDeclined Then No matter what status of both inventory/shipping services
         // the order will be nonetheless cancelled
 
-
-        //initiate order
+        // initiate order
         var request = OrderDTO.Request.builder()
                 .customerId(1L)
                 .productId(1L)
@@ -198,7 +171,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         var orderId = initiateOrder(request);
 
-
         // verify OrderCreated
 
         verifyOrderEventCreated(orderId, event -> {
@@ -206,8 +178,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
             assertEquals(1L, event.productId());
             assertEquals(4, event.quantity());
         });
-
-
 
         // emit InventoryEventDeducted
 
@@ -219,8 +189,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
                 .build();
 
         emitInventoryEvent(inventoryEvent);
-
-
 
         // emit PaymentEventDeclined
 
@@ -232,7 +200,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         emitPaymentEvent(paymentEvent);
 
-
         // emit ShippingEventReady
 
         var shippingEvent = ShippingEvent.Ready.builder()
@@ -242,15 +209,11 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         emitShippingEvent(shippingEvent);
 
-
-
         Thread.sleep(10_000);
-
 
         // verify OrderCancelled
 
         verifyOrderEventCancelled(orderId);
-
 
         // verify OrderDetails
 
@@ -260,19 +223,15 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
             assertEquals(PaymentStatus.DECLINED, detail.payment().status());
             assertEquals(ShippingStatus.PENDING, detail.shipping().status());
         });
-
     }
-
-
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void test3() throws InterruptedException {
-        //whenShippingDeclined Then No matter what status of both payment/inventory services
+        // whenShippingDeclined Then No matter what status of both payment/inventory services
         // the order will be nonetheless cancelled
 
-
-        //initiate order
+        // initiate order
         var request = OrderDTO.Request.builder()
                 .customerId(1L)
                 .productId(1L)
@@ -281,7 +240,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         var orderId = initiateOrder(request);
 
-
         // verify OrderCreated
 
         verifyOrderEventCreated(orderId, event -> {
@@ -289,8 +247,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
             assertEquals(1L, event.productId());
             assertEquals(4, event.quantity());
         });
-
-
 
         // emit InventoryEventDeducted
 
@@ -303,8 +259,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         emitInventoryEvent(inventoryEvent);
 
-
-
         // emit PaymentEventDeducted
 
         var paymentEvent = PaymentEvent.Deducted.builder()
@@ -316,7 +270,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         emitPaymentEvent(paymentEvent);
 
-
         // emit ShippingEventDeclined
 
         var shippingEvent = ShippingEvent.Declined.builder()
@@ -326,15 +279,11 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         emitShippingEvent(shippingEvent);
 
-
-
         Thread.sleep(10_000);
-
 
         // verify OrderCancelled
 
         verifyOrderEventCancelled(orderId);
-
 
         // verify OrderDetails
 
@@ -344,17 +293,14 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
             assertEquals(PaymentStatus.DEDUCTED, detail.payment().status());
             assertEquals(ShippingStatus.DECLINED, detail.shipping().status());
         });
-
     }
-
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void test4() throws InterruptedException {
         // when all declined then order cancelled
 
-
-        //initiate order
+        // initiate order
         var request = OrderDTO.Request.builder()
                 .customerId(1L)
                 .productId(1L)
@@ -363,7 +309,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         var orderId = initiateOrder(request);
 
-
         // verify OrderCreated
 
         verifyOrderEventCreated(orderId, event -> {
@@ -371,8 +316,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
             assertEquals(1L, event.productId());
             assertEquals(4, event.quantity());
         });
-
-
 
         // emit InventoryEventDeclined
 
@@ -384,8 +327,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         emitInventoryEvent(inventoryEvent);
 
-
-
         // emit PaymentEventDeclined
 
         var paymentEvent = PaymentEvent.Declined.builder()
@@ -396,7 +337,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         emitPaymentEvent(paymentEvent);
 
-
         // emit ShippingEventDeclined
 
         var shippingEvent = ShippingEvent.Declined.builder()
@@ -406,15 +346,11 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         emitShippingEvent(shippingEvent);
 
-
-
         Thread.sleep(10_000);
-
 
         // verify OrderCancelled
 
         verifyOrderEventCancelled(orderId);
-
 
         // verify OrderDetails
 
@@ -426,9 +362,7 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
             assertEquals(PaymentStatus.DECLINED, detail.payment().status());
             assertEquals(ShippingStatus.DECLINED, detail.shipping().status());
         });
-
     }
-
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
@@ -436,8 +370,7 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
         // when inventory deducted then restored and both payment/shipping are declined
         // the order is cancelled
 
-
-        //initiate order
+        // initiate order
         var request = OrderDTO.Request.builder()
                 .customerId(1L)
                 .productId(1L)
@@ -446,7 +379,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         var orderId = initiateOrder(request);
 
-
         // verify OrderCreated
 
         verifyOrderEventCreated(orderId, event -> {
@@ -454,8 +386,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
             assertEquals(1L, event.productId());
             assertEquals(4, event.quantity());
         });
-
-
 
         // emit InventoryEventDeclined
 
@@ -467,7 +397,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
                 .build();
 
         emitInventoryEvent(inventoryEvent);
-
 
         // emit InventoryEventRestored
 
@@ -480,8 +409,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         emitInventoryEvent(inventoryEvent1);
 
-
-
         // emit PaymentEventDeducted
 
         var paymentEvent = PaymentEvent.Declined.builder()
@@ -492,7 +419,6 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         emitPaymentEvent(paymentEvent);
 
-
         // emit ShippingEventReady
 
         var shippingEvent = ShippingEvent.Declined.builder()
@@ -502,15 +428,11 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
 
         emitShippingEvent(shippingEvent);
 
-
-
         Thread.sleep(10_000);
-
 
         // verify OrderCancelled
 
         verifyOrderEventCancelled(orderId);
-
 
         // verify OrderDetails
 
@@ -519,11 +441,5 @@ public class EventProcessorTests extends AbstractEventProcessorTests{
             assertEquals(PaymentStatus.DECLINED, detail.payment().status());
             assertEquals(ShippingStatus.DECLINED, detail.shipping().status());
         });
-
     }
-
-
-
-
-
 }

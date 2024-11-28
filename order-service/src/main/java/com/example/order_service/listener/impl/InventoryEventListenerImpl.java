@@ -17,16 +17,19 @@ public class InventoryEventListenerImpl implements InventoryEventListener {
 
     @Override
     public Mono<Void> handle(InventoryEvent.Deducted inventoryEvent) {
-        return inventoryService.handleSuccessfulInventory(InventoryMapper.fromDeductedToInventoryDTO().apply(inventoryEvent));
+        return inventoryService.handleSuccessfulInventory(
+                InventoryMapper.fromDeductedToInventoryDTO().apply(inventoryEvent));
     }
 
     @Override
     public Mono<Void> handle(InventoryEvent.Declined inventoryEvent) {
-        return inventoryService.handleFailedInventory(InventoryMapper.fromDeclinedToInventoryDTO().apply(inventoryEvent));
+        return inventoryService.handleFailedInventory(
+                InventoryMapper.fromDeclinedToInventoryDTO().apply(inventoryEvent));
     }
 
     @Override
     public Mono<Void> handle(InventoryEvent.Restored inventoryEvent) {
-        return inventoryService.handleRolledBackInventory(InventoryMapper.fromRestoredToInventoryDTO().apply(inventoryEvent));
+        return inventoryService.handleRolledBackInventory(
+                InventoryMapper.fromRestoredToInventoryDTO().apply(inventoryEvent));
     }
 }

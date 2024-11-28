@@ -3,7 +3,6 @@ package com.example.order_service.listener.impl;
 import com.example.order_service.events.PaymentEvent;
 import com.example.order_service.listener.PaymentEventListener;
 import com.example.order_service.mapper.PaymentMapper;
-import com.example.order_service.service.OrderService;
 import com.example.order_service.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,16 +17,19 @@ public class PaymentEventListenerImpl implements PaymentEventListener {
 
     @Override
     public Mono<Void> handle(PaymentEvent.Deducted paymentEvent) {
-        return service.handleSuccessfulPayment(PaymentMapper.fromDeductedToPaymentDTO().apply(paymentEvent));
+        return service.handleSuccessfulPayment(
+                PaymentMapper.fromDeductedToPaymentDTO().apply(paymentEvent));
     }
 
     @Override
     public Mono<Void> handle(PaymentEvent.Declined paymentEvent) {
-        return service.handleFailedPayment(PaymentMapper.fromDeclinedToPaymentDTO().apply(paymentEvent));
+        return service.handleFailedPayment(
+                PaymentMapper.fromDeclinedToPaymentDTO().apply(paymentEvent));
     }
 
     @Override
     public Mono<Void> handle(PaymentEvent.Refunded paymentEvent) {
-        return service.handleRolledBackPayment(PaymentMapper.fromRefundedToPaymentDTO().apply(paymentEvent));
+        return service.handleRolledBackPayment(
+                PaymentMapper.fromRefundedToPaymentDTO().apply(paymentEvent));
     }
 }

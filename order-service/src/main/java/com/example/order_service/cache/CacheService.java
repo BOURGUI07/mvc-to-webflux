@@ -1,8 +1,7 @@
-package com.example.order_service.service.cache;
-
-import reactor.core.publisher.Mono;
+package com.example.order_service.cache;
 
 import java.util.UUID;
+import reactor.core.publisher.Mono;
 
 public interface CacheService<T> {
 

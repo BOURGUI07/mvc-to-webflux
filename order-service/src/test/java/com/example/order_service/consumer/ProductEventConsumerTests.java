@@ -1,17 +1,14 @@
 package com.example.order_service.consumer;
 
-import com.example.order_service.AbstractIntegrationTests;
-import com.example.order_service.events.ProductEvent;
-import org.junit.jupiter.api.Test;
-import org.springframework.test.annotation.DirtiesContext;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
-
-import java.math.BigDecimal;
-import java.time.Duration;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import com.example.order_service.AbstractIntegrationTests;
+import com.example.order_service.events.ProductEvent;
+import java.math.BigDecimal;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.annotation.DirtiesContext;
+import reactor.test.StepVerifier;
 
 public class ProductEventConsumerTests extends AbstractIntegrationTests {
 
@@ -24,12 +21,12 @@ public class ProductEventConsumerTests extends AbstractIntegrationTests {
                 .productId(1L)
                 .build();
 
-
         streamBridge.send("catalog-events", event);
 
         Thread.sleep(10_000);
 
-        productRepo.findByCodeIgnoreCase("p100")
+        productRepo
+                .findByCodeIgnoreCase("p100")
                 .as(StepVerifier::create)
                 .assertNext(product -> {
                     assertNotNull(product.getId());
@@ -49,12 +46,12 @@ public class ProductEventConsumerTests extends AbstractIntegrationTests {
                 .productId(1L)
                 .build();
 
-
         streamBridge.send("catalog-events", event);
 
         Thread.sleep(10_000);
 
-        productRepo.findByCodeIgnoreCase("p100")
+        productRepo
+                .findByCodeIgnoreCase("p100")
                 .as(StepVerifier::create)
                 .assertNext(product -> {
                     assertNotNull(product.getId());
@@ -69,12 +66,12 @@ public class ProductEventConsumerTests extends AbstractIntegrationTests {
                 .price(new BigDecimal("125.00"))
                 .build();
 
-
         streamBridge.send("catalog-events", event1);
 
         Thread.sleep(10_000);
 
-        productRepo.findByCodeIgnoreCase("p100")
+        productRepo
+                .findByCodeIgnoreCase("p100")
                 .as(StepVerifier::create)
                 .assertNext(product -> {
                     assertNotNull(product.getId());
@@ -85,7 +82,6 @@ public class ProductEventConsumerTests extends AbstractIntegrationTests {
                 .verifyComplete();
     }
 
-
     @Test
     void whenProductEventDeletedThenProductDeleted() throws InterruptedException {
         var event = ProductEvent.Created.builder()
@@ -94,26 +90,24 @@ public class ProductEventConsumerTests extends AbstractIntegrationTests {
                 .productId(1L)
                 .build();
 
-
         streamBridge.send("catalog-events", event);
 
         Thread.sleep(10_000);
 
-        productRepo.existsByCodeIgnoreCase("p100")
+        productRepo
+                .existsByCodeIgnoreCase("p100")
                 .as(StepVerifier::create)
                 .expectNext(true)
                 .verifyComplete();
 
-        var event1 = ProductEvent.Deleted.builder()
-                .code("p100")
-                .build();
-
+        var event1 = ProductEvent.Deleted.builder().code("p100").build();
 
         streamBridge.send("catalog-events", event1);
 
         Thread.sleep(10_000);
 
-        productRepo.existsByCodeIgnoreCase("p100")
+        productRepo
+                .existsByCodeIgnoreCase("p100")
                 .as(StepVerifier::create)
                 .expectNext(false)
                 .verifyComplete();

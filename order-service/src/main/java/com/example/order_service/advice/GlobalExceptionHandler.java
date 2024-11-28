@@ -3,6 +3,9 @@ package com.example.order_service.advice;
 import com.example.order_service.dto.OrderServiceProperties;
 import com.example.order_service.exception.InvalidRequestException;
 import com.example.order_service.util.Util;
+import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -10,10 +13,6 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ServerWebExchange;
-
-import java.net.URI;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @ControllerAdvice
 @RequiredArgsConstructor
@@ -31,7 +30,6 @@ public class GlobalExceptionHandler {
         var method = exchange.getRequest().getMethod().name();
 
         var date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
-
 
         problemDetail.setInstance(URI.create(path));
         problemDetail.setProperty("date", date);

@@ -6,64 +6,59 @@ import com.example.order_service.outbox.OrderOutbox;
 import com.example.order_service.outbox.OutboxDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
 public class OutboxMapper {
 
-    private  final ObjectMapper mapper;
+    private final ObjectMapper mapper;
 
-    public BiFunction<OrderEvent, OrderStatus, OrderOutbox> toEntity(){
-        return (orderEvent,status) -> OrderOutbox.builder()
+    public BiFunction<OrderEvent, OrderStatus, OrderOutbox> toEntity() {
+        return (orderEvent, status) -> OrderOutbox.builder()
                 .status(status)
                 .message(toBytes().apply(orderEvent))
                 .build();
     }
 
-    private Function<OrderEvent,byte[]> toBytes(){
+    private Function<OrderEvent, byte[]> toBytes() {
         return event -> {
-            try{
+            try {
                 return mapper.writeValueAsBytes(event);
-            }catch (JsonProcessingException e){
+            } catch (JsonProcessingException e) {
                 log.warn("Failed to convert order event to bytes: {}", e.getMessage());
             }
             return null;
         };
     }
 
-    public Function<OrderOutbox, OutboxDTO<OrderEvent>> toDTO(){
+    public Function<OrderOutbox, OutboxDTO<OrderEvent>> toDTO() {
         return entity -> OutboxDTO.<OrderEvent>builder()
                 .correlationId(entity.getId())
-                .event(toEvent().apply(entity.getStatus(),entity.getMessage()))
+                .event(toEvent().apply(entity.getStatus(), entity.getMessage()))
                 .build();
     }
 
-    private <T> T toObject(byte[] bytes, Class<T> type){
-            try{
-                return mapper.readValue(bytes,type);
-            }catch (IOException e){
-                log.warn("Failed to convert bytes to OrderEvent: {}", e.getMessage());
-            }
-            return null;
+    private <T> T toObject(byte[] bytes, Class<T> type) {
+        try {
+            return mapper.readValue(bytes, type);
+        } catch (IOException e) {
+            log.warn("Failed to convert bytes to OrderEvent: {}", e.getMessage());
+        }
+        return null;
     }
 
-
-    private BiFunction<OrderStatus,byte[],OrderEvent> toEvent(){
-        return (status,bytes) -> switch (status){
-            case CREATED -> toObject(bytes,OrderEvent.Created.class);
-            case COMPLETED -> toObject(bytes,OrderEvent.Completed.class);
-            case CANCELLED -> toObject(bytes,OrderEvent.Cancelled.class);
+    private BiFunction<OrderStatus, byte[], OrderEvent> toEvent() {
+        return (status, bytes) -> switch (status) {
+            case CREATED -> toObject(bytes, OrderEvent.Created.class);
+            case COMPLETED -> toObject(bytes, OrderEvent.Completed.class);
+            case CANCELLED -> toObject(bytes, OrderEvent.Cancelled.class);
         };
     }
-
-
 }

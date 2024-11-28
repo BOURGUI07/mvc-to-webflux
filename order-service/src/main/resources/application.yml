@@ -15,6 +15,7 @@ order:
         reactor: INFO
         reactive: INFO
         webflux: INFO
+        redis: INFO
         service: INFO
     exceptionNotFound: https://api.bookstore.com/errors/not-found
     exceptionGeneral: https://api.bookstore.com/errors/general
@@ -87,6 +88,10 @@ spring:
           orderEventProducer-out-0:
             producer:
               record-metadata-channel: orderEventResults
+  data:
+    redis:
+      port: 6379
+      host: 127.0.0.1
 
 ########### SERVER CONFIGURATION #############
 
@@ -135,7 +140,9 @@ logging:
     io.r2dbc: ${order.service.logging.level.r2dbc:INFO}
     org.flywaydb: ${order.service.logging.level.flyway:INFO}
     reactor: ${order.service.logging.level.reactor:INFO}
+    org.springframework.data.redis: ${order.service.logging.level.redis:INFO}
     com.example.order_service: ${order.service.logging.level.service:INFO}
+
 
 
 

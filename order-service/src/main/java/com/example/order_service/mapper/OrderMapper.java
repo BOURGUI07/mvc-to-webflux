@@ -5,14 +5,13 @@ import com.example.order_service.entity.Product;
 import com.example.order_service.entity.PurchaseOrder;
 import com.example.order_service.enums.OrderStatus;
 import com.example.order_service.events.OrderEvent;
-
 import java.math.BigDecimal;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class OrderMapper {
 
-    public static BiFunction<OrderDTO.Request, Product, PurchaseOrder> toEntity(){
+    public static BiFunction<OrderDTO.Request, Product, PurchaseOrder> toEntity() {
         return (request, product) -> PurchaseOrder.builder()
                 .customerId(request.customerId())
                 .price(product.getPrice())
@@ -23,7 +22,7 @@ public class OrderMapper {
                 .build();
     }
 
-    public static Function<PurchaseOrder,OrderDTO.Response> toDto(){
+    public static Function<PurchaseOrder, OrderDTO.Response> toDto() {
         return entity -> OrderDTO.Response.builder()
                 .amount(entity.getAmount())
                 .customerId(entity.getCustomerId())
@@ -35,8 +34,7 @@ public class OrderMapper {
                 .build();
     }
 
-
-    public static Function<OrderDTO.Response, OrderEvent> toCreatedOrderEvent(){
+    public static Function<OrderDTO.Response, OrderEvent> toCreatedOrderEvent() {
         return response -> OrderEvent.Created.builder()
                 .customerId(response.customerId())
                 .orderId(response.orderId())
@@ -46,21 +44,22 @@ public class OrderMapper {
                 .build();
     }
 
-    public static Function<OrderDTO.Response, OrderEvent> toCancelledOrderEvent(){
+    public static Function<OrderDTO.Response, OrderEvent> toCancelledOrderEvent() {
         return response -> OrderEvent.Cancelled.builder()
                 .customerId(response.customerId())
                 .orderId(response.orderId())
                 .build();
     }
 
-    public static Function<OrderDTO.Response, OrderEvent> toCompletedOrderEvent(){
+    public static Function<OrderDTO.Response, OrderEvent> toCompletedOrderEvent() {
         return response -> OrderEvent.Completed.builder()
                 .customerId(response.customerId())
                 .orderId(response.orderId())
                 .build();
     }
 
-    public static OrderDetails toOrderDetails(OrderDTO.Response order, OrderShippingDTO shipping , OrderInventoryDTO inventory, OrderPaymentDTO payment){
+    public static OrderDetails toOrderDetails(
+            OrderDTO.Response order, OrderShippingDTO shipping, OrderInventoryDTO inventory, OrderPaymentDTO payment) {
         return OrderDetails.builder()
                 .order(order)
                 .shipping(shipping)
@@ -68,6 +67,4 @@ public class OrderMapper {
                 .payment(payment)
                 .build();
     }
-
-
 }

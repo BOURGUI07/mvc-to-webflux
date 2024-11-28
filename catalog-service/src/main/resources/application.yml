@@ -15,6 +15,7 @@ catalog:
         reactor: INFO
         reactive: INFO
         webflux: INFO
+        redisson: INFO
         service: INFO
     defaultPageSize: 10
     exceptionNotFound: https://api.bookstore.com/errors/not-found
@@ -126,6 +127,7 @@ logging:
     io.r2dbc: ${catalog.service.logging.level.r2dbc:INFO}
     org.flywaydb: ${catalog.service.logging.level.flyway:INFO}
     reactor: ${catalog.service.logging.level.reactor:INFO}
+    org.redisson: ${catalog.service.logging.level.redisson:INFO}
     com.example.catalog_service: ${catalog.service.logging.level.service:INFO}
 
 
