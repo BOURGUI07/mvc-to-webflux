@@ -12,7 +12,7 @@ public final class Constants {
         public static final String NOT_ENOUGH_BALANCE = "Customer with id %s doesn't have enough balance";
     }
 
-    public static final class API_BASE_URL{
+    public static final class PublicApiUrls {
         public static final String CUSTOMER_BASE_URL = "/api/customers";
     }
 }

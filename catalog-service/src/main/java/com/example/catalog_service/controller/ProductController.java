@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static com.example.catalog_service.util.Constants.API_BASE_URL.PRODUCT_BASE_URL;
+import static com.example.catalog_service.util.Constants.PublicApiUrls.PRODUCT_BASE_URL;
 
 @RestController
 @RequestMapping(PRODUCT_BASE_URL)

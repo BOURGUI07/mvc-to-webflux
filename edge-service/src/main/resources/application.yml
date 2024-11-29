@@ -17,8 +17,6 @@ service:
   url:
     catalog: http://localhost:8081
     customer: http://localhost:8082
-    shipping: http://localhost:8083
-    notification: http://localhost:8084
     analytics: http://localhost:8085
     order: http://localhost:8086
 
@@ -27,9 +25,11 @@ service:
 spring:
   application:
     name: ${edge.service.name:catalog-service}
+  lifecycle:
+    timeout-per-shutdown-phase: 15s
 
 
-################### REDIS CONFIGURATION #################
+  ################### REDIS CONFIGURATION #################
 
   data:
     redis:
@@ -40,11 +40,90 @@ spring:
 
   cloud:
     gateway:
+      httpclient:
+        connect-timeout: 2000  # Time Limit for a connection to be established
+        response-timeout: 10s  # Time Limit for a response to be received
+        pool:
+          type: elastic
+          max-idle-time: 15s # Idle Time after which the communication channel will be closed
+          max-life-time: 60s # Time after which the communication channel will be closed
+
+      default-filters:
+        - name: Retry  # Filter Name
+          args:
+            retries: 3  # Maximum of 3 retry attempts
+            methods: GET
+            series: SERVER_ERROR #Retries only when 5XX errors occur
+            exceptions: java.io.IOException, java.util.concurrent.TimeoutException  # Retries only when the given exceptions are thrown
+            backoff:
+              firstBackoff: 50ms
+              maxBackoff: 500ms
+              factor: 2
+              basedOnPreviousValue: false
+
+
       routes:
         - id: catalog-route
           uri: ${service.url.catalog:http://localhost:8081}
           predicates:
             - Path=/api/products/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: catalogCircuitBreaker
+                fallbackUri: forward:/catalog-fallback  #when circuit is open forward request to this uri
+
+
+        - id: customer-route
+          uri: ${service.url.customer:http://localhost:8082}
+          predicates:
+            - Path=/api/customers/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: customerCircuitBreaker
+                fallbackUri: forward:/customer-fallback  #when circuit is open forward request to this uri
+
+
+        - id: analytics-route
+          uri: ${service.url.analytics:http://localhost:8085}
+          predicates:
+            - Path=/api/analytics/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: analyticsCircuitBreaker
+                fallbackUri: forward:/analytics-fallback  #when circuit is open forward request to this uri
+
+
+        - id: order-route
+          uri: ${service.url.order:http://localhost:8086}
+          predicates:
+            - Path=/api/orders/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: orderCircuitBreaker
+                fallbackUri: forward:/order-fallback  #when circuit is open forward request to this uri
+
+
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default: # default configuration bean for all circuit breakers
+        sliding-window-size: 20 # the size of the sliding window used to record the outcome of calls when the circuit is closed
+        permitted-number-of-calls-in-half-open-state: 5
+        failure-rate-threshold: 50  # when the failure rate is above the threshold, the circuit becomes open
+        wait-duration-in-open-state:  # waiting time before moving from open to half-open
+          seconds: 15
+  timelimiter:
+    configs:
+      default:
+        timeout-duration:
+          seconds: 10
+
+
 
 
 ########### SERVER CONFIGURATION #############
@@ -82,6 +161,7 @@ management:
       application: ${spring.application.name}
   server:
     port: ${edge.service.actuator.port:9888}
+
 
 
 

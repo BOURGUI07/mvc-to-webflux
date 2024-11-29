@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static com.example.order_service.util.Constants.ApiBaseUrl.ORDER_BASE_URL;
+import static com.example.order_service.util.Constants.PublicApiUrls.ORDER_BASE_URL;
 
 @RestController
 @RequestMapping(ORDER_BASE_URL)

@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import static com.example.customer_service.util.Constants.API_BASE_URL.CUSTOMER_BASE_URL;
+import static com.example.customer_service.util.Constants.PublicApiUrls.CUSTOMER_BASE_URL;
 
 @RequiredArgsConstructor
 @RestController
