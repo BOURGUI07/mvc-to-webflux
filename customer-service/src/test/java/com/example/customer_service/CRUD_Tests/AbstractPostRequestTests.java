@@ -22,7 +22,7 @@ public abstract class AbstractPostRequestTests extends AbstractIntegrationTests 
                 .uri("/api/customers")
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().isCreated()
                 .returnResult(CustomerDTO.Response.class)
                 .getResponseBody()
                 .as(StepVerifier::create)

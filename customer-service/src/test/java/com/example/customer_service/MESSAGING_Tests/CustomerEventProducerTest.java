@@ -58,7 +58,7 @@ public class CustomerEventProducerTest extends AbstractIntegrationTests {
                 .uri("/api/customers")
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().isCreated()
                 .returnResult(CustomerDTO.Response.class)
                 .getResponseBody()
                 .thenMany(resFlux)

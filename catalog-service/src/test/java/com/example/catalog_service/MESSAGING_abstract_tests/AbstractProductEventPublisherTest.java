@@ -50,7 +50,7 @@ public class AbstractProductEventPublisherTest extends AbstractIntegrationTest {
                 .uri("/api/products")
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().is2xxSuccessful()
+                .expectStatus().isCreated()
                 .returnResult(ProductResponse.class)
                 .getResponseBody()
                 .doOnNext(x -> productId.set(x.id()))

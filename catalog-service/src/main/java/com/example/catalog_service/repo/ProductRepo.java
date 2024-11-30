@@ -14,4 +14,6 @@ public interface ProductRepo extends ReactiveCrudRepository<Product, Long> {
     Mono<Product> findByCodeIgnoreCase(String code);
 
     Mono<Boolean> existsByCodeIgnoreCase(String code);
+
+
 }

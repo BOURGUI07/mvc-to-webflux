@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ServerWebExchange;
@@ -21,7 +22,7 @@ public class GlobalExceptionHandler {
 
     private final OrderServiceProperties properties;
 
-    private ProblemDetail handleException(
+    private ResponseEntity<ProblemDetail> handleException(
             Exception ex, HttpStatus status, String title, String errorCategory, URI type, ServerWebExchange exchange) {
         var problemDetail = ProblemDetail.forStatusAndDetail(status, ex.getMessage());
         problemDetail.setTitle(title);
@@ -40,11 +41,11 @@ public class GlobalExceptionHandler {
 
         log.error("Problem Detail Response: {}", Util.write(problemDetail));
 
-        return problemDetail;
+        return ResponseEntity.status(status).body(problemDetail);
     }
 
     @ExceptionHandler(Exception.class)
-    public ProblemDetail handleGeneralException(Exception ex, ServerWebExchange exchange) {
+    public ResponseEntity<ProblemDetail> handleGeneralException(Exception ex, ServerWebExchange exchange) {
         return handleException(
                 ex,
                 HttpStatus.INTERNAL_SERVER_ERROR,
@@ -55,7 +56,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidRequestException.class)
-    public ProblemDetail handleInvalidRequest(InvalidRequestException ex, ServerWebExchange exchange) {
+    public ResponseEntity<ProblemDetail> handleInvalidRequest(InvalidRequestException ex, ServerWebExchange exchange) {
         return handleException(
                 ex,
                 HttpStatus.BAD_REQUEST,

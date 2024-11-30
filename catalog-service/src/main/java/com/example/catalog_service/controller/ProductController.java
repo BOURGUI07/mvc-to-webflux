@@ -8,7 +8,9 @@ import com.example.catalog_service.service.ProductService;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -23,9 +25,10 @@ public class ProductController {
     private final ProductService service;
 
     @GetMapping
-    public Mono<PagedResult<ProductResponse>> getProducts(
+    public Mono<ResponseEntity<PagedResult<ProductResponse>>> getProducts(
             @RequestParam(defaultValue = "1", required = false) int page) {
-        return service.getProducts(page);
+        return service.getProducts(page)
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping(value = "/stream/{maxPrice}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -34,23 +37,27 @@ public class ProductController {
     }
 
     @GetMapping("/{code}")
-    public Mono<ProductResponse> getProduct(@PathVariable String code) {
-        return service.findByCode(code);
+    public Mono<ResponseEntity<ProductResponse>> getProduct(@PathVariable String code) {
+        return service.findByCode(code)
+                .map(ResponseEntity::ok);
     }
 
 
     @PostMapping
-    public Mono<ProductResponse> create(@RequestBody Mono<ProductCreationRequest> request) {
-        return service.createProduct(request);
+    public Mono<ResponseEntity<ProductResponse>> create(@RequestBody Mono<ProductCreationRequest> request) {
+        return service.createProduct(request)
+                .map(dto -> ResponseEntity.status(HttpStatus.CREATED).body(dto));
     }
 
     @PutMapping("/{code}")
-    public Mono<ProductResponse> update(@PathVariable String code,@RequestBody Mono<ProductUpdateRequest> request) {
-        return service.update(code, request);
+    public Mono<ResponseEntity<ProductResponse>> update(@PathVariable String code,@RequestBody Mono<ProductUpdateRequest> request) {
+        return service.update(code, request)
+                .map(ResponseEntity::ok);
     }
 
     @DeleteMapping("/{code}")
-    public Mono<Void> delete(@PathVariable String code) {
-        return service.deleteByCode(code);
+    public Mono<ResponseEntity<Void>> delete(@PathVariable String code) {
+        return service.deleteByCode(code)
+                .then(Mono.fromSupplier(() -> ResponseEntity.ok().build()));
     }
 }

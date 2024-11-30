@@ -5,7 +5,6 @@ import com.example.catalog_service.exceptions.InvalidProductRequestException;
 import com.example.catalog_service.exceptions.ProductAlreadyExistsException;
 import com.example.catalog_service.exceptions.ProductNotFoundException;
 import java.net.URI;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -14,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ServerWebExchange;
@@ -24,7 +24,7 @@ import org.springframework.web.server.ServerWebExchange;
 public class GlobalExceptionHandler {
     private final CatalogServiceProperties properties;
 
-    private ProblemDetail handleException(
+    private ResponseEntity<ProblemDetail> handleException(
             Exception ex, HttpStatus status, String title, String errorCategory, URI type, ServerWebExchange exchange) {
         var problemDetail = ProblemDetail.forStatusAndDetail(status, ex.getMessage());
         problemDetail.setTitle(title);
@@ -44,11 +44,11 @@ public class GlobalExceptionHandler {
 
         log.error("Problem Detail Response: {}", Util.write(problemDetail));
 
-        return problemDetail;
+        return ResponseEntity.status(status).body(problemDetail);
     }
 
     @ExceptionHandler(Exception.class)
-    public ProblemDetail handleGeneralException(Exception ex, ServerWebExchange exchange) {
+    public ResponseEntity<ProblemDetail> handleGeneralException(Exception ex, ServerWebExchange exchange) {
         return handleException(
                 ex,
                 HttpStatus.INTERNAL_SERVER_ERROR,
@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ProductNotFoundException.class)
-    public ProblemDetail handleProductNotFoundException(ProductNotFoundException ex, ServerWebExchange exchange) {
+    public ResponseEntity<ProblemDetail> handleProductNotFoundException(ProductNotFoundException ex, ServerWebExchange exchange) {
         return handleException(
                 ex,
                 HttpStatus.NOT_FOUND,
@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidProductRequestException.class)
-    public ProblemDetail handleInvalidRequest(InvalidProductRequestException ex, ServerWebExchange exchange) {
+    public ResponseEntity<ProblemDetail> handleInvalidRequest(InvalidProductRequestException ex, ServerWebExchange exchange) {
         return handleException(
                 ex,
                 HttpStatus.BAD_REQUEST,
@@ -81,7 +81,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ProductAlreadyExistsException.class)
-    public ProblemDetail handleAlreadyExistingProduct(ProductAlreadyExistsException ex, ServerWebExchange exchange) {
+    public ResponseEntity<ProblemDetail> handleAlreadyExistingProduct(ProductAlreadyExistsException ex, ServerWebExchange exchange) {
         return handleException(
                 ex,
                 HttpStatus.BAD_REQUEST,

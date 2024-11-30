@@ -26,7 +26,7 @@ public abstract class AbstractPostRequestTests extends AbstractIntegrationTest {
                     .uri("/api/products")
                     .bodyValue(request)
                     .exchange()
-                    .expectStatus().is2xxSuccessful()
+                    .expectStatus().isCreated()
                     .returnResult(ProductResponse.class)
                     .getResponseBody()
                     .doOnNext(p-> productId.set(p.id()))
