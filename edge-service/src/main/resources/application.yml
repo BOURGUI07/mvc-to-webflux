@@ -35,11 +35,22 @@ spring:
     redis:
       port: ${redis.port:6379}
       host: ${redis.host:127.0.0.1}
+      timeout: 2s # Time Limit for a response to be received
+      connect-timeout: 2s # Time Limit for a connection to be established
 
-################## GATEWAY CONFIGURATION ##################
+  ################## GATEWAY CONFIGURATION ##################
 
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allow-credentials: false
+            allowed-headers: "*"
+            allowed-methods: "*"
+            allowed-origins: "*"
+
+
       httpclient:
         connect-timeout: 2000  # Time Limit for a connection to be established
         response-timeout: 10s  # Time Limit for a response to be received
@@ -47,6 +58,7 @@ spring:
           type: elastic
           max-idle-time: 15s # Idle Time after which the communication channel will be closed
           max-life-time: 60s # Time after which the communication channel will be closed
+
 
       default-filters:
         - name: Retry  # Filter Name
@@ -60,6 +72,17 @@ spring:
               maxBackoff: 500ms
               factor: 2
               basedOnPreviousValue: false
+
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter:
+              replenishRate: 10  # Number of tokens dripped in the bucket each second
+              burstCapacity: 20  # Allow request bursts of up to 20 requests
+              requestedTokens: 1 # How many tokens a request costs
+              keyResolver: '#{@keyResolver}'
+
+
+        - SaveSession
 
 
       routes:
@@ -107,21 +130,46 @@ spring:
                 fallbackUri: forward:/order-fallback  #when circuit is open forward request to this uri
 
 
+  session:
+    timeout: 10m
+    redis:
+      namespace: bookstore:edge
+
+
+
 
 resilience4j:
   circuitbreaker:
     configs:
       default: # default configuration bean for all circuit breakers
+        sliding-window-type: COUNT_BASED
         sliding-window-size: 20 # the size of the sliding window used to record the outcome of calls when the circuit is closed
+        minimum-number-of-calls: 10  #consider at minimum 10 new requests before taking any decision of opening or closing
         permitted-number-of-calls-in-half-open-state: 5
         failure-rate-threshold: 50  # when the failure rate is above the threshold, the circuit becomes open
         wait-duration-in-open-state:  # waiting time before moving from open to half-open
           seconds: 15
+        recordExceptions: #consider these kinds of exceptions as failures
+          - org.springframework.web.reactive.function.client.WebClientResponseException
+          - java.util.concurrent.TimeoutException
+          - java.io.IOException
+
+
+
   timelimiter:
     configs:
       default:
         timeout-duration:
           seconds: 10
+
+
+#  ratelimiter:
+#    configs:
+#      default:
+#        limitRefreshPeriod: 20s #in a period of 20s
+#        limitForPeriod: 5 # I want to limit 5 requests per 20s
+#        timeoutDuration: 5s # if a client sends 5 request and there's still 5s left to 20s, then allow for more requests
+
 
 
 
@@ -163,8 +211,9 @@ management:
     port: ${edge.service.actuator.port:9888}
 
 
-
-
-
+############## LOGGING CONFIGURATION  ######################
+logging:
+  level:
+    io.github.resilience4j: DEBUG
 
 

@@ -107,6 +107,11 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9081/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:
@@ -137,6 +142,11 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9082/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:
@@ -167,6 +177,11 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9083/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:
@@ -199,6 +214,11 @@ services:
         condition: service_started
       kafka:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9084/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:
@@ -230,6 +250,11 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9085/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:
@@ -263,12 +288,63 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9086/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:
           memory: 700m
     networks:
       - app-network
+
+
+
+  edge-service:
+    image: youness544/bookstore-edge-service
+    container_name: edge-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - REDIS_PORT=6379
+      - REDIS_HOST=redis
+      - SERVICE_URL_CATALOG=http://catlog-service:8081
+      - SERVICE_URL_CUSTOMER=http://catlog-service:8082
+      - SERVICE_URL_ANALYTICS=http://catlog-service:8085
+      - SERVICE_URL_ORDER=http://catlog-service:8086
+    ports:
+      - "8888:8888"
+      - "9888:9888" #actuator port
+    restart: unless-stopped
+    depends_on:
+      catalog-service:
+        condition: service_healthy
+      customer-service:
+        condition: service_healthy
+      order-service:
+        condition: service_healthy
+      shipping-service:
+        condition: service_healthy
+      notification-service:
+        condition: service_healthy
+      analytics-service:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9888/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - app-network
+
+
+
+
 
 
 
