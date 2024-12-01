@@ -1,0 +1,145 @@
+############# Externalized Configuration ##############
+rating:
+  service:
+    name: rating-service
+    port: 8087
+    actuator:
+      port: 9087
+    logging:
+      level:
+        root: INFO
+        spring: INFO
+        flyway: INFO
+        r2dbc: INFO
+        netty: INFO
+        reactor: INFO
+        reactive: INFO
+        webflux: INFO
+        redis: INFO
+        service: INFO
+    defaultPageSize: 10
+    exceptionNotFound: https://api.bookstore.com/errors/not-found
+    exceptionGeneral: https://api.bookstore.com/errors/general
+    exceptionBadRequest: https://api.bookstore.com/errors/bad-request
+
+db:
+  url:
+    r2dbc: r2dbc:postgresql://localhost:5432/rating_db
+    flyway: jdbc:postgresql://localhost:5432/rating_db
+  username: user
+  password: password
+
+
+redis:
+  port: 6379
+  host: 127.0.0.1
+
+
+test:
+  timeout: 10000
+############# SPRING CONFIGURATION ###############
+
+spring:
+  application:
+    name: ${rating.service.name:rating-service}
+  r2dbc:
+    url: ${db.url.r2dbc:r2dbc:postgresql://localhost:5432/rating_db}
+    username: ${db.username:user}
+    password: ${db.password:password}
+    pool:
+      max-size: 10
+      initial-size: 5
+      max-create-connection-time: 2s
+  flyway:
+    url: ${db.url.flyway:jdbc:postgresql://localhost:5432/rating_db}
+    user: ${db.username:user}
+    password: ${db.password:password}
+    enabled: true
+
+
+
+
+############# SPRING CLOUD STREAM WITH KAFKA CONFIGURATION ###############
+  cloud:
+    function:
+      definition: completedOrderEventConsumer
+    stream:
+      default:
+        producer:
+          useNativeEncoding: true
+
+      bindings:
+        completedOrderEventConsumer-in-0:
+          destination: order-events
+          group: "rating-service-group"
+      kafka:
+        binder:
+          consumer-properties:
+            "value.deserializer": org.springframework.kafka.support.serializer.JsonDeserializer
+            "key.deserializer": org.apache.kafka.common.serialization.StringDeserializer
+            "auto.offset.reset": "earliest"
+            "spring.json.trusted.packages": "com.example.rating_service.events"
+          producer-properties:
+            "value.serializer": org.springframework.kafka.support.serializer.JsonSerializer
+            "key.serializer": org.apache.kafka.common.serialization.StringSerializer
+
+
+################### REDIS CONFIGURATION #################
+
+  data:
+    redis:
+      port: ${redis.port:6379}
+      host: ${redis.host:127.0.0.1}
+########### SERVER CONFIGURATION #############
+
+server:
+  port: ${rating.service.port:8087}
+  shutdown: graceful
+  netty:
+    connection-timeout: 2s
+    idle-timeout: 15s
+
+############ ACTUATOR CONFIGURATION #############
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState
+  info:
+    git:
+      enabled: true
+      mode: full
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  server:
+    port: ${rating.service.actuator.port:9087}
+
+############## LOGGING CONFIGURATION ################
+logging:
+  level:
+    root: ${rating.service.logging.level.root:INFO}
+    org.springframework: ${rating.service.logging.level.spring:INFO}
+    org.springframework.web.reactive: ${rating.service.logging.level.reactive:INFO}
+    org.springframework.web: ${rating.service.logging.level.webflux:INFO}
+    io.netty: ${rating.service.logging.level.netty:INFO}
+    io.r2dbc: ${rating.service.logging.level.r2dbc:INFO}
+    org.flywaydb: ${rating.service.logging.level.flyway:INFO}
+    reactor: ${rating.service.logging.level.reactor:INFO}
+    org.springframework.redis: ${rating.service.logging.level.redis:INFO}
+    com.example.rating_service: ${rating.service.logging.level.service:INFO}
+
+
+
+

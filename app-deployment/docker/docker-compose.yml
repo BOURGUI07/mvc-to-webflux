@@ -264,6 +264,45 @@ services:
 
 
 
+  rating-service:
+    image: youness544/bookstore-rating-service
+    container_name: rating-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_URL_R2DBC=r2dbc:postgresql://book-postgres:5432/rating_db
+      - DB_URL_FLYWAY=jdbc:postgresql://book-postgres:5432/rating_db
+      - SPRING_FLYWAY_ENABLED=true
+      - DB_USERNAME=user
+      - DB_PASSWORD=password
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9093
+      - REDIS_PORT=6379
+      - REDIS_HOST=redis
+    ports:
+      - "8087:8087"
+      - "9087:9087" #actuator port
+    restart: unless-stopped
+    depends_on:
+      book-postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9087/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - app-network
+
+
+
+
   order-service:
     image: youness544/bookstore-order-service
     container_name: order-service
