@@ -4,6 +4,7 @@ import com.example.ratingservice.events.OrderEvent;
 import com.example.ratingservice.exceptions.ApplicationExceptions;
 import com.example.ratingservice.mapper.OrderMapper;
 import com.example.ratingservice.repo.OrderHistoryRepo;
+import com.example.ratingservice.util.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class OrderService {
                 .switchIfEmpty(ApplicationExceptions.duplicateEvent())
                 .then(repo.save(OrderMapper.toEntity().apply(event)))
                 .map(OrderMapper.toDto())
-                .doOnNext(dto -> log.info("Order Service Layer Produced Order History: {}", dto))
+                .doOnNext(dto -> log.info("Order Service Layer Produced Order History: {}", Util.write(dto)))
                 .then();
     }
 }

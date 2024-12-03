@@ -1,5 +1,7 @@
 package com.example.ratingservice.events;
 
+import lombok.Builder;
+
 import java.util.UUID;
 
 public sealed interface OrderEvent {
@@ -8,6 +10,7 @@ public sealed interface OrderEvent {
     Long customerId();
     Long productId();
 
+    @Builder
     record Completed(
             UUID orderId,
             Long customerId,

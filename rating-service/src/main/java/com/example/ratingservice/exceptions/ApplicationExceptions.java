@@ -6,7 +6,7 @@ import reactor.core.publisher.Mono;
 public class ApplicationExceptions {
 
     public static <T>Mono<T> invalidRequest(String message) {
-        return Mono.error(new InvalidRequestException(message));
+        return Mono.error(new InvalidRatingRequestException(message));
     }
 
     public static <T>Mono<T> notFound(Long ratingId) {

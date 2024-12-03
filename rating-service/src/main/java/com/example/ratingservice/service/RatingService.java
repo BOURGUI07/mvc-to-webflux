@@ -50,7 +50,9 @@ public class RatingService {
                     var request = x.getT1();
                     var orderHistory = x.getT2();
 
-                    return Mono.fromSupplier(() -> request).filter(__->hasValidProductAndCustomer().test(request,orderHistory));
+                    return Mono.fromSupplier(() -> request)
+                            .filter(__->hasValidProductAndCustomer().test(request,orderHistory))
+                            .switchIfEmpty(ApplicationExceptions.invalidRequest("Either productId or customerId doesn't match existing productId or customerId."));
                 });
     }
 

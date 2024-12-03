@@ -24,6 +24,7 @@ public class RatingMapper {
 
     public static Function<Rating, RatingResponse> toDto(){
         return entity -> RatingResponse.builder()
+                .ratingId(entity.getRatingId())
                 .customerId(entity.getCustomerId())
                 .value(entity.getValue())
                 .productId(entity.getProductId())

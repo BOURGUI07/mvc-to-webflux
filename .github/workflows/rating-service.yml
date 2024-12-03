@@ -30,7 +30,7 @@ jobs:
 
       - name: Build with Maven
         env:
-          TEST_TIMEOUT: 10000  # Set the test timeout property
+          TEST_TIMEOUT: 10  # Set the test timeout property
         run: |
           cd rating-service  # Navigate to the rating-service directory
           mvn -ntp verify     # Run the Maven build
