@@ -1,0 +1,233 @@
+openapi: 3.0.0
+info:
+  title: Customer API
+  description: API for managing customer data.
+  version: 1.0.0
+paths:
+  /customers:
+    get:
+      summary: Get a list of customers
+      description: Retrieve a paginated list of customers.
+      parameters:
+        - name: page
+          in: query
+          description: The page number to retrieve (default is 1).
+          required: false
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: A list of customers with pagination information.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        customerId:
+                          type: integer
+                        username:
+                          type: string
+                        phone:
+                          type: string
+                        email:
+                          type: string
+                        city:
+                          type: string
+                        street:
+                          type: string
+                        state:
+                          type: string
+                        country:
+                          type: string
+                        balance:
+                          type: number
+                          format: float
+                        createdAt:
+                          type: string
+                          format: date-time
+                        updatedAt:
+                          type: string
+                          format: date-time
+                  totalElements:
+                    type: integer
+                  pageNumber:
+                    type: integer
+                  totalPages:
+                    type: integer
+                  isFirst:
+                    type: boolean
+                  isLast:
+                    type: boolean
+                  hasNext:
+                    type: boolean
+                  hasPrevious:
+                    type: boolean
+    post:
+      summary: Create a new customer
+      description: Create a new customer using the provided data.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                phone:
+                  type: string
+                email:
+                  type: string
+                city:
+                  type: string
+                street:
+                  type: string
+                state:
+                  type: string
+                country:
+                  type: string
+                balance:
+                  type: number
+                  format: float
+      responses:
+        '201':
+          description: Customer created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customerId:
+                    type: integer
+                  username:
+                    type: string
+                  phone:
+                    type: string
+                  email:
+                    type: string
+                  city:
+                    type: string
+                  street:
+                    type: string
+                  state:
+                    type: string
+                  country:
+                    type: string
+                  balance:
+                    type: number
+                    format: float
+                  createdAt:
+                    type: string
+                    format: date-time
+                  updatedAt:
+                    type: string
+                    format: date-time
+components:
+  schemas:
+    ProblemDetail:
+      type: object
+      properties:
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        type:
+          type: string
+        date:
+          type: string
+        errorCategory:
+          type: string
+        service:
+          type: string
+        httpMethod:
+          type: string
+    CustomerDTO:
+      type: object
+      properties:
+        username:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        street:
+          type: string
+    CustomerRequest:
+      allOf:
+        - $ref: '#/components/schemas/CustomerDTO'
+    CustomerResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CustomerDTO'
+        - properties:
+            customerId:
+              type: integer
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+    PageResult:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              customerId:
+                type: integer
+              username:
+                type: string
+              phone:
+                type: string
+              email:
+                type: string
+              city:
+                type: string
+              street:
+                type: string
+              state:
+                type: string
+              country:
+                type: string
+              balance:
+                type: number
+                format: float
+              createdAt:
+                type: string
+                format: date-time
+              updatedAt:
+                type: string
+                format: date-time
+        totalElements:
+          type: integer
+        pageNumber:
+          type: integer
+        totalPages:
+          type: integer
+        isFirst:
+          type: boolean
+        isLast:
+          type: boolean
+        hasNext:
+          type: boolean
+        hasPrevious:
+          type: boolean

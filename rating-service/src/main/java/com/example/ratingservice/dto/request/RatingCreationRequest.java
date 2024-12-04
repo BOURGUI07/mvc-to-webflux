@@ -1,16 +1,8 @@
 package com.example.ratingservice.dto.request;
 
-import lombok.Builder;
-
 import java.util.UUID;
+import lombok.Builder;
 
 @Builder
 public record RatingCreationRequest(
-        Long customerId,
-        Long productId,
-        UUID orderId,
-        String title,
-        String content,
-        Double value
-) {
-}
+        Long customerId, Long productId, UUID orderId, String title, String content, Double value) {}

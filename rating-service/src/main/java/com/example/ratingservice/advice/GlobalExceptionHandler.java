@@ -4,6 +4,9 @@ import com.example.ratingservice.dto.RatingServiceProperties;
 import com.example.ratingservice.exceptions.InvalidRatingRequestException;
 import com.example.ratingservice.exceptions.RatingNotFoundException;
 import com.example.ratingservice.util.Util;
+import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,10 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ServerWebExchange;
-
-import java.net.URI;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @ControllerAdvice
 @Slf4j
@@ -32,7 +31,6 @@ public class GlobalExceptionHandler {
         var method = exchange.getRequest().getMethod().name();
 
         var date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
-
 
         problemDetail.setInstance(URI.create(path));
         problemDetail.setProperty("date", date);
@@ -58,7 +56,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(RatingNotFoundException.class)
-    public ResponseEntity<ProblemDetail> handleRatingNotFoundException(RatingNotFoundException ex, ServerWebExchange exchange) {
+    public ResponseEntity<ProblemDetail> handleRatingNotFoundException(
+            RatingNotFoundException ex, ServerWebExchange exchange) {
         return handleException(
                 ex,
                 HttpStatus.NOT_FOUND,
@@ -69,7 +68,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidRatingRequestException.class)
-    public ResponseEntity<ProblemDetail> handleInvalidRequest(InvalidRatingRequestException ex, ServerWebExchange exchange) {
+    public ResponseEntity<ProblemDetail> handleInvalidRequest(
+            InvalidRatingRequestException ex, ServerWebExchange exchange) {
         return handleException(
                 ex,
                 HttpStatus.BAD_REQUEST,

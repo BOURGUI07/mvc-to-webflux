@@ -1,21 +1,19 @@
 package com.example.ratingservice.CRUD_TESTS;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.example.ratingservice.AbstractIntegrationTests;
 import com.example.ratingservice.entity.Rating;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.ProblemDetail;
-import org.springframework.test.annotation.DirtiesContext;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
-
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.ProblemDetail;
+import org.springframework.test.annotation.DirtiesContext;
+import reactor.test.StepVerifier;
 
 public class DeleteRequestTests extends AbstractIntegrationTests {
-    private Supplier<Long> insertData(){
+    private Supplier<Long> insertData() {
         return () -> {
             var atomicLong = new AtomicLong();
             var rating = Rating.builder()
@@ -27,7 +25,8 @@ public class DeleteRequestTests extends AbstractIntegrationTests {
                     .content("Disappointed")
                     .build();
 
-            ratingRepo.save(rating)
+            ratingRepo
+                    .save(rating)
                     .doOnNext(entity -> atomicLong.set(entity.getRatingId()))
                     .then()
                     .as(StepVerifier::create)
@@ -37,10 +36,9 @@ public class DeleteRequestTests extends AbstractIntegrationTests {
         };
     }
 
-
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void testValidDeleteRequest(){
+    void testValidDeleteRequest() {
         var ratingId = insertData().get();
 
         client.delete()
@@ -54,15 +52,13 @@ public class DeleteRequestTests extends AbstractIntegrationTests {
                 .as(StepVerifier::create)
                 .verifyComplete();
 
-        ratingRepo.findById(ratingId)
-                .as(StepVerifier::create)
-                .verifyComplete();
+        ratingRepo.findById(ratingId).as(StepVerifier::create).verifyComplete();
     }
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void testInvalidDeleteRequest(){
-        var ratingId = insertData().get()+99;
+    void testInvalidDeleteRequest() {
+        var ratingId = insertData().get() + 99;
 
         client.delete()
                 .uri("/api/ratings/" + ratingId)
@@ -72,8 +68,7 @@ public class DeleteRequestTests extends AbstractIntegrationTests {
                 .returnResult(ProblemDetail.class)
                 .getResponseBody()
                 .as(StepVerifier::create)
-                .assertNext(resp -> assertEquals("Rating Not Found",resp.getTitle()))
+                .assertNext(resp -> assertEquals("Rating Not Found", resp.getTitle()))
                 .verifyComplete();
-
     }
 }

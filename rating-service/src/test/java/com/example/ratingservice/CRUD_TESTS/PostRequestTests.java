@@ -1,65 +1,61 @@
 package com.example.ratingservice.CRUD_TESTS;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.example.ratingservice.AbstractIntegrationTests;
 import com.example.ratingservice.dto.request.RatingCreationRequest;
 import com.example.ratingservice.dto.response.RatingResponse;
 import com.example.ratingservice.entity.OrderHistory;
+import java.util.UUID;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ProblemDetail;
 import org.springframework.test.annotation.DirtiesContext;
 import reactor.test.StepVerifier;
 
-import java.util.UUID;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 public class PostRequestTests extends AbstractIntegrationTests {
 
-    private UUID insertData(){
+    private UUID insertData() {
         var orderHistory = OrderHistory.builder()
                 .orderId(UUID.randomUUID())
                 .customerId(1L)
                 .productId(1L)
                 .build();
 
-        orderRepo.save(orderHistory)
-                .then()
-                .as(StepVerifier::create)
-                .verifyComplete();
+        orderRepo.save(orderHistory).then().as(StepVerifier::create).verifyComplete();
 
         return orderHistory.getOrderId();
     }
 
-    //POST REQUEST
-    private BiConsumer<RatingCreationRequest,Consumer<RatingResponse>> validPostRequest(){
-        return (request,responseConsumer) -> {
+    // POST REQUEST
+    private BiConsumer<RatingCreationRequest, Consumer<RatingResponse>> validPostRequest() {
+        return (request, responseConsumer) -> {
             insertData();
             client.post()
                     .uri("/api/ratings")
                     .bodyValue(request)
                     .exchange()
-                    .expectStatus().isCreated()
+                    .expectStatus()
+                    .isCreated()
                     .returnResult(RatingResponse.class)
                     .getResponseBody()
                     .as(StepVerifier::create)
                     .assertNext(response -> {
-                        assertEquals(request.value(),response.value());
+                        assertEquals(request.value(), response.value());
                         assertNotNull(response.ratingId());
-                        assertEquals(request.customerId(),response.customerId());
-                        assertEquals(request.productId(),response.productId());
+                        assertEquals(request.customerId(), response.customerId());
+                        assertEquals(request.productId(), response.productId());
                         responseConsumer.accept(response);
                     })
                     .verifyComplete();
         };
     }
 
-
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void testValidRequest(){
+    void testValidRequest() {
         var request = RatingCreationRequest.builder()
                 .customerId(1L)
                 .productId(1L)
@@ -70,14 +66,14 @@ public class PostRequestTests extends AbstractIntegrationTests {
                 .build();
 
         validPostRequest().accept(request, response -> {
-            assertEquals(request.content(),response.content());
-            assertEquals(request.title(),response.title());
+            assertEquals(request.content(), response.content());
+            assertEquals(request.title(), response.title());
         });
     }
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void testValidRequestWithMissingContentAndTitle(){
+    void testValidRequestWithMissingContentAndTitle() {
         var request = RatingCreationRequest.builder()
                 .customerId(1L)
                 .productId(1L)
@@ -91,28 +87,29 @@ public class PostRequestTests extends AbstractIntegrationTests {
         });
     }
 
-    private TriConsumer<RatingCreationRequest,String,String> invalidPostRequest(){
+    private TriConsumer<RatingCreationRequest, String, String> invalidPostRequest() {
         return (request, detail, title) -> {
-          insertData();
-          client.post()
-                  .uri("/api/ratings")
-                  .bodyValue(request)
-                  .exchange()
-                  .expectStatus().is4xxClientError()
-                  .returnResult(ProblemDetail.class)
-                  .getResponseBody()
-                  .as(StepVerifier::create)
-                  .assertNext(response -> {
-                      assertEquals(title, response.getTitle());
-                      assertEquals(detail,response.getDetail());
-                  })
-                  .verifyComplete();
+            insertData();
+            client.post()
+                    .uri("/api/ratings")
+                    .bodyValue(request)
+                    .exchange()
+                    .expectStatus()
+                    .is4xxClientError()
+                    .returnResult(ProblemDetail.class)
+                    .getResponseBody()
+                    .as(StepVerifier::create)
+                    .assertNext(response -> {
+                        assertEquals(title, response.getTitle());
+                        assertEquals(detail, response.getDetail());
+                    })
+                    .verifyComplete();
         };
     }
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void testPostRequestWithMissingCustomerId(){
+    void testPostRequestWithMissingCustomerId() {
         var request = RatingCreationRequest.builder()
                 .productId(1L)
                 .orderId(insertData())
@@ -126,7 +123,7 @@ public class PostRequestTests extends AbstractIntegrationTests {
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void testPostRequestWithMissingProductId(){
+    void testPostRequestWithMissingProductId() {
         var request = RatingCreationRequest.builder()
                 .customerId(1L)
                 .orderId(insertData())
@@ -140,7 +137,7 @@ public class PostRequestTests extends AbstractIntegrationTests {
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void testPostRequestWithMissingOrderId(){
+    void testPostRequestWithMissingOrderId() {
         var request = RatingCreationRequest.builder()
                 .customerId(1L)
                 .productId(1L)
@@ -154,7 +151,7 @@ public class PostRequestTests extends AbstractIntegrationTests {
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void testPostRequestWithMissingRatingValue(){
+    void testPostRequestWithMissingRatingValue() {
         var request = RatingCreationRequest.builder()
                 .customerId(1L)
                 .productId(1L)
@@ -168,7 +165,7 @@ public class PostRequestTests extends AbstractIntegrationTests {
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void testPostRequestWithInvalidRatingValue(){
+    void testPostRequestWithInvalidRatingValue() {
         var request = RatingCreationRequest.builder()
                 .customerId(1L)
                 .productId(1L)
@@ -181,10 +178,9 @@ public class PostRequestTests extends AbstractIntegrationTests {
         invalidPostRequest().accept(request, detail, title);
     }
 
-
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void testPostRequestWithNotFoundOrderId(){
+    void testPostRequestWithNotFoundOrderId() {
         var request = RatingCreationRequest.builder()
                 .customerId(1L)
                 .productId(1L)
@@ -199,7 +195,7 @@ public class PostRequestTests extends AbstractIntegrationTests {
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void testPostRequestWithInvalidProductId(){
+    void testPostRequestWithInvalidProductId() {
         var request = RatingCreationRequest.builder()
                 .customerId(1L)
                 .productId(2L)
@@ -214,7 +210,7 @@ public class PostRequestTests extends AbstractIntegrationTests {
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void testPostRequestWithInvalidCustomerId(){
+    void testPostRequestWithInvalidCustomerId() {
         var request = RatingCreationRequest.builder()
                 .customerId(2L)
                 .productId(1L)
@@ -226,13 +222,4 @@ public class PostRequestTests extends AbstractIntegrationTests {
         var title = "Invalid Rating Request";
         invalidPostRequest().accept(request, detail, title);
     }
-
-
-
-
-
-
-
-
-
 }

@@ -16,7 +16,8 @@ public class OrderEventConsumerImpl implements OrderEventConsumer {
 
     @Override
     public Mono<Void> handle(OrderEvent.Completed event) {
-        return orderService.saveOrder(event)
+        return orderService
+                .saveOrder(event)
                 .doOnError(DuplicateEventException.class, ex -> log.info("DUPLICATE EVENT"))
                 .onErrorResume(DuplicateEventException.class, ex -> Mono.empty());
     }

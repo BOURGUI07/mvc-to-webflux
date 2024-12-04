@@ -9,8 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Util {
     private static final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
-
-    public static String write(Object object){
+    public static String write(Object object) {
         try {
             return mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {

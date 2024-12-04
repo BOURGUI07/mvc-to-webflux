@@ -1,0 +1,63 @@
+openapi: 3.0.0
+info:
+  title: Product View API
+  description: API for retrieving product view data.
+  version: 1.0.0
+paths:
+  /views:
+    get:
+      summary: Get Product Views
+      description: Retrieve a list of product view data.
+      responses:
+        '200':
+          description: A list of product views returned successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    productCode:
+                      type: string
+                      example: "ABC123"
+                      description: "The unique code identifying the product."
+                    viewCount:
+                      type: integer
+                      example: 150
+                      description: "The total number of views for the product."
+                    createdAt:
+                      type: string
+                      format: date-time
+                      example: "2023-12-04T10:15:30"
+                      description: "The timestamp when the product view record was created."
+                    updateAt:
+                      type: string
+                      format: date-time
+                      example: "2023-12-04T12:45:00"
+                      description: "The timestamp when the product view record was last updated."
+      tags:
+        - Product View
+components:
+  schemas:
+    ProductViewDTO:
+      type: object
+      properties:
+        productCode:
+          type: string
+          example: "ABC123"
+          description: "The unique code identifying the product."
+        viewCount:
+          type: integer
+          example: 150
+          description: "The total number of views for the product."
+        createdAt:
+          type: string
+          format: date-time
+          example: "2023-12-04T10:15:30"
+          description: "The timestamp when the product view record was created."
+        updateAt:
+          type: string
+          format: date-time
+          example: "2023-12-04T12:45:00"
+          description: "The timestamp when the product view record was last updated."

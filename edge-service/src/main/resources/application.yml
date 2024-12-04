@@ -19,6 +19,7 @@ service:
     customer: http://localhost:8082
     analytics: http://localhost:8085
     order: http://localhost:8086
+    rating: http://localhost:8087
 
 ############# SPRING CONFIGURATION ###############
 
@@ -129,6 +130,46 @@ spring:
                 name: orderCircuitBreaker
                 fallbackUri: forward:/order-fallback  #when circuit is open forward request to this uri
 
+        - id: rating-route
+          uri: ${service.url.rating:http://localhost:8087}
+          predicates:
+            - Path=/api/ratings/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: ratingCircuitBreaker
+                fallbackUri: forward:/rating-fallback  #when circuit is open forward request to this uri
+
+
+        - id: order-service-swagger
+          uri: ${service.url.order:http://localhost:8086}
+          predicates:
+            - Path=/order-service/v3/api-docs, /order-service/swagger-ui.html
+
+
+        - id: customer-service-swagger
+          uri: ${service.url.customer:http://localhost:8082}
+          predicates:
+            - Path=/customer-service/v3/api-docs, /customer-service/swagger-ui.html
+
+        - id: catalog-service-swagger
+          uri: ${service.url.catalog:http://localhost:8081}
+          predicates:
+            - Path=/catalog-service/v3/api-docs, /catalog-service/swagger-ui.html
+
+
+        - id: rating-service-swagger
+          uri: ${service.url.rating:http://localhost:8087}
+          predicates:
+            - Path=/rating-service/v3/api-docs, /rating-service/swagger-ui.html
+
+
+        - id: analytics-service-swagger
+          uri: ${service.url.analytics:http://localhost:8085}
+          predicates:
+            - Path=/analytics-service/v3/api-docs, /analytics-service/swagger-ui.html
+
+
 
   session:
     timeout: 10m
@@ -215,5 +256,29 @@ management:
 logging:
   level:
     io.github.resilience4j: DEBUG
+
+
+################# SWAGGER CONFIGURATION  ##################
+
+
+# Edge service-specific Swagger setup
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - url: /v3/api-docs
+        name: edge-service
+      - url: /order-service/v3/api-docs
+        name: order-service
+      - url: /catalog-service/v3/api-docs
+        name: catalog-service
+      - url: /customer-service/v3/api-docs
+        name: customer-service
+      - url: /analytics-service/v3/api-docs
+        name: analytics-service
+      - url: /rating-service/v3/api-docs
+        name: rating-service
+    use-root-path: true
+
 
 

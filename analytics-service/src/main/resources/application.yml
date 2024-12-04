@@ -123,3 +123,15 @@ logging:
 
 
 
+
+##################### SWAGGER CONFIGURATION ###############
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /analytics-service/v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /analytics-service/swagger-ui.html
+    url: /analytics-service/v3/api-docs
+  show-actuator: true

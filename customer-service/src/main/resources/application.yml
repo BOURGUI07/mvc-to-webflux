@@ -129,5 +129,15 @@ logging:
     reactor: ${customer.service.logging.level.reactor:INFO}
     com.example.customer_service: ${customer.service.logging.level.service:INFO}
 
+##################### SWAGGER CONFIGURATION ###############
 
+springdoc:
+  api-docs:
+    enabled: true
+    path: /customer-service/v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /customer-service/swagger-ui.html
+    url: /customer-service/v3/api-docs
+  show-actuator: true
 

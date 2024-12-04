@@ -88,6 +88,7 @@ server:
   netty:
     connection-timeout: 2s
     idle-timeout: 15s
+  forward-headers-strategy: framework
 
 ############ ACTUATOR CONFIGURATION #############
 management:
@@ -129,7 +130,19 @@ logging:
     reactor: ${rating.service.logging.level.reactor:INFO}
     org.springframework.redis: ${rating.service.logging.level.redis:INFO}
     com.example.rating_service: ${rating.service.logging.level.service:INFO}
+    org.springdoc: DEBUG
 
 
+##################### SWAGGER CONFIGURATION ###############
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /rating-service/v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /rating-service/swagger-ui.html
+    url: /rating-service/v3/api-docs
+  show-actuator: true
 
 

@@ -1,0 +1,279 @@
+openapi: 3.0.1
+info:
+  title: Rating Service API
+  description: API documentation for managing ratings by customers and products.
+  version: 1.0.0
+servers:
+  - url: /api/ratings
+paths:
+  /customers/{customerId}:
+    get:
+      summary: Get Ratings by Customer ID
+      description: Retrieve a paginated list of ratings associated with a specific customer.
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          description: ID of the customer.
+          schema:
+            type: integer
+        - name: page
+          in: query
+          required: false
+          description: Page number for pagination (default is 1).
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: Paginated list of ratings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRatingResponse'
+        '404':
+          $ref: '#/components/responses/RatingNotFoundError'
+        '400':
+          $ref: '#/components/responses/InvalidRatingRequestError'
+
+  /products/{productId}:
+    get:
+      summary: Get Ratings by Product ID
+      description: Retrieve a paginated list of ratings associated with a specific product.
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: ID of the product.
+          schema:
+            type: integer
+        - name: page
+          in: query
+          required: false
+          description: Page number for pagination (default is 1).
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: Paginated list of ratings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRatingResponse'
+        '404':
+          $ref: '#/components/responses/RatingNotFoundError'
+        '400':
+          $ref: '#/components/responses/InvalidRatingRequestError'
+
+  /:
+    post:
+      summary: Create a Rating
+      description: Add a new rating.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RatingCreationRequest'
+      responses:
+        '201':
+          description: Rating created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatingResponse'
+        '400':
+          $ref: '#/components/responses/InvalidRatingRequestError'
+
+  /{ratingId}:
+    put:
+      summary: Update a Rating
+      description: Update an existing rating by its ID.
+      parameters:
+        - name: ratingId
+          in: path
+          required: true
+          description: ID of the rating to update.
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RatingUpdateRequest'
+      responses:
+        '200':
+          description: Rating updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatingResponse'
+        '404':
+          $ref: '#/components/responses/RatingNotFoundError'
+        '400':
+          $ref: '#/components/responses/InvalidRatingRequestError'
+
+    delete:
+      summary: Delete a Rating
+      description: Remove an existing rating by its ID.
+      parameters:
+        - name: ratingId
+          in: path
+          required: true
+          description: ID of the rating to delete.
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Rating deleted successfully.
+        '404':
+          $ref: '#/components/responses/RatingNotFoundError'
+
+components:
+  schemas:
+    PaginatedRatingResponse:
+      type: object
+      properties:
+        ratings:
+          type: array
+          items:
+            $ref: '#/components/schemas/RatingResponse'
+        count:
+          type: integer
+        minRating:
+          type: number
+          format: float
+        averageRating:
+          type: number
+          format: float
+        maxRating:
+          type: number
+          format: float
+
+    RatingResponse:
+      type: object
+      properties:
+        customerId:
+          type: integer
+        productId:
+          type: integer
+        orderId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        content:
+          type: string
+        value:
+          type: number
+          format: float
+        ratingId:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    RatingCreationRequest:
+      type: object
+      properties:
+        customerId:
+          type: integer
+        productId:
+          type: integer
+        orderId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        content:
+          type: string
+        value:
+          type: number
+          format: float
+
+    RatingUpdateRequest:
+      type: object
+      properties:
+        value:
+          type: number
+          format: float
+        title:
+          type: string
+        content:
+          type: string
+
+  responses:
+    GeneralError:
+      description: General error response for unexpected issues.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              status:
+                type: integer
+              detail:
+                type: string
+              instance:
+                type: string
+              date:
+                type: string
+              errorCategory:
+                type: string
+              service:
+                type: string
+              httpMethod:
+                type: string
+    RatingNotFoundError:
+      description: Error response when a rating is not found.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              status:
+                type: integer
+              detail:
+                type: string
+              instance:
+                type: string
+              date:
+                type: string
+              errorCategory:
+                type: string
+              service:
+                type: string
+              httpMethod:
+                type: string
+    InvalidRatingRequestError:
+      description: Error response for invalid rating requests.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              status:
+                type: integer
+              detail:
+                type: string
+              instance:
+                type: string
+              date:
+                type: string
+              errorCategory:
+                type: string
+              service:
+                type: string
+              httpMethod:
+                type: string

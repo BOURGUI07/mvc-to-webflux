@@ -2,9 +2,9 @@
 order:
   service:
     name: order-service
-    port: 8085
+    port: 8086
     actuator:
-      port: 9085
+      port: 9086
     logging:
       level:
         root: INFO
@@ -108,7 +108,7 @@ spring:
 ########### SERVER CONFIGURATION #############
 
 server:
-  port: ${order.service.port:8085}
+  port: ${order.service.port:8086}
   shutdown: graceful
   netty:
     connection-timeout: 2s
@@ -139,7 +139,7 @@ management:
     tags:
       application: ${spring.application.name}
   server:
-    port: ${order.service.actuator.port:9085}
+    port: ${order.service.actuator.port:9086}
 
 ############## LOGGING CONFIGURATION ################
 logging:
@@ -157,5 +157,15 @@ logging:
 
 
 
+##################### SWAGGER CONFIGURATION ###############
 
+springdoc:
+  api-docs:
+    enabled: true
+    path: /order-service/v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /order-service/swagger-ui.html
+    url: /order-service/v3/api-docs
+  show-actuator: true
 

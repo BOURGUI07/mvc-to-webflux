@@ -10,5 +10,6 @@ import reactor.core.publisher.Flux;
 public interface RatingRepo extends ReactiveCrudRepository<Rating, Long> {
 
     Flux<Rating> findByProductId(Long id, Pageable pageable);
+
     Flux<Rating> findByCustomerId(Long id, Pageable pageable);
 }

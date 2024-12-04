@@ -5,13 +5,11 @@ import reactor.core.publisher.Mono;
 
 public interface OrderEventConsumer {
 
-    default Mono<Void> consume(OrderEvent orderEvent){
-        return switch (orderEvent){
+    default Mono<Void> consume(OrderEvent orderEvent) {
+        return switch (orderEvent) {
             case OrderEvent.Completed e -> handle(e);
         };
     }
 
-     Mono<Void> handle(OrderEvent.Completed event);
-
-
+    Mono<Void> handle(OrderEvent.Completed event);
 }

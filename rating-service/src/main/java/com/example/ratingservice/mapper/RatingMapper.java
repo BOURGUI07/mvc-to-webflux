@@ -3,12 +3,11 @@ package com.example.ratingservice.mapper;
 import com.example.ratingservice.dto.request.RatingCreationRequest;
 import com.example.ratingservice.dto.response.RatingResponse;
 import com.example.ratingservice.entity.Rating;
-
 import java.util.Optional;
 import java.util.function.Function;
 
 public class RatingMapper {
-    public static Function<RatingCreationRequest, Rating> toEntity(){
+    public static Function<RatingCreationRequest, Rating> toEntity() {
         return dto -> {
             var rating = Rating.builder()
                     .customerId(dto.customerId())
@@ -22,7 +21,7 @@ public class RatingMapper {
         };
     }
 
-    public static Function<Rating, RatingResponse> toDto(){
+    public static Function<Rating, RatingResponse> toDto() {
         return entity -> RatingResponse.builder()
                 .ratingId(entity.getRatingId())
                 .customerId(entity.getCustomerId())

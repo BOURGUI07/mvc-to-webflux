@@ -2,8 +2,8 @@ package com.example.ratingservice;
 
 import com.example.ratingservice.repo.OrderHistoryRepo;
 import com.example.ratingservice.repo.RatingRepo;
+import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -16,22 +16,18 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.test.StepVerifier;
 
-import java.util.Arrays;
-
 @Import(TestcontainersConfiguration.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
-                "logging.level.root=ERROR",
-                "logging.level.com.example=INFO",
-                "spring.cloud.stream.kafka.binder.configuration.auto.offset.reset=earliest"
+            "logging.level.root=ERROR",
+            "logging.level.com.example=INFO",
+            "spring.cloud.stream.kafka.binder.configuration.auto.offset.reset=earliest"
         })
 @DirtiesContext
-@EmbeddedKafka(
-        partitions = 1,
-        bootstrapServersProperty = "spring.kafka.bootstrap-servers"
-)
+@EmbeddedKafka(partitions = 1, bootstrapServersProperty = "spring.kafka.bootstrap-servers")
 @AutoConfigureWebTestClient
-public abstract  class AbstractIntegrationTests {
+public abstract class AbstractIntegrationTests {
 
     @Autowired
     protected WebTestClient client;
@@ -51,7 +47,8 @@ public abstract  class AbstractIntegrationTests {
     @Value("${test.timeout}")
     protected Long timeout;
 
-    private static final String TEST_DATA = """
+    private static final String TEST_DATA =
+            """
             truncate table order_history;
             truncate table rating;
             """;
@@ -70,5 +67,4 @@ public abstract  class AbstractIntegrationTests {
                         .expectNextCount(1)
                         .verifyComplete());
     }
-
 }

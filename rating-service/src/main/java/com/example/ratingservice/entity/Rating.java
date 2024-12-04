@@ -1,11 +1,10 @@
 package com.example.ratingservice.entity;
 
+import java.util.UUID;
 import lombok.*;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
-
-import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -18,6 +17,7 @@ public class Rating extends BaseEntity {
 
     @Id
     private Long ratingId;
+
     private Long customerId;
     private Long productId;
     private Double value;

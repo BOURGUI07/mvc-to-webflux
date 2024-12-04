@@ -148,4 +148,14 @@ logging:
 
 
 
+##################### SWAGGER CONFIGURATION ###############
 
+springdoc:
+  api-docs:
+    enabled: true
+    path: /catalog-service/v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /catalog-service/swagger-ui.html
+    url: /catalog-service/v3/api-docs
+  show-actuator: true

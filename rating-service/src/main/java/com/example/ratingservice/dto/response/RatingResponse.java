@@ -1,9 +1,8 @@
 package com.example.ratingservice.dto.response;
 
-import lombok.Builder;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.Builder;
 
 @Builder
 public record RatingResponse(
@@ -15,6 +14,4 @@ public record RatingResponse(
         Double value,
         Long ratingId,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
-) {
-}
+        LocalDateTime updatedAt) {}

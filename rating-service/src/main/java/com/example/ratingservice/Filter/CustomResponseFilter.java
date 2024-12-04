@@ -12,13 +12,23 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 public class CustomResponseFilter implements WebFilter {
-    @NotNull
-    @Override
+    @NotNull @Override
     public Mono<Void> filter(ServerWebExchange exchange, @NotNull WebFilterChain chain) {
-        if(exchange.getRequest().getMethod().equals(HttpMethod.GET)){
-            log.info("WebFilter :: Processing GET request: {}", exchange.getRequest().getURI());
+        String path = exchange.getRequest().getURI().getPath();
+
+        // Log Swagger UI requests without interrupting
+        if (path.contains("/swagger-ui") || path.contains("/v3/api-docs")) {
+            log.info("WebFilter :: Swagger UI or API Docs request: {}", path);
+        }
+
+        // Add caching for GET requests, excluding Swagger resources
+        if (exchange.getRequest().getMethod() == HttpMethod.GET
+                && !path.contains("/swagger-ui")
+                && !path.contains("/v3/api-docs")) {
+            log.info("WebFilter :: Processing cacheable GET request: {}", path);
             exchange.getResponse().getHeaders().set("Cache-Control", "max-age=60");
         }
+
         return chain.filter(exchange);
     }
 }
