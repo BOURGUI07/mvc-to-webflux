@@ -57,6 +57,7 @@ public class OrderMapper {
         return response -> OrderEvent.Completed.builder()
                 .customerId(response.customerId())
                 .orderId(response.orderId())
+                .productId(response.productId())
                 .build();
     }
 

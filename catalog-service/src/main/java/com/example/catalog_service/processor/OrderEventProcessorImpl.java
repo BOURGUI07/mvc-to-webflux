@@ -21,6 +21,16 @@ import reactor.core.publisher.Mono;
 public class OrderEventProcessorImpl implements OrderEventProcessor {
     private final InventoryService service;
 
+
+    /**
+     * Receive the CreatedOrderEvent
+     * Convert it into PurchaseRequest so that the inventory-service can process it
+     * After processing it, The inventory-service will return a DTO
+     * Convert the DTO into DeductedInventoryEvent
+     * If either a ProductNotFound or NotEnoughBalance Exception was encountered while processing,
+     * then return a DeclinedInventoryEvent
+     * If DuplicatedEvent Exception is raised, return Mono.empty()
+     */
     @Override
     public Mono<InventoryEvent> handle(OrderEvent.Created event) {
         return service.processRequest(Mapper.toPurchaseRequest().apply(event))
@@ -33,12 +43,23 @@ public class OrderEventProcessorImpl implements OrderEventProcessor {
                 .doOnNext(inventoryEvent -> log.info("OrderEventProcessorImpl Processing Result: {}", Util.write(inventoryEvent)));
     }
 
+
+    /**
+     * No reaction if the order is completed
+     */
     @Override
     public Mono<InventoryEvent> handle(OrderEvent.Completed event) {
         return Mono.<InventoryEvent>empty()
                 .doFirst(() -> log.info("OrderEventProcessorImpl Received OrderEvent.Completed: {}",Util.write(event)));
     }
 
+
+    /**
+     * Receive the CancelledOrderEvent
+     * the inventory-service only needs the orderId
+     * The inventory-service gonna return DTO
+     * Convert the DTO into RestoredInventoryEvent
+     */
     @Override
     public Mono<InventoryEvent> handle(OrderEvent.Cancelled event) {
         return service.restore(event.orderId())

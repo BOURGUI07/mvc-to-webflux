@@ -30,7 +30,7 @@ jobs:
 
       - name: Build with Maven
         env:
-          TEST_TIMEOUT: 60000  # Set the test timeout property
+          TEST_TIMEOUT: 10000  # Set the test timeout property
         run: |
           cd order-service  # Navigate to the order-service directory
           mvn -ntp verify     # Run the Maven build

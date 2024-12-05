@@ -13,6 +13,13 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 public class CustomResponseFilter implements WebFilter {
+
+    /**
+     * Intercept the GET requests.
+     * set the responses with Cache Header so next time the response
+     * will be retrieved by the Client-Cache instead from the server
+     */
+
     @NotNull
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, @NotNull WebFilterChain chain) {

@@ -7,6 +7,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
+/**
+ * The analytics-service is interested in viewedProducts
+ * The order-service is interested in product events.
+ * Be it created, updated, or removed.
+ * It has to track the product prices.
+ * I've avoided network calls to use Event Carried State Transfer Pattern
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j

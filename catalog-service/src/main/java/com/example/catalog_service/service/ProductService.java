@@ -23,6 +23,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 
+/**
+ * The product-service mainly deals with CRUD operations and sending
+ * ViewedProductEvents and CreatedProductEvents to Analytics-Service and Order_Service
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -30,25 +34,37 @@ import reactor.core.publisher.Sinks;
 public class ProductService {
     private final ProductRepo repo;
     private final CatalogServiceProperties properties;
+
     private final Sinks.Many<ProductEvent> sink = Sinks.many().unicast().onBackpressureBuffer();
     private final Sinks.Many<ProductEvent> viewedProductsSink = Sinks.many().unicast().onBackpressureBuffer();
 
     private final CacheService cacheService;
 
+    /**
+     * This is gonna be used by the CreatedProductEventPublisher
+     */
     public Flux<ProductEvent> products(){
         return sink.asFlux();
     }
 
+    /**
+     * This is gonna be used by the ViewedProductEventPublisher
+     */
     public Flux<ProductEvent> viewedProducts(){
         return viewedProductsSink.asFlux();
     }
 
 
+    /**
+     * Get all the products from cache
+     * filter by products whose price is less that maxPrice
+     */
     public Flux<ProductResponse> getProductStream(BigDecimal maxPrice) {
         return cacheService.findAll()
                 .map(Mapper.toDto())
                 .filter(x -> x.price().compareTo(maxPrice) < 0);
     }
+
 
     public Mono<PagedResult<ProductResponse>> getProducts(int page) {
         var pageNumber = page >= 1 ? page - 1 : 0;
@@ -60,6 +76,10 @@ public class ProductService {
     }
 
 
+    /**
+     * The moment this endpoint is triggered, a ViewedProductEvent gonna
+     * be published to analytics-service
+     */
     public Mono<ProductResponse> findByCode(String code) {
         return cacheService.findByCode(code)
                 .map(Mapper.toDto())
@@ -68,6 +88,14 @@ public class ProductService {
     }
 
 
+    /**
+     * Check the request fields Nullability.
+     * Then Check the code uniqueness.
+     * If all went well, save the product into the DB
+     * Convert the newly saved product entity into DTO
+     * Convert That DTO into a CreatedProductEvent
+     * Then emit the event via the sink.
+     */
     @Transactional
     public Mono<ProductResponse> createProduct(Mono<ProductCreationRequest> request) {
         return request
@@ -79,6 +107,7 @@ public class ProductService {
                 .doOnNext(response -> log.info("A New Product is Created: {}", Util.write(response)));
 
     }
+
 
     private UnaryOperator<Mono<ProductCreationRequest>> validateCodeUniqueness(){
         return request -> request.flatMap(req -> {
@@ -94,6 +123,12 @@ public class ProductService {
                 );
     }
 
+
+    /**
+     * Get the code from cache
+     * Delete the product from DB. Then from the cache
+     * Send a DeletedProductEvent to Order-Service
+     */
     @Transactional
     public Mono<Void> deleteByCode(String code){
         return  cacheService.findByCode(code)
@@ -105,7 +140,10 @@ public class ProductService {
     }
 
 
-
+    /**
+     * After Saving the product into the database,
+     * Send UpdatedProductEvent to OrderService.
+     */
     @Transactional
     public Mono<ProductResponse> update(String code, Mono<ProductUpdateRequest> request) {
         return cacheService.findByCode(code)
@@ -122,6 +160,13 @@ public class ProductService {
                 .doOnNext(dto -> log.info("Received Product Update Request: {}",Util.write(dto)));
     }
 
+    /**
+     * The client has the option of updating at least ONE field.
+     * He's NOT obliged to update ALL fields.
+     * After updating the product, validate its price and quantity
+     * If no problems encountered, save the product into DB
+     * Then remove the product from the cache
+     */
     private BiFunction<Product,ProductUpdateRequest,Mono<ProductResponse>> processUpdate(){
         return (product,request) ->
             Mono.fromSupplier(() -> {

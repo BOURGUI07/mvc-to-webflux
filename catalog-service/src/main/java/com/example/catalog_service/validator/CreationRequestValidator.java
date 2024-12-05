@@ -9,6 +9,13 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+/**
+ * The ProductCreationRequest has to have valid fields.
+ * All the fields has to be non-null.
+ * The product-price as well as the product-quantity should be greater than 0
+ */
+
+
 @Service
 public class CreationRequestValidator {
 

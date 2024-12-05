@@ -21,6 +21,15 @@ public class OrderEventProcessorConfig {
 
     private final OrderEventProcessor orderEventProcessor;
 
+
+    /**
+     * Received Messages of Order-Events from The Order-MicroService
+     * Convert the messages into Records(custom records)
+     * process the Record's message (The Message Payload)
+     * Acknowledge
+     * The processing will return an event
+     * Wrap it into Message.
+     */
     @Bean
     public Function<Flux<Message<OrderEvent>>,Flux<Message<InventoryEvent>>> processor(){
         return flux -> flux

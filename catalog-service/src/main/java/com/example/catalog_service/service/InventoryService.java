@@ -18,6 +18,11 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * The Inventory-service is mainly concerned about processing
+ * Deduct and Restore operations
+ */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -27,6 +32,15 @@ public class InventoryService {
     private final CacheService cacheService;
 
 
+    /**
+     * First, check if the orderId of request is already processed or not.
+     * If so, Raise DuplicateEvent Exception.
+     * Otherwise, find the product.
+     * Check if he has enough inventory to deduct
+     * If he doesn't, raise NotEnoughInventory Exception
+     * Otherwise, convert the request into ProductInventory entity
+     * then proceed into deduction process
+     */
     public Mono<PurchaseDTO> processRequest(PurchaseDTO.Request request) {
         var orderId = request.orderId();
         return inventoryRepo.existsByOrderId(orderId)
@@ -42,6 +56,13 @@ public class InventoryService {
 
     }
 
+    /**
+     * First, lower the product quantity
+     * Set the InventoryStatus to DEDUCTED
+     * save the product, remove it from cache
+     * save the productInventory entity.
+     * convert it into DTO
+     */
     private BiFunction<Product, ProductInventory,Mono<PurchaseDTO>> executeProcess(){
         return (product,inventory) -> repo.save(product).then(cacheService.doOnChanged(product))
                 .then(inventoryRepo.save(inventory))
@@ -52,12 +73,25 @@ public class InventoryService {
                 });
     }
 
+
+    /**
+     * To restore a product quantity, it has to be already deducted
+     * if so, then proceed to the restoration process
+     */
     public Mono<PurchaseDTO> restore(UUID orderId){
         return inventoryRepo.findByOrderIdAndStatus(orderId,InventoryStatus.DEDUCTED)
                 .zipWhen( inv -> repo.findById(inv.getProductId()), executeRestore())
                 .flatMap(Function.identity());
     }
 
+
+    /**
+     * Restore the product quantity.
+     * Update the ProductInventory Status to RESTORED
+     * save the product, then remove it from cache
+     * save the productInventory.
+     * Convert it into DTO
+     */
     private BiFunction<ProductInventory,Product,Mono<PurchaseDTO>> executeRestore(){
         return (inventory,product) -> repo.save(product).then(cacheService.doOnChanged(product))
                 .then(inventoryRepo.save(inventory))

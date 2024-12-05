@@ -30,7 +30,7 @@ jobs:
 
       - name: Build with Maven
         env:
-          TEST_TIMEOUT: 30000  # Set the test timeout property
+          TEST_TIMEOUT: 10000  # Set the test timeout property
         run: |
           cd catalog-service  # Navigate to the catalog-service directory
           mvn -ntp verify     # Run the Maven build

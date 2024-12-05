@@ -9,6 +9,12 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+/**
+ * When we're about to save an updated product into the DB,
+ * we have to check the validity of its price and quantity.
+ */
+
+
 public class PostUpdateProductValidator {
 
     public static UnaryOperator<Mono<Product>> validate(){

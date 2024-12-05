@@ -23,7 +23,9 @@ public class CacheService {
     private final ProductRepo repo;
     private final ReactiveHashOperations<String, String, Product> operations;
 
-
+    /**
+     * Every day, at 12 am, remove cache
+     */
     @Scheduled(cron = "0 0 0 * * *")
     public void evictCache(){
         operations.delete(PRODUCT_KEY)
@@ -31,6 +33,9 @@ public class CacheService {
                 .subscribe();
     }
 
+    /**
+     * For every 10 secs, persist absent values in the cache
+     */
     @Scheduled(fixedRate = 10_000)
     public void updateCache(){
         repo.findAll()
@@ -39,6 +44,12 @@ public class CacheService {
                 .subscribe();
     }
 
+    /**
+     *  Retrieve from cache first.
+     *  if Absent, retrieve from DB.
+     *  persist the DB-retrieved value into the cache
+     *  return  the value.
+     */
     public Mono<Product> findByCode(String code){
         return operations.get(PRODUCT_KEY,code)
                 .switchIfEmpty(repo.findByCodeIgnoreCase(code)
@@ -47,11 +58,17 @@ public class CacheService {
                 );
     }
 
-
+    /**
+     * Whenever a product is either updated or removed, remove it from cache
+     */
     public Mono<Long> doOnChanged(Product product){
         return operations.remove(PRODUCT_KEY,product.getCode());
     }
 
+
+    /**
+     * Return from cache.
+     */
     public Flux<Product> findAll(){
         return operations.values(PRODUCT_KEY);
     }
