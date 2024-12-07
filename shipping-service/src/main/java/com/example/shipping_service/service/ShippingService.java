@@ -25,6 +25,17 @@ import static com.example.shipping_service.util.Constants.BusinessLogic.QUANTITY
 public class ShippingService {
     private final ShippingRepo repo;
 
+    /**
+     * receive the request
+     * make sure the order hasn't bee processed before
+     * of so raise duplicate event exception
+     * also make sure the request quantity doesn't exceed the quantity limit
+     * if s raise quantityLimit exception
+     * if all went well, convert the request into entity
+     * set the entity status to PENDING
+     * save into the DB
+     * convert the saved entity into DTO
+     */
 
     public Function<ShippingDTO.Request, Mono<ShippingDTO>> planShipping() {
         return request -> {
@@ -41,12 +52,28 @@ public class ShippingService {
         };
     }
 
+
+    /**
+     * Receive the CancelledOrderEvent orderId
+     * to cancel the shipping, it has to have PENDING status before
+     * find the entity, set its status to CANCELLED
+     * then save into the DB
+     * finally convert the saved entity into dto
+     */
     public Function<UUID, Mono<ShippingDTO>> cancelShipping() {
         return orderId -> repo.findByOrderIdAndStatus(orderId,ShippingStatus.PENDING)
                 .flatMap(entity -> repo.save(entity.setStatus(ShippingStatus.CANCELLED)))
                 .map(Mapper.toDto());
     }
 
+
+    /**
+     * Receive the CancelledOrderEvent orderId
+     * to schedule the shipping, it has to have PENDING status before
+     * find the entity, set its status to SCHEDULED and set delivery date
+     * then save into the DB
+     * finally convert the saved entity into dto
+     */
     public Function<UUID, Mono<ShippingDTO>> scheduleShipping() {
         return orderId -> repo.findByOrderIdAndStatus(orderId,ShippingStatus.PENDING)
                 .flatMap(e -> repo.save(e.setStatus(ShippingStatus.SCHEDULED).setDeliveryDate(Instant.now().plus(Duration.ofDays(3)))))

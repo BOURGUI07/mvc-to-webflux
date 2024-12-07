@@ -13,11 +13,25 @@ import reactor.core.publisher.Mono;
 
 import java.util.function.Predicate;
 
+/**
+ * Since the Customer-Microservice only implements POST requests regarding customer states
+ * then the customer-service here is responsible for saving the newlyCreatedCustomers into the DB
+ * it only save the customerId, username and email
+ */
+
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class CustomerService {
     private final CustomerRepo repo;
+
+    /**
+     * Received the CreatedCustomerEvent
+     * make sure the customer doesn't already exist
+     * convert the event into an entity
+     * save the entity.
+     */
 
     @Transactional
     public Mono<Void> saveCustomer(CustomerEvent.Created event) {

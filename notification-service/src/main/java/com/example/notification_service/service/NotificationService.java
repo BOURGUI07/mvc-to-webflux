@@ -20,6 +20,13 @@ import reactor.core.publisher.Mono;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * The notification-service is responsible for sending notifications
+ * as soon as an order is either created, cancelled, or completed
+ * the notification service will send messages
+ */
+
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -33,6 +40,11 @@ public class NotificationService {
     private static final String CREATED_SUBJECT= "Order Created Notification";
     private static final String CANCELLED_SUBJECT= "Order Cancelled Notification";
     private static final String COMPLETED_SUBJECT= "Order Completed Notification";
+
+    /**
+     * Here the generic message
+     * the subject, username, orderId, and the orderStatus gonna change based on the situation
+     */
 
     private static final String GENERIC_MESSAGE = """
             ==============================
@@ -74,6 +86,11 @@ public class NotificationService {
     }
 
 
+    /**
+     * make sure the order with event orderId hasn't been processed before,
+     * if so raise duplicate event exception
+     * otherwise save the order while setting the status to CREATED
+     */
     private Function<OrderEvent.Created,Mono<OrderEvent.Created>> validateCreatedOrderEvent(){
         return event -> repo.existsByOrderId(event.orderId())
                 .filter(Predicate.not(b->b))
@@ -82,6 +99,11 @@ public class NotificationService {
                 .thenReturn(event);
     }
 
+
+    /**
+     * the order has to be of CREATED status before considering sending CANCELLED notification
+     * set the status into CANCELLED and then save the order
+     */
     private Function<OrderEvent.Cancelled,Mono<OrderEvent.Cancelled>> validateCancelledOrderEvent(){
         return event -> repo.findByOrderIdAndStatus(event.orderId(),OrderStatus.CREATED)
                 .flatMap(x -> repo.save(x.setStatus(OrderStatus.CANCELED)))
@@ -94,6 +116,11 @@ public class NotificationService {
 
     }
 
+
+    /**
+     * the order has to be of CREATED status before considering sending COMPLETED notification
+     * set the status into COMPLETED and then save the order
+     */
     private Function<OrderEvent.Completed,Mono<OrderEvent.Completed>> validateCompletedOrderEvent(){
         return event -> repo.findByOrderIdAndStatus(event.orderId(),OrderStatus.CREATED)
                 .flatMap(x -> repo.save(x.setStatus(OrderStatus.COMPLETED)))
@@ -106,7 +133,13 @@ public class NotificationService {
     }
 
 
-
+    /**
+     * Receive the event
+     * make sure it hasn't been processed before
+     * then send the email to customer
+     * if the operation failed, raise emailFailure exception
+     * do nothing if either email failure or duplicate event exception were raised
+     */
     @Transactional
     public Mono<Void> sendEmailCreated(OrderEvent.Created event) {
         return validateCreatedOrderEvent().apply(event)
