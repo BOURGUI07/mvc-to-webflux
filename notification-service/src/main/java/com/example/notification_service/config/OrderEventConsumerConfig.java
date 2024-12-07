@@ -14,6 +14,14 @@ import reactor.core.publisher.Flux;
 
 import java.util.function.Consumer;
 
+/**
+ * The Notification-Microservice gonna consume OrderEvents
+ * It will receive the events wrapped into Messages
+ * will convert them into custom Records
+ * consume the Records messages, then acknowledge
+ */
+
+
 @Configuration
 @RequiredArgsConstructor
 @Slf4j

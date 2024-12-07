@@ -20,6 +20,15 @@ public class OrderEventProcessorImpl implements OrderEventProcessor {
 
     private final ShippingService service;
 
+    /**
+     * Receive the CreatedOrderEvent
+     * Convert it into shipping Request dto
+     * the shipping-service will return shipping response dto
+     * convert the latter into ReadyShippingEvent
+     * if duplicate event is raised, do nothing
+     * return DeclinedShippingEvent in case the quantity limit exceeded
+     */
+
     @Override
     public Mono<ShippingEvent> handle(OrderEvent.Created event) {
         return service.planShipping().apply(((ShippingDTO.Request) Mapper.toRequest().apply(event)))
@@ -29,6 +38,10 @@ public class OrderEventProcessorImpl implements OrderEventProcessor {
                 .onErrorResume(QuantityLimitException.class, ex -> Mapper.toDeclined().apply(ex, event));
     }
 
+
+    /**
+     * If the order is completed, then we have to schedule the shipping
+     */
     @Override
     public Mono<ShippingEvent> handle(OrderEvent.Completed event) {
         return service.scheduleShipping().apply(event.orderId())
@@ -36,6 +49,10 @@ public class OrderEventProcessorImpl implements OrderEventProcessor {
                 .map(Mapper.toScheduled());
     }
 
+
+    /**
+     * cancel shipping if order is cancelled
+     */
     @Override
     public Mono<ShippingEvent> handle(OrderEvent.Cancelled event) {
         return service.cancelShipping().apply(event.orderId())
