@@ -8,6 +8,10 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * The Analytics-Microservice gonna consume ViewedProductEvents
+ */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j

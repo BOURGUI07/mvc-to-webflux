@@ -14,6 +14,14 @@ import reactor.core.publisher.Flux;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+/**
+ * The Customer-Microservice gonna emit CustomerEvents.
+ * Before emitting them, it will wrap them in Message format
+ * As the Notification-Microservice will eventually need the customer infos
+ * such as username and email, it will consumer these customer-events
+ * to be able to send emails.
+ */
+
 @Configuration
 @RequiredArgsConstructor
 @Slf4j

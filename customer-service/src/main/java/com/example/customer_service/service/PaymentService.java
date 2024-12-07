@@ -17,6 +17,11 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * the payment-service is responsible for processing either refund or deduct requests
+ */
+
+
 @RequiredArgsConstructor
 @Service
 public class PaymentService {
@@ -24,6 +29,12 @@ public class PaymentService {
     private final CustomerRepo repo;
     private final PaymentRepo paymentRepo;
 
+    /**
+     * Receive the request, make sure we haven't processed the event yet. if so raise duplicate event exception
+     * make sure the customer does exist and has enough balance.
+     * if everything went well, convert the request into CustomerPayment Entity
+     * then proceed into executing the deduction operation
+     */
     public Function<PaymentDTO.Request,Mono<PaymentDTO>> processPayment() {
        return request -> {
            var orderId = request.orderId();
@@ -39,6 +50,13 @@ public class PaymentService {
        };
     }
 
+
+    /**
+     * decrease the customer balance
+     * set the customerPayment status to DEDUCTED
+     * then save the customer then save the payment
+     * convert the saved payment into PaymentResponseDTO
+     */
     private BiFunction<Customer, CustomerPayment,Mono<PaymentDTO>> deduct() {
         return (customer,payment) -> repo.save(customer.setBalance(customer.getBalance().subtract(payment.getAmount())))
                 .then(paymentRepo.save(payment.setStatus(PaymentStatus.DEDUCTED)))
@@ -46,6 +64,12 @@ public class PaymentService {
     }
 
 
+    /**
+     * The orderId will be of a CancelledOrderEvent
+     * To refund, the payment has to be deducted before
+     * get the customer-payment and the customer entities
+     * then proceed into executing the refund operation
+     */
     public Function<UUID,Mono<PaymentDTO>> refund(){
         return orderId -> paymentRepo.findByOrderIdAndStatus(orderId,PaymentStatus.DEDUCTED)
                 .zipWhen(payment -> repo.findById(payment.getCustomerId()), executeRefund())
@@ -53,6 +77,13 @@ public class PaymentService {
 
     }
 
+
+    /**
+     * increase the customer balance
+     * set the customer-payment-entity status into REFUNDED
+     * save the customer, then save the payment
+     * then convert the saved payment into PaymentResponseDTO
+     */
     private BiFunction<CustomerPayment,Customer,Mono<PaymentDTO>> executeRefund() {
         return (payment, customer) -> repo.save(customer)
                 .then(paymentRepo.save(payment))

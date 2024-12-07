@@ -26,12 +26,20 @@ public class ProductViewService {
 
     private final ProductViewRepo repo;
 
+    /**
+     * Return the top 5 most viewed products in descending order
+     */
     public Flux<ProductViewDTO> products() {
        return  repo.findTop5ByOrderByViewCountDesc()
                 .map(Mapper.toDTO());
     }
 
-
+    /**
+     * Find the product by code
+     * if it does exist, increase its viewing count by one
+     * if it doesn't, create a new one with 1 as view count
+     * then save into the DB
+     */
     public Function<ProductEvent.View,Mono<Void>> consume(){
         return event -> repo.findByProductCode(event.code())
                 .doOnNext(p -> p.setViewCount(p.getViewCount()+1))
