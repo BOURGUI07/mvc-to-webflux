@@ -2,6 +2,11 @@ package com.example.customer_service.events;
 
 import reactor.core.publisher.Mono;
 
+/**
+ * The customer-Microservice gonna process each order-event
+ * be it created, completed, or cancelled
+ */
+
 public interface OrderEventProcessor extends EventProcessor<OrderEvent,PaymentEvent> {
 
     @Override

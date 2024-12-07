@@ -20,6 +20,15 @@ import reactor.core.publisher.Mono;
 public class OrderEventProcessorImpl implements OrderEventProcessor {
     private final PaymentService service;
 
+    /**
+     * if the OrderEvent received is Created, then it will convert it into
+     * PaymentRequest DTO so that the payment-service will be able to process it
+     * After processing, the payment-service will return a PaymentResponse.DTO
+     * the latter will be converted into DeductedPaymentEvent.
+     * If a duplicate event exception is raised, then do nothing
+     * A DeclinedPaymentEvent will be returned if either CustomerNotFoundException or NotEnoughBalanceException is raised
+     */
+
     @Override
     public Mono<PaymentEvent> handle(OrderEvent.Created event) {
         return service.processPayment().apply(((PaymentDTO.Request) EventMapper.toRequest().apply(event)))
@@ -31,11 +40,22 @@ public class OrderEventProcessorImpl implements OrderEventProcessor {
                 .onErrorResume(NotEnoughBalanceException.class, ex -> EventMapper.toDeclined().apply(ex,event));
     }
 
+    /**
+     * If the order is completed, we basically have to do nothing
+     */
+
     @Override
     public Mono<PaymentEvent> handle(OrderEvent.Completed event) {
         return Mono.empty();
     }
 
+
+    /**
+     * If the order is cancelled, we basically have to refund the payment.
+     * we will only need event orderId to process the refund request.
+     * The payment-service will return a PaymentResponseDTO
+     * will converted to RefundedPaymentEvent
+     */
     @Override
     public Mono<PaymentEvent> handle(OrderEvent.Cancelled event) {
         return service.refund().apply(event.orderId())

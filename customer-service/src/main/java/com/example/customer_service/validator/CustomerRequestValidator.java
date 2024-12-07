@@ -8,6 +8,12 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+/**
+ * The customer creation request has to have ALL fields as non-null
+ * valid email
+ * valid balance
+ */
+
 public class CustomerRequestValidator {
     private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
 

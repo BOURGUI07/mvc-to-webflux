@@ -17,6 +17,15 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * The Catalog-Microservice will emit product-events
+ * among these events, ViewedProductEvents
+ * The Analytics-Microservice gonna receive those events wrapped in Message formats
+ * Then it will convert them into custom Records
+ * Consumer the Record message (or the Message payload)
+ * Then acknowledge the messages.
+ */
+
 @Configuration
 @RequiredArgsConstructor
 @Slf4j

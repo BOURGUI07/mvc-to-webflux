@@ -14,6 +14,15 @@ import reactor.core.publisher.Flux;
 
 import java.util.function.Function;
 
+/**
+ * The Order-Microservice gonna emit order-events.
+ * Among the service that gonna process those events, is the Customer-Microservice
+ * It will convert the Message of events into Record of events.
+ * Process the Records messages (or the Message payloads)
+ * then as a reaction, will publish customer-events wrapped into messages
+ */
+
+
 @Slf4j
 @Configuration
 @RequiredArgsConstructor

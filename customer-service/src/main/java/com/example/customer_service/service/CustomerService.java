@@ -24,6 +24,12 @@ import reactor.core.publisher.Sinks;
 import java.util.List;
 import java.util.function.Predicate;
 
+/***
+ * the customer-service is responsible for standard CRUD operations
+ * such as Post and Get Requests
+ * It's responsible for sending the CreatedCustomerEvents as well
+ */
+
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -35,6 +41,16 @@ public class CustomerService {
     public Flux<CustomerEvent> events(){
         return sink.asFlux();
     }
+
+    /**
+     * Received a mono of CustomerRequestDTO
+     * validate the request field nullability
+     * then make sure the username and email don't  already exists in the DB
+     * convert the dto into an entity
+     * save the entity
+     * convert the entity into ResponseDTO
+     * Asynchronously convert the dto into CreatedCustomerEvent and put it into a sink
+     */
 
     @Transactional
     public Mono<CustomerDTO> create(Mono<CustomerDTO.Request> dto) {
@@ -55,6 +71,8 @@ public class CustomerService {
                 .doOnNext(res -> log.info("Created New Customer: {}", Util.write(res)));
 
     }
+
+
 
     public Mono<PageResult<CustomerDTO.Response>> findAll(int page){
         var pageNumber = page >=1 ? page - 1: 0;
