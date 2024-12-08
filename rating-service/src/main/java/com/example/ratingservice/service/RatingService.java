@@ -25,6 +25,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
+/**
+ * The rating-service is responsible for standard CRUD endpoints.
+ */
+
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -33,6 +38,15 @@ public class RatingService {
     private final RatingRepo ratingRepo;
     private final RatingServiceProperties properties;
 
+    /**
+     * Receive the request
+     * validate the fields nullability
+     * make sure the orderId exists
+     * make sure the request productId and customerId equals to the existing OrderHistory entity
+     * convert the request into entity
+     * save the entity
+     * convert the saved entity into response dto
+     */
     @Transactional
     public Mono<RatingResponse> createRating(Mono<RatingCreationRequest> request) {
         return RatingRequestValidator.validate()
@@ -63,6 +77,13 @@ public class RatingService {
                 && Objects.equals(request.productId(), orderHistory.getProductId());
     }
 
+
+    /**
+     * make sure the ratingId exists. if not, raise notFound exception
+     * update the fields. The user has to update at least one field.
+     * save the rating entity
+     * convert the saved entity into response dto
+     */
     @Transactional
     public Mono<RatingResponse> updateRating(Long ratingId, Mono<RatingUpdateRequest> request) {
         return ratingRepo
@@ -87,6 +108,13 @@ public class RatingService {
         };
     }
 
+
+    /**
+     * find the rating entities by customerId
+     * convert it into dto
+     * convert the flux into list
+     * convert the list into paginated response
+     */
     public Mono<PaginatedRatingResponse> findByCustomerId(Long customerId, int page) {
         var pageNumber = page >= 1 ? page - 1 : 0;
         PageRequest pageable = PageRequest.of(
