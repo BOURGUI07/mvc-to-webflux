@@ -12,6 +12,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import reactor.core.publisher.Flux;
 
+/**
+ * The moment a order is completed, the order-microservice will emit
+ * order-events. Among the microservices that will consume those events is
+ * the rating-microservice. So that whenever a user wants to write a rating for a product
+ * the rating service will be able to validate if the productId and customerId were part of some order.
+ */
+
+
 @Configuration
 @Slf4j
 @RequiredArgsConstructor

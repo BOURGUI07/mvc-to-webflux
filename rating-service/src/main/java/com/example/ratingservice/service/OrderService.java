@@ -12,6 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
+/**
+ * The order-service is responsible for persisting the completed orders.
+ */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -20,6 +24,12 @@ public class OrderService {
 
     private final OrderHistoryRepo repo;
 
+    /**
+     * Make sure the order hasn't been persisted before, if so raise DuplicateException
+     * Convert the event into OrderHistory entity
+     * save the entity
+     * convert it into dto
+     */
     public Mono<Void> saveOrder(OrderEvent.Completed event) {
         return repo.existsByOrderId(event.orderId())
                 .filter(Predicate.not(b -> b))

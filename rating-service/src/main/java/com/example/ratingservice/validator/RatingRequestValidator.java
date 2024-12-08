@@ -7,6 +7,14 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import reactor.core.publisher.Mono;
 
+/**
+ * The RatingCreationRequest should basically have:
+ * customerId non-null
+ * productId non-null
+ * orderId non-null
+ * the rating value non-null as well as to be between 1 and 5.
+ */
+
 public class RatingRequestValidator {
 
     public static UnaryOperator<Mono<RatingCreationRequest>> validate() {
