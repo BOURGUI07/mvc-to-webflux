@@ -1,4 +1,4 @@
-package com.example.analytics_service;
+package com.example.analytics_service.intergration_tests;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;

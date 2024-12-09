@@ -1,4 +1,4 @@
-package com.example.analytics_service;
+package com.example.analytics_service.intergration_tests;
 
 import com.example.analytics_service.dto.ProductViewDTO;
 import com.example.analytics_service.events.ProductEvent;
@@ -8,17 +8,11 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.MediaType;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
-
-import java.time.Duration;
-import java.util.List;
-import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
