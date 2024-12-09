@@ -1,5 +1,6 @@
-package com.example.analytics_service;
+package com.example.analytics_service.intergration_tests;
 
+import com.example.analytics_service.AnalyticsServiceApplication;
 import org.springframework.boot.SpringApplication;
 
 public class TestAnalyticsServiceApplication {
