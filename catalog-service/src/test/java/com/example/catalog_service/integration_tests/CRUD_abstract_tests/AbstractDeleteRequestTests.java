@@ -1,6 +1,6 @@
-package com.example.catalog_service.CRUD_abstract_tests;
+package com.example.catalog_service.integration_tests.CRUD_abstract_tests;
 
-import com.example.catalog_service.AbstractIntegrationTest;
+import com.example.catalog_service.integration_tests.AbstractIntegrationTest;
 import org.springframework.http.ProblemDetail;
 import reactor.test.StepVerifier;
 

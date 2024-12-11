@@ -1,11 +1,9 @@
-package com.example.catalog_service.MESSAGING_abstract_tests;
+package com.example.catalog_service.integration_tests.MESSAGING_abstract_tests;
 
-import com.example.catalog_service.AbstractIntegrationTest;
+import com.example.catalog_service.integration_tests.AbstractIntegrationTest;
 import com.example.catalog_service.dto.ProductCreationRequest;
 import com.example.catalog_service.dto.ProductResponse;
 import com.example.catalog_service.dto.ProductUpdateRequest;
-import com.example.catalog_service.dto.PurchaseDTO;
-import com.example.catalog_service.events.InventoryEvent;
 import com.example.catalog_service.events.ProductEvent;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;

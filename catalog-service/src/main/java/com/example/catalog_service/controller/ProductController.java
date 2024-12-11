@@ -1,9 +1,7 @@
 package com.example.catalog_service.controller;
 
-import com.example.catalog_service.dto.PagedResult;
-import com.example.catalog_service.dto.ProductCreationRequest;
-import com.example.catalog_service.dto.ProductResponse;
-import com.example.catalog_service.dto.ProductUpdateRequest;
+import com.example.catalog_service.dto.*;
+import com.example.catalog_service.service.ProductCreationBulkService;
 import com.example.catalog_service.service.ProductService;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +21,7 @@ import static com.example.catalog_service.util.Constants.PublicApiUrls.PRODUCT_B
 @Slf4j
 public class ProductController {
     private final ProductService service;
+    private final ProductCreationBulkService bulkService;
 
     @GetMapping
     public Mono<ResponseEntity<PagedResult<ProductResponse>>> getProducts(
@@ -47,6 +46,13 @@ public class ProductController {
     public Mono<ResponseEntity<ProductResponse>> create(@RequestBody Mono<ProductCreationRequest> request) {
         return service.createProduct(request)
                 .map(dto -> ResponseEntity.status(HttpStatus.CREATED).body(dto));
+    }
+
+    @PostMapping("/bulk")
+    public Mono<ResponseEntity<ProductCreationBulkResponse>> createProducts(
+            @RequestParam() String filePath) {
+        return bulkService.createProducts(filePath)
+                .map(dto -> ResponseEntity.status(HttpStatus.OK).body(dto));
     }
 
     @PutMapping("/{code}")
