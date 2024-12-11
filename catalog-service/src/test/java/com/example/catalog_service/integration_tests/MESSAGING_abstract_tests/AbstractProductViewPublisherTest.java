@@ -1,6 +1,6 @@
-package com.example.catalog_service.MESSAGING_abstract_tests;
+package com.example.catalog_service.integration_tests.MESSAGING_abstract_tests;
 
-import com.example.catalog_service.AbstractIntegrationTest;
+import com.example.catalog_service.integration_tests.AbstractIntegrationTest;
 import com.example.catalog_service.dto.ProductResponse;
 import com.example.catalog_service.events.ProductEvent;
 import org.springframework.boot.test.context.TestConfiguration;

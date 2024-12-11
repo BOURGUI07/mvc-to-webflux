@@ -1,6 +1,6 @@
-package com.example.catalog_service.CRUD_abstract_tests;
+package com.example.catalog_service.integration_tests.CRUD_abstract_tests;
 
-import com.example.catalog_service.AbstractIntegrationTest;
+import com.example.catalog_service.integration_tests.AbstractIntegrationTest;
 import com.example.catalog_service.dto.ProductCreationRequest;
 import com.example.catalog_service.dto.ProductResponse;
 import org.apache.logging.log4j.util.TriConsumer;

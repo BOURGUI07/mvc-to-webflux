@@ -1,7 +1,7 @@
-package com.example.catalog_service.MESSAGING_abstract_tests;
+package com.example.catalog_service.integration_tests.MESSAGING_abstract_tests;
 
-import com.example.catalog_service.AbstractIntegrationTest;
-import com.example.catalog_service.MESSAGING_tests.TestDataUtil;
+import com.example.catalog_service.integration_tests.AbstractIntegrationTest;
+import com.example.catalog_service.integration_tests.MESSAGING_tests.TestDataUtil;
 import com.example.catalog_service.domain.InventoryStatus;
 import com.example.catalog_service.events.InventoryEvent;
 import com.example.catalog_service.events.OrderEvent;

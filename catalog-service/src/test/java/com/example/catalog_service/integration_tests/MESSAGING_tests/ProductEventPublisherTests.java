@@ -1,6 +1,6 @@
-package com.example.catalog_service.MESSAGING_tests;
+package com.example.catalog_service.integration_tests.MESSAGING_tests;
 
-import com.example.catalog_service.MESSAGING_abstract_tests.AbstractProductEventPublisherTest;
+import com.example.catalog_service.integration_tests.MESSAGING_abstract_tests.AbstractProductEventPublisherTest;
 import com.example.catalog_service.dto.ProductCreationRequest;
 import com.example.catalog_service.dto.ProductUpdateRequest;
 import org.junit.jupiter.api.Test;

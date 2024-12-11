@@ -1,4 +1,4 @@
-package com.example.catalog_service.MESSAGING_tests;
+package com.example.catalog_service.integration_tests.MESSAGING_tests;
 
 import com.example.catalog_service.events.OrderEvent;
 import org.apache.commons.lang3.function.TriFunction;

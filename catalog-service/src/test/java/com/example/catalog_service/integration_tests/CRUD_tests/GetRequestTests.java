@@ -1,8 +1,8 @@
-package com.example.catalog_service.CRUD_tests;
+package com.example.catalog_service.integration_tests.CRUD_tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.example.catalog_service.AbstractIntegrationTest;
+import com.example.catalog_service.integration_tests.AbstractIntegrationTest;
 import com.example.catalog_service.dto.PagedResult;
 import java.math.BigDecimal;
 import java.net.URI;

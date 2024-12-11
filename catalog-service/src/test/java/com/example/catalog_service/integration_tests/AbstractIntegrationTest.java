@@ -1,9 +1,8 @@
-package com.example.catalog_service;
+package com.example.catalog_service.integration_tests;
 
 
 import java.util.Arrays;
 
-import com.example.catalog_service.domain.Product;
 import com.example.catalog_service.repo.ProductInventoryRepo;
 import com.example.catalog_service.repo.ProductRepo;
 import org.junit.jupiter.api.BeforeEach;

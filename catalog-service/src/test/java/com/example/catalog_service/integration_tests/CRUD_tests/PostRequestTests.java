@@ -1,6 +1,6 @@
-package com.example.catalog_service.CRUD_tests;
+package com.example.catalog_service.integration_tests.CRUD_tests;
 
-import com.example.catalog_service.CRUD_abstract_tests.AbstractPostRequestTests;
+import com.example.catalog_service.integration_tests.CRUD_abstract_tests.AbstractPostRequestTests;
 import com.example.catalog_service.dto.ProductCreationRequest;
 import org.junit.jupiter.api.Test;
 
