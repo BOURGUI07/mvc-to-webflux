@@ -3,7 +3,7 @@ package com.example.catalog_service.unit_tests;
 import com.example.catalog_service.domain.Product;
 import com.example.catalog_service.dto.CatalogServiceProperties;
 import com.example.catalog_service.repo.ProductRepo;
-import com.example.catalog_service.service.CacheService;
+import com.example.catalog_service.service.cache.ProductCacheService;
 import com.example.catalog_service.service.ProductService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,12 +19,10 @@ import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTests {
     @Mock
-    private CacheService cacheService;
+    private ProductCacheService cacheService;
 
     @Mock
     private ProductRepo repo;

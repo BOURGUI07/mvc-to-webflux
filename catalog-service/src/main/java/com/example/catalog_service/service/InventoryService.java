@@ -8,6 +8,7 @@ import com.example.catalog_service.exceptions.ApplicationsExceptions;
 import com.example.catalog_service.mapper.Mapper;
 import com.example.catalog_service.repo.ProductInventoryRepo;
 import com.example.catalog_service.repo.ProductRepo;
+import com.example.catalog_service.service.cache.ProductCacheService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ import java.util.function.Predicate;
 public class InventoryService {
     private final ProductRepo repo;
     private final ProductInventoryRepo inventoryRepo;
-    private final CacheService cacheService;
+    private final ProductCacheService cacheService;
 
 
     /**
