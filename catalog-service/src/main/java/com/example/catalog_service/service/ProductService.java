@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.function.*;
 
+import com.example.catalog_service.service.cache.CacheTemplate;
 import com.example.catalog_service.util.Util;
 import com.example.catalog_service.validator.CreationRequestValidator;
 import com.example.catalog_service.validator.PostUpdateProductValidator;
@@ -38,7 +39,7 @@ public class ProductService {
     private final Sinks.Many<ProductEvent> sink = Sinks.many().unicast().onBackpressureBuffer();
     private final Sinks.Many<ProductEvent> viewedProductsSink = Sinks.many().unicast().onBackpressureBuffer();
 
-    private final CacheService cacheService;
+    private final CacheTemplate<String,Product> cacheTemplate;
 
     /**
      * This is gonna be used by the CreatedProductEventPublisher
@@ -60,7 +61,7 @@ public class ProductService {
      * filter by products whose price is less that maxPrice
      */
     public Flux<ProductResponse> getProductStream(BigDecimal maxPrice) {
-        return cacheService.findAll()
+        return cacheTemplate.findAll()
                 .map(Mapper.toDto())
                 .filter(x -> x.price().compareTo(maxPrice) < 0);
     }
@@ -81,7 +82,7 @@ public class ProductService {
      * be published to analytics-service
      */
     public Mono<ProductResponse> findByCode(String code) {
-        return cacheService.findByCode(code)
+        return cacheTemplate.findByKey(code)
                 .map(Mapper.toDto())
                 .doOnNext(dto -> viewedProductsSink.tryEmitNext(ProductEvent.View.builder().code(code).build()))
                 .doOnNext(response -> log.info("Product with code: {} is: {}", code, Util.write(response)));
@@ -131,8 +132,8 @@ public class ProductService {
      */
     @Transactional
     public Mono<Void> deleteByCode(String code){
-        return  cacheService.findByCode(code)
-                .flatMap(product -> repo.delete(product).then(cacheService.doOnChanged(product)).then())
+        return  cacheTemplate.findByKey(code)
+                .flatMap(product -> repo.delete(product).then(cacheTemplate.doOnChanged(product)).then())
                 .doOnSuccess(x->{
                     sink.tryEmitNext(Mapper.toDeletedProductEvent().apply(code));
                     log.info("Product Deleted Successfully");
@@ -146,7 +147,7 @@ public class ProductService {
      */
     @Transactional
     public Mono<ProductResponse> update(String code, Mono<ProductUpdateRequest> request) {
-        return cacheService.findByCode(code)
+        return cacheTemplate.findByKey(code)
                 .zipWhen(product -> request.transform(print()),processUpdate())
                 .flatMap(Function.identity())
                 .doOnNext(response -> {
@@ -178,7 +179,7 @@ public class ProductService {
                 return product;
             })
                     .transform(PostUpdateProductValidator.validate())
-                    .flatMap(p -> repo.save(p).then(cacheService.doOnChanged(p).thenReturn(p)))
+                    .flatMap(p -> repo.save(p).then(cacheTemplate.doOnChanged(p).thenReturn(p)))
                     .map(Mapper.toDto());
 
     }

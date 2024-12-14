@@ -1,15 +1,13 @@
 package com.example.catalog_service.unit_tests;
 
-import com.example.catalog_service.domain.InventoryStatus;
 import com.example.catalog_service.domain.Product;
-import com.example.catalog_service.domain.ProductInventory;
 import com.example.catalog_service.dto.PurchaseDTO;
 import com.example.catalog_service.exceptions.DuplicatedEventException;
 import com.example.catalog_service.exceptions.NotEnoughInventoryException;
 import com.example.catalog_service.exceptions.ProductNotFoundException;
 import com.example.catalog_service.repo.ProductInventoryRepo;
 import com.example.catalog_service.repo.ProductRepo;
-import com.example.catalog_service.service.CacheService;
+import com.example.catalog_service.service.cache.ProductCacheService;
 import com.example.catalog_service.service.InventoryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +30,7 @@ public class InventoryServiceTests {
     private  ProductInventoryRepo inventoryRepo;
 
     @Mock
-    private  CacheService cacheService;
+    private ProductCacheService cacheService;
 
     @InjectMocks
     private InventoryService inventoryService;

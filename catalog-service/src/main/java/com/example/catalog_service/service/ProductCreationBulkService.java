@@ -3,6 +3,8 @@ package com.example.catalog_service.service;
 import com.example.catalog_service.dto.ProductCreationBulkResponse;
 import com.example.catalog_service.dto.ProductCreationRequest;
 import com.example.catalog_service.dto.ProductResponse;
+import com.example.catalog_service.exceptions.InvalidProductRequestException;
+import com.example.catalog_service.exceptions.ProductAlreadyExistsException;
 import com.example.catalog_service.util.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,13 +62,14 @@ public class ProductCreationBulkService {
                     log.info("Received Line: {}",line);
                     var rowValue = incrementAndGet();
                     return service.createProduct(Mono.fromSupplier(() -> createRequest(line)))
-                            .onErrorContinue((ex,__) -> {
-                                handleFailure(ex, rowValue);
-                                log.info("Adding Error Detail Because of: {}", ex.getMessage());
-                            })
                             .doOnSuccess(productResponse -> {
                                 handleSuccess(productResponse);
                                 log.info("Added Product Response: {}", productResponse);
+                            })
+                            .onErrorResume(ex -> {
+                                handleFailure(ex, rowValue);
+                                log.info("Adding Error Detail Because of: {}", ex.getMessage());
+                                return Mono.empty();
                             });
                 });
     }

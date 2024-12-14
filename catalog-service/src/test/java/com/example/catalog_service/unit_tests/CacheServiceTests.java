@@ -3,7 +3,7 @@ package com.example.catalog_service.unit_tests;
 import com.example.catalog_service.domain.Product;
 import com.example.catalog_service.exceptions.ProductNotFoundException;
 import com.example.catalog_service.repo.ProductRepo;
-import com.example.catalog_service.service.CacheService;
+import com.example.catalog_service.service.cache.ProductCacheService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +29,7 @@ public class CacheServiceTests {
     private  ReactiveHashOperations<String, String, Product> operations;
 
     @InjectMocks
-    private CacheService service;
+    private ProductCacheService service;
 
     @Test
     @DisplayName("Test findAll()")

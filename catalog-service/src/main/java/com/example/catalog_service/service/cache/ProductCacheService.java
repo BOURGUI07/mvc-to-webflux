@@ -1,4 +1,4 @@
-package com.example.catalog_service.service;
+package com.example.catalog_service.service.cache;
 
 import com.example.catalog_service.domain.Product;
 import com.example.catalog_service.exceptions.ApplicationsExceptions;
@@ -18,7 +18,7 @@ import static com.example.catalog_service.util.Constants.RedisKeys.PRODUCT_KEY;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CacheService {
+public class ProductCacheService extends AbstractCacheService<String,Product>{
 
     private final ProductRepo repo;
     private final ReactiveHashOperations<String, String, Product> operations;
@@ -44,35 +44,34 @@ public class CacheService {
                 .subscribe();
     }
 
-    /**
-     *  Retrieve from cache first.
-     *  if Absent, retrieve from DB.
-     *  persist the DB-retrieved value into the cache
-     *  return  the value.
-     */
     public Mono<Product> findByCode(String code){
-        return operations.get(PRODUCT_KEY,code)
-                .switchIfEmpty(repo.findByCodeIgnoreCase(code)
-                        .flatMap(product -> operations.put(PRODUCT_KEY,code,product).thenReturn(product))
-                        .switchIfEmpty(ApplicationsExceptions.productNotFound(code))
-                );
+        return findByKey(code).switchIfEmpty(ApplicationsExceptions.productNotFound(code));
     }
 
-    /**
-     * Whenever a product is either updated or removed, remove it from cache
-     */
-    public Mono<Long> doOnChanged(Product product){
-        return operations.remove(PRODUCT_KEY,product.getCode());
+    @Override
+    public Mono<Product> getFromSource(String code) {
+        return repo.findByCodeIgnoreCase(code);
     }
 
+    @Override
+    public Mono<Product> getFromCache(String code) {
+        return operations.get(PRODUCT_KEY,code);
+    }
 
-    /**
-     * Return from cache.
-     */
-    public Flux<Product> findAll(){
+    @Override
+    public Flux<Product> getAllFromCache() {
         return operations.values(PRODUCT_KEY);
     }
 
+    @Override
+    public Mono<Boolean> putInCache(String s, Product product) {
+        return operations.putIfAbsent(PRODUCT_KEY,s,product);
+    }
+
+    @Override
+    public Mono<Long> removeFromCache(Product product) {
+        return operations.remove(PRODUCT_KEY,product.getCode());
+    }
 
 
 
