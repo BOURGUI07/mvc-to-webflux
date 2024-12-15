@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Import(AbstractProductViewPublisherTest.testConfig.class)
 @TestPropertySource(properties = {
-        "spring.cloud.function.definition=productViewProducer;consumer",
+        "spring.cloud.function.definition=producer;consumer",
         "spring.cloud.stream.bindings.consumer-in-0.destination=catalog-events"
 })
 public class AbstractProductViewPublisherTest extends AbstractIntegrationTest {
