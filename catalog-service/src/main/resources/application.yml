@@ -62,7 +62,7 @@ spring:
 ############# SPRING CLOUD STREAM WITH KAFKA CONFIGURATION ###############
   cloud:
     function:
-      definition: processor;producer;productViewProducer
+      definition: processor;producer
     stream:
       default:
         producer:

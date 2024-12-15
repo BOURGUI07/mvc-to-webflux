@@ -7,8 +7,8 @@ public class ProductViewPublisherTests extends AbstractProductViewPublisherTest 
 
     @Test
     void test(){
-        viewProduct("p100");
-        viewProduct("p114");
-        viewProduct("p102");
+        viewProduct("P100");
+        viewProduct("P114");
+        viewProduct("P102");
     }
 }

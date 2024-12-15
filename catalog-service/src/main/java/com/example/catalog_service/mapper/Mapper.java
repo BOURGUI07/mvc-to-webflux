@@ -1,6 +1,7 @@
 package com.example.catalog_service.mapper;
 
 import com.example.catalog_service.domain.Product;
+import com.example.catalog_service.domain.ProductAction;
 import com.example.catalog_service.domain.ProductInventory;
 import com.example.catalog_service.dto.*;
 import com.example.catalog_service.events.InventoryEvent;
@@ -114,28 +115,48 @@ public class Mapper {
                 .build());
     }
 
+    public static BiFunction<ProductAction,ProductResponse,ProductActionDTO> toProductActionDTO(){
+        return (action, dto) -> ProductActionDTO.builder()
+                .action(action)
+                .response(dto)
+                .build();
+    }
 
-    public static Function<ProductResponse, ProductEvent> toCreatedProductEvent(){
+    public static ProductActionDTO productActionDTO(ProductAction action,String code){
+        return ProductActionDTO.builder()
+                .action(action)
+                .response(ProductResponse.builder().code(code).build())
+                .build();
+    }
+
+    public static Function<ProductActionDTO,ProductEvent> toViewedProductEvent(){
+        return dto -> ProductEvent.View.builder()
+                .code(dto.response().code())
+                .build();
+    }
+
+    public static Function<ProductActionDTO, ProductEvent> toCreatedProductEvent(){
         return dto -> ProductEvent.Created.builder()
-                .code(dto.code())
-                .price(dto.price())
-                .productId(dto.id())
+                .code(dto.response().code())
+                .productId(dto.response().id())
+                .price(dto.response().price())
                 .build();
     }
 
-    public static Function<ProductResponse, ProductEvent> toUpdatedProductEvent(){
+    public static Function<ProductActionDTO, ProductEvent> toUpdatedProductEvent(){
         return dto -> ProductEvent.Updated.builder()
-                .price(dto.price())
-                .code(dto.code())
+                .code(dto.response().code())
+                .price(dto.response().price())
+                .build();
+    }
+
+    public static Function<ProductActionDTO, ProductEvent> toDeletedProductEvent(){
+        return dto -> ProductEvent.Deleted.builder()
+                .code(dto.response().code())
                 .build();
     }
 
 
-    public static Function<String, ProductEvent> toDeletedProductEvent(){
-        return code -> ProductEvent.Deleted.builder()
-                .code(code)
-                .build();
-    }
 
 
 

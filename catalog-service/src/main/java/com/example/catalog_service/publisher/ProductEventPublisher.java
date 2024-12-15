@@ -1,6 +1,7 @@
 package com.example.catalog_service.publisher;
 
 import com.example.catalog_service.events.ProductEvent;
+import com.example.catalog_service.listener.ProductEventListener;
 import com.example.catalog_service.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,17 +19,13 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 @Slf4j
 public class ProductEventPublisher {
-    private final ProductService service;
+    private final ProductEventListener listener;
 
 
     public Flux<ProductEvent> publish() {
-        return service.products();
+        return listener.productEvents();
     }
 
-
-    public Flux<ProductEvent> publishViewedProducts() {
-        return service.viewedProducts();
-    }
 
 
 

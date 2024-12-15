@@ -1,9 +1,11 @@
 package com.example.catalog_service.service;
 
 import com.example.catalog_service.domain.Product;
+import com.example.catalog_service.domain.ProductAction;
 import com.example.catalog_service.dto.*;
 import com.example.catalog_service.events.ProductEvent;
 import com.example.catalog_service.exceptions.ApplicationsExceptions;
+import com.example.catalog_service.listener.ProductEventListener;
 import com.example.catalog_service.mapper.Mapper;
 import com.example.catalog_service.repo.ProductRepo;
 import java.math.BigDecimal;
@@ -35,25 +37,9 @@ import reactor.core.publisher.Sinks;
 public class ProductService {
     private final ProductRepo repo;
     private final CatalogServiceProperties properties;
-
-    private final Sinks.Many<ProductEvent> sink = Sinks.many().unicast().onBackpressureBuffer();
-    private final Sinks.Many<ProductEvent> viewedProductsSink = Sinks.many().unicast().onBackpressureBuffer();
-
     private final CacheTemplate<String,Product> cacheTemplate;
+    private final ProductEventListener listener;
 
-    /**
-     * This is gonna be used by the CreatedProductEventPublisher
-     */
-    public Flux<ProductEvent> products(){
-        return sink.asFlux();
-    }
-
-    /**
-     * This is gonna be used by the ViewedProductEventPublisher
-     */
-    public Flux<ProductEvent> viewedProducts(){
-        return viewedProductsSink.asFlux();
-    }
 
 
     /**
@@ -84,7 +70,7 @@ public class ProductService {
     public Mono<ProductResponse> findByCode(String code) {
         return cacheTemplate.findByKey(code)
                 .map(Mapper.toDto())
-                .doOnNext(dto -> viewedProductsSink.tryEmitNext(ProductEvent.View.builder().code(code).build()))
+                .doOnNext(dto -> listener.listen(Mapper.toProductActionDTO().apply(ProductAction.VIEWED,dto)))
                 .doOnNext(response -> log.info("Product with code: {} is: {}", code, Util.write(response)));
     }
 
@@ -104,7 +90,7 @@ public class ProductService {
                 .map(Mapper.toEntity())
                 .flatMap(repo::save)
                 .map(Mapper.toDto())
-                .doOnNext(dto -> sink.tryEmitNext(Mapper.toCreatedProductEvent().apply(dto)))
+                .doOnNext(dto -> listener.listen(Mapper.toProductActionDTO().apply(ProductAction.CREATED,dto)))
                 .doOnNext(response -> log.info("A New Product is Created: {}", Util.write(response)));
 
     }
@@ -135,7 +121,7 @@ public class ProductService {
         return  cacheTemplate.findByKey(code)
                 .flatMap(product -> repo.delete(product).then(cacheTemplate.doOnChanged(product)).then())
                 .doOnSuccess(x->{
-                    sink.tryEmitNext(Mapper.toDeletedProductEvent().apply(code));
+                    listener.handleDeletedProduct(Mapper.productActionDTO(ProductAction.DELETED,code));
                     log.info("Product Deleted Successfully");
                 });
     }
@@ -152,7 +138,7 @@ public class ProductService {
                 .flatMap(Function.identity())
                 .doOnNext(response -> {
                     log.info("Product Updated Successfully: {}", Util.write(response));
-                    sink.tryEmitNext(Mapper.toUpdatedProductEvent().apply(response));
+                    listener.handleUpdatedProduct(Mapper.toProductActionDTO().apply(ProductAction.UPDATED,response));
                 });
     }
 

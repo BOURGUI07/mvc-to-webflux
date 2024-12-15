@@ -27,11 +27,4 @@ public class ProductEventPublisherConfig {
                 .doOnNext(msg -> log.info("Catalog-Service Produced Product Event: {}", Util.write(msg.getPayload())));
     }
 
-
-    @Bean
-    public Supplier<Flux<Message<ProductEvent>>> productViewProducer(){
-        return () -> publisher.publishViewedProducts()
-                .map(MessageConverter.toProductEventMessage())
-                .doOnNext(msg -> log.info("Catalog-Service Produced Product Viewed Event: {}", Util.write(msg.getPayload())));
-    }
 }
