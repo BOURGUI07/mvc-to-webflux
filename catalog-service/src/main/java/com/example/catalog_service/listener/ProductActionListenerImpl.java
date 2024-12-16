@@ -5,11 +5,16 @@ import com.example.catalog_service.events.ProductEvent;
 import com.example.catalog_service.mapper.Mapper;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 
+import java.util.function.Consumer;
+
+/**
+ * Receive the dto, convert it into a product-event
+ * then emit it via a sink. so that the producer() will consume it
+ */
 @Service
-public class ProductEventListenerImpl implements ProductEventListener {
+public class ProductActionListenerImpl implements ProductActionListener {
     private final Sinks.Many<ProductEvent> sink = Sinks.many().unicast().onBackpressureBuffer();
 
     @Override
@@ -19,25 +24,25 @@ public class ProductEventListenerImpl implements ProductEventListener {
 
     @Override
     public void handleDeletedProduct(ProductActionDTO dto) {
-        var deletedEvent = Mapper.toDeletedProductEvent().apply(dto);
-        sink.tryEmitNext(deletedEvent);
+         handleEvent().accept(Mapper.toDeletedProductEvent().apply(dto));
     }
 
     @Override
     public void handleUpdatedProduct(ProductActionDTO dto) {
-        var updatedEvent = Mapper.toUpdatedProductEvent().apply(dto);
-        sink.tryEmitNext(updatedEvent);
+        handleEvent().accept(Mapper.toUpdatedProductEvent().apply(dto));
     }
 
     @Override
     public void handleCreatedProduct(ProductActionDTO dto) {
-        var createdEvent = Mapper.toCreatedProductEvent().apply(dto);
-        sink.tryEmitNext(createdEvent);
+        handleEvent().accept(Mapper.toCreatedProductEvent().apply(dto));
     }
 
     @Override
     public void handleViewedProduct(ProductActionDTO dto) {
-        var viewedEvent = Mapper.toViewedProductEvent().apply(dto);
-        sink.tryEmitNext(viewedEvent);
+        handleEvent().accept(Mapper.toViewedProductEvent().apply(dto));
+    }
+
+    private Consumer<ProductEvent> handleEvent(){
+        return sink::tryEmitNext;
     }
 }
