@@ -3,9 +3,8 @@ package com.example.catalog_service.service;
 import com.example.catalog_service.domain.Product;
 import com.example.catalog_service.domain.ProductAction;
 import com.example.catalog_service.dto.*;
-import com.example.catalog_service.events.ProductEvent;
 import com.example.catalog_service.exceptions.ApplicationsExceptions;
-import com.example.catalog_service.listener.ProductEventListener;
+import com.example.catalog_service.listener.ProductActionListener;
 import com.example.catalog_service.mapper.Mapper;
 import com.example.catalog_service.repo.ProductRepo;
 import java.math.BigDecimal;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.Sinks;
 
 /**
  * The product-service mainly deals with CRUD operations and sending
@@ -38,7 +36,7 @@ public class ProductService {
     private final ProductRepo repo;
     private final CatalogServiceProperties properties;
     private final CacheTemplate<String,Product> cacheTemplate;
-    private final ProductEventListener listener;
+    private final ProductActionListener listener;
 
 
 
@@ -64,8 +62,9 @@ public class ProductService {
 
 
     /**
-     * The moment this endpoint is triggered, a ViewedProductEvent gonna
-     * be published to analytics-service
+     * Get the product from cache,
+     * convert it to DTO,
+     * make it available for productEventListener to subscribe to it.
      */
     public Mono<ProductResponse> findByCode(String code) {
         return cacheTemplate.findByKey(code)
@@ -80,8 +79,7 @@ public class ProductService {
      * Then Check the code uniqueness.
      * If all went well, save the product into the DB
      * Convert the newly saved product entity into DTO
-     * Convert That DTO into a CreatedProductEvent
-     * Then emit the event via the sink.
+     * Asynchronously the Listener will subscribe to it
      */
     @Transactional
     public Mono<ProductResponse> createProduct(Mono<ProductCreationRequest> request) {
@@ -114,7 +112,7 @@ public class ProductService {
     /**
      * Get the code from cache
      * Delete the product from DB. Then from the cache
-     * Send a DeletedProductEvent to Order-Service
+     * Listener subscribes to the deleted product code
      */
     @Transactional
     public Mono<Void> deleteByCode(String code){
@@ -129,7 +127,7 @@ public class ProductService {
 
     /**
      * After Saving the product into the database,
-     * Send UpdatedProductEvent to OrderService.
+     * Listener subscribes to response dto
      */
     @Transactional
     public Mono<ProductResponse> update(String code, Mono<ProductUpdateRequest> request) {

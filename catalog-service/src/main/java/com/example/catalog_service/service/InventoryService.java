@@ -8,6 +8,7 @@ import com.example.catalog_service.exceptions.ApplicationsExceptions;
 import com.example.catalog_service.mapper.Mapper;
 import com.example.catalog_service.repo.ProductInventoryRepo;
 import com.example.catalog_service.repo.ProductRepo;
+import com.example.catalog_service.service.cache.CacheTemplate;
 import com.example.catalog_service.service.cache.ProductCacheService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ import java.util.function.Predicate;
 public class InventoryService {
     private final ProductRepo repo;
     private final ProductInventoryRepo inventoryRepo;
-    private final ProductCacheService cacheService;
+    private final CacheTemplate<String,Product> cacheTemplate;
 
 
     /**
@@ -64,7 +65,7 @@ public class InventoryService {
      * convert it into DTO
      */
     private BiFunction<Product, ProductInventory,Mono<PurchaseDTO>> executeProcess(){
-        return (product,inventory) -> repo.save(product).then(cacheService.doOnChanged(product))
+        return (product,inventory) -> repo.save(product).then(cacheTemplate.doOnChanged(product))
                 .then(inventoryRepo.save(inventory))
                 .map(inv -> Mapper.toPurchaseDTO().apply(inv,product))
                 .doFirst(() -> {
@@ -93,7 +94,7 @@ public class InventoryService {
      * Convert it into DTO
      */
     private BiFunction<ProductInventory,Product,Mono<PurchaseDTO>> executeRestore(){
-        return (inventory,product) -> repo.save(product).then(cacheService.doOnChanged(product))
+        return (inventory,product) -> repo.save(product).then(cacheTemplate.doOnChanged(product))
                 .then(inventoryRepo.save(inventory))
                 .map(inv -> Mapper.toPurchaseDTO().apply(inv,product))
                 .doFirst(() -> {

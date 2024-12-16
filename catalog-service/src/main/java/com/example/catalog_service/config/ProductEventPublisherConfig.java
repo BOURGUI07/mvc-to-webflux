@@ -13,6 +13,12 @@ import reactor.core.publisher.Flux;
 
 import java.util.function.Supplier;
 
+
+/**
+ * Produce product-events.
+ * Viewed product events will be consumed by the analytic-microservice
+ * While deleted, created, and updated product events will be consumed by the order-microservice
+ */
 @Configuration
 @RequiredArgsConstructor
 @Slf4j

@@ -44,13 +44,10 @@ public class ProductCacheService extends AbstractCacheService<String,Product>{
                 .subscribe();
     }
 
-    public Mono<Product> findByCode(String code){
-        return findByKey(code).switchIfEmpty(ApplicationsExceptions.productNotFound(code));
-    }
-
     @Override
     public Mono<Product> getFromSource(String code) {
-        return repo.findByCodeIgnoreCase(code);
+        return repo.findByCodeIgnoreCase(code)
+                .switchIfEmpty(ApplicationsExceptions.productNotFound(code));
     }
 
     @Override
